@@ -56,23 +56,6 @@ module.exports.createMDR = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
-module.exports.createComment = async (req, res) => {
-  try {
-    console.log(req.body.highlight.position.rects);
-
-    const comments = await CommentsModel.create(req?.body);
-    console.log('hi',comments);
-    // await SystemLogModel.create({
-    //   title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
-    //   companyId: req?.body?.companyId,
-    // });
-    return res.status(200).send({ message: "Comment saved into DB" });
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send({ message: err.message });
-  }
-};
-
 module.exports.createDocument = async (req, res) => {
   try {
     // if (req?.body?.roleId != 1) {
@@ -134,6 +117,35 @@ module.exports.createPermission = async (req, res) => {
     if (req?.body?.createDocument) req.body.reviewDocument = 1;
     await DocumentPermssionModel.create(req?.body);
     return res.status(200).send({ message: "Document Permission Created" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+module.exports.createComment = async (req, res) => {
+  try {
+    console.log(req.body);
+
+    const comments = await CommentsModel.create(req?.body);
+    console.log('hi',comments);
+    // await SystemLogModel.create({
+    //   title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
+    //   companyId: req?.body?.companyId,
+    // });
+    return res.status(200).send({ message: "Comment saved into DB" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+module.exports.listComments = async (req, res) => {
+  try {
+    const comments = await CommentsModel.findAll({
+      where: { docName: req?.query?.docName },
+    });
+    const commentsObject = comments.map(comment => comment.comments);
+
+    return res.status(200).send(commentsObject);
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
