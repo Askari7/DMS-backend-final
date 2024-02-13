@@ -42,6 +42,7 @@ module.exports = {
       },
       noOfUsers: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
     });
   },

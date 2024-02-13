@@ -24,6 +24,7 @@ lumie.load(app, {
   ignore: ["*.spec", "*.action"],
   controllers_path: path.join(__dirname, "controllers"),
 });
+app.use('/documents', express.static(path.join(__dirname, 'documents')));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
