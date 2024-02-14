@@ -92,26 +92,50 @@ module.exports.createDocument = async (req, res) => {
       title: log,
       companyId: req?.body?.companyId,
     });
-    const filePath = path.join(
-      __dirname,
-      "..",
-      "..",
-      "uploads",
-      `${req?.body?.title}${req?.body?.extension}`
-    );
-    if (req?.body?.extension == ".pdf") {
-      await createPDF(req?.body?.content, filePath);
-    }
-    if (req?.body?.extension == ".docx") {
-      await createWordFile(req?.body?.content, filePath);
-    }
+    // if(req.body.status==)
+    // const filePath = path.join(
+    //   __dirname,
+    //   "..",
+    //   "..",
+    //   "uploads",
+    //   `${req?.body?.title}${req?.body?.extension}`
+    // );
+    // if (req?.body?.extension == ".pdf") {
+    //   await createPDF(req?.body?.content, filePath);
+    // }
+    // if (req?.body?.extension == ".docx") {
+    //   await createWordFile(req?.body?.content, filePath);
+    // }
     return res.status(200).send({ message: "Document Created" });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
+module.exports.uploadDoc = async (req, res) => {
+  try {
+    const title = req.body.title;
+    console.log(title);
+    const log = `${req?.body?.userName} Uploaded Document ${req?.body?.title}`;
+    // const body = omit(req.body, ["roleId", "userId", "userName"]);
+const status='Uploaded';
+    // Update document if it exists, otherwise create a new one
+    const updatedDocument = await DocumentModel.update({status}, {
+      where: { title: title }
+    });
 
+console.log('helooo',updatedDocument);
+    await SystemLogModel.create({
+      title: log,
+      companyId: req?.body?.companyId,
+    });
+
+    return res.status(200).send({ message: "Document uploaded" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
 module.exports.createPermission = async (req, res) => {
   try {
     if (req?.body?.createDocument) req.body.reviewDocument = 1;
@@ -133,6 +157,33 @@ module.exports.createComment = async (req, res) => {
     //   companyId: req?.body?.companyId,
     // });
     return res.status(200).send({ message: "Comment saved into DB" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+module.exports.uploadComment = async (req, res) => {
+  try {
+    console.log(req.body);
+
+    const comments = req.body.comments;
+    const docName = req.body.docName;
+
+    // const log = `${req?.body?.userName} replied to comment ${req?.body?.title}`;
+    // const body = omit(req.body, ["roleId", "userId", "userName"]);
+// const status='Uploaded';
+    // Update document if it exists, otherwise create a new one
+    const updatedDocument = await CommentsModel.update({comments}, {
+      where: { docName: docName }
+    });
+
+// console.log('helooo',updatedDocument);
+//     await SystemLogModel.create({
+//       title: log,
+//       companyId: req?.body?.companyId,
+//     });
+
+    return res.status(200).send({ message: "Comment reply sent" });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

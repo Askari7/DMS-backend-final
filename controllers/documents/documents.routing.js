@@ -7,7 +7,7 @@ const {
   listPermission,
   updateDocumentFormat,
   exportMDRCsv,
-  getCodes,createComment, listComments
+  getCodes,createComment, listComments, uploadDoc, uploadComment
 } = require("./documents.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 
@@ -41,6 +41,17 @@ module.exports = {
       level: "public",
     },
   },
+  "/upload": {
+    // get: {
+    //   action: [validateToken, listDocuments],
+    //   level: "public",
+    // },
+    post: {
+      middlewares: [uploadFile.single("file")],
+      action: [validateToken, uploadDoc],
+      level: "public",
+    },
+  },
   "/mdr": {
     get: {
       action: [validateToken, listMDR],
@@ -63,7 +74,10 @@ module.exports = {
       action: [ createComment],
       level: "public",
     },
-    
+    put: {
+      action: [ uploadComment],
+      level: "public",
+    },
   },
   "/permissions": {
     get: {
