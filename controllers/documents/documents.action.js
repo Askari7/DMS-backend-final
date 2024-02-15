@@ -1,6 +1,7 @@
 const db = require("../../models/index");
 const DocumentModel = db.documents;
 const CommentsModel = db.comments;
+const EstablishmentModel = db.establishments;
 
 const DepartmentModel = db.departments;
 const ProjectModel = db.projects;
@@ -16,18 +17,44 @@ const { omit } = require("lodash");
 
 const fs = require("fs");
 const Papa = require("papaparse");
+const { Sequelize } = require('sequelize');
 
 module.exports.listDocuments = async (req, res) => {
   try {
+    const companyId = req?.query?.companyId;
+    const departmentId = req?.query?.department;
+    const assignedTo = req?.query?.roleId;
+    console.log('hello');
+    console.log('hi',typeof(assignedTo));
+if(assignedTo=='1'){
+  const documents = await DocumentModel.findAll({
+    where: {
+      companyId: companyId,
+    }
+  });
+  return res.status(200).send(documents);
+
+}
     const documents = await DocumentModel.findAll({
-      where: { companyId: req?.query?.companyId },
+      where: {
+        companyId: companyId,
+        departmentId: {
+          [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
+        },
+        
+        assignedTo: 
+         assignedTo// Using Sequelize operator for LIKE clause
+        
+      }
     });
+
     return res.status(200).send(documents);
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
+
 module.exports.listMDR = async (req, res) => {
   try {
     const mdr = await MDRModel.findAll({
@@ -80,14 +107,38 @@ module.exports.createDocument = async (req, res) => {
         masterDocumentId: req.body.masterDocumentId
       }
     });
-    console.log(count);
+    const appName=JSON.parse(req.body.approver);
+    console.log('my approver names',appName);
+  console.log(count);
 
     let docNumber = `${count+1}`
-
+    
     // req.body.title = `${projectCode}-${areaCode}-${deptSuffix}-${docNumber}`
     const log = `${req?.body?.userName} Created Document ${req?.body?.title}`;
+    console.log("mybody ",req.body);
     const body = omit(req.body, ["roleId", "userId", "userName"]);
     const document = await DocumentModel.create(body);
+    console.log('created',document);
+    for(let i of appName){
+      console.log(appName);
+      console.log(i,i.name,i['name']);
+      const userName= i.name
+      const designation=true;
+      const status=false;
+
+      req.body.docName=req.body.title;
+      req.body.docDepartmentId=req.body.departmentId;
+      req.body.docDepartmentName=req.body.departmentName;
+      req.body.masterDocumentCode=req.body.masterDocumentId;
+      req.body.masterDocumentName=req.body.masterDocumentId;
+      req.body.userName=userName; 
+      req.body.designation=designation; 
+      req.body.status=status;
+      const establishments = await EstablishmentModel.create(req.body);
+console.log(establishments);
+
+     }
+        
     await SystemLogModel.create({
       title: log,
       companyId: req?.body?.companyId,
@@ -107,6 +158,27 @@ module.exports.createDocument = async (req, res) => {
     //   await createWordFile(req?.body?.content, filePath);
     // }
     return res.status(200).send({ message: "Document Created" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+module.exports.assignDoc = async (req, res) => {
+  try {
+    const title= req?.query?.docName ;
+    const assignedTo=req?.query?.assignedTo ;
+    const assignedBy=req?.query?.assignedBy ;
+    console.log(req.body);
+
+    updatedDocs = await DocumentModel.update(
+      { assignedTo: assignedTo, assignedBy: assignedBy },
+      { where: { title: title } }
+    );
+    // await SystemLogModel.update({
+    //   title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
+    //   companyId: req?.body?.companyId,
+    // });
+    return res.status(200).send({ message: "Document Assigned" });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

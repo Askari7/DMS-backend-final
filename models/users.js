@@ -34,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
       department: {
         type: DataTypes.STRING,
       },
+      departmentId: {
+        type: DataTypes.STRING,
+      },
       email: {
         type: DataTypes.STRING,
         unique: true,

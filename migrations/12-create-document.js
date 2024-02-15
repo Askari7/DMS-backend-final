@@ -38,7 +38,15 @@ module.exports = {
       },
       status: {
         type: Sequelize.STRING,
-        //   values:['pending,']
+      },
+      version: {
+        type: Sequelize.STRING,
+      },
+      assignedTo: {
+        type: Sequelize.STRING,
+      },
+      assignedBy: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
