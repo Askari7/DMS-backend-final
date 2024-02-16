@@ -56,7 +56,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       assignedTo: {
         type: DataTypes.STRING,
-        defaultValue:'2'
+        //   values:['pending,']
+      },
+      assignedFrom: {
+        type: DataTypes.STRING,
         //   values:['pending,']
       },
       assignedBy: {

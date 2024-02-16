@@ -48,6 +48,9 @@ module.exports = {
       assignedBy: {
         type: Sequelize.STRING,
       },
+      assignedFrom: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -18,14 +18,16 @@ const { omit } = require("lodash");
 const fs = require("fs");
 const Papa = require("papaparse");
 const { Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 
 module.exports.listDocuments = async (req, res) => {
   try {
-    const companyId = req?.query?.companyId;
+    const companyId = parseInt(req?.query?.companyId);
     const departmentId = req?.query?.department;
-    const assignedTo = req?.query?.roleId;
+    const assignedTo = req?.query?.userId;
+    const assignedBy = req?.query?.assignedBy;
     console.log('hello');
-    console.log('hi',typeof(assignedTo));
+    console.log('hi',typeof(companyId));
 if(assignedTo=='1'){
   const documents = await DocumentModel.findAll({
     where: {
@@ -35,6 +37,7 @@ if(assignedTo=='1'){
   return res.status(200).send(documents);
 
 }
+else{
     const documents = await DocumentModel.findAll({
       where: {
         companyId: companyId,
@@ -42,15 +45,25 @@ if(assignedTo=='1'){
           [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
         },
         
-        assignedTo: 
-         assignedTo// Using Sequelize operator for LIKE clause
+        [Op.or]: [
+          {
+            assignedBy: {
+              [Op.gte]: assignedBy // Matches or greater than assignedBy from query param
+            }},
+           { assignedFrom: assignedTo // Matches assignedTo from query param
+          },
+          {
+            assignedTo: assignedTo // Matches assignedTo from query param
+          }
+        ]
         
       }
     });
 
     return res.status(200).send(documents);
+  }
   } catch (err) {
-    console.log(err.message);
+    console.log('error',err.message);
     res.status(500).send({ message: err.message });
   }
 };
@@ -168,10 +181,12 @@ module.exports.assignDoc = async (req, res) => {
     const title= req?.query?.docName ;
     const assignedTo=req?.query?.assignedTo ;
     const assignedBy=req?.query?.assignedBy ;
+    const assignedFrom=req?.query?.assignedFrom ;
+
     console.log(req.body);
 
     updatedDocs = await DocumentModel.update(
-      { assignedTo: assignedTo, assignedBy: assignedBy },
+      { assignedTo: assignedTo, assignedBy: assignedBy,assignedFrom: assignedFrom },
       { where: { title: title } }
     );
     // await SystemLogModel.update({
