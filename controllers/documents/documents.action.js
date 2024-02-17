@@ -199,6 +199,28 @@ module.exports.assignDoc = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+module.exports.updateMDR = async (req, res) => {
+  try {
+    
+    console.log("body",req.body);
+    const projectId= req?.query?.projectId ;
+    const projectCode= req?.query?.projectCode ;
+console.log("codes",projectId,projectCode);
+    const update = await MDRModel.update(req.body, {
+      where: { projectId, projectCode },
+    });
+
+    console.log(projectCode,projectId);
+
+    return res.status(200).send({ message: "MDR Updated" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
+
 module.exports.uploadDoc = async (req, res) => {
   try {
     const title = req.body.title;
