@@ -1,10 +1,10 @@
 "use strict";
 const { Model } = require("sequelize");
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   class Establishments extends Model {
     /**
      * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
+     * This method is not a part of DataTypes lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
@@ -17,34 +17,54 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
       },
       docName: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
       },
       userName: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
       },
+      reviewer: {
+        type: DataTypes.STRING,
+      },
+      approver: {
+        type: DataTypes.STRING,
+      },
+      approverId: {
+        type: DataTypes.STRING,
+      },
+      reviewerId: {
+        type: DataTypes.STRING,
+      },
+
+      approverStatus: {
+        type: DataTypes.STRING,
+      },
+      reviewerStatus: {
+        type: DataTypes.STRING,
+      },
+
       status: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
       },
       designation: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
       },
       companyId: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
       },
       docDepartmentId: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
       },
       docDepartmentName: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
       },
       masterDocumentCode: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
       },
       masterDocumentName: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
       },
      
      

@@ -19,6 +19,7 @@ const fs = require("fs");
 const Papa = require("papaparse");
 const { Sequelize } = require('sequelize');
 const { Op } = require('sequelize');
+const { reverse } = require("dns/promises");
 
 module.exports.listDocuments = async (req, res) => {
   try {
@@ -120,7 +121,9 @@ module.exports.createDocument = async (req, res) => {
         masterDocumentId: req.body.masterDocumentId
       }
     });
+    console.log("approvers",req.body.approver);
     const appName=JSON.parse(req.body.approver);
+
     const revName=JSON.parse(req.body.reviewer);
 
     console.log('my approver names',appName);
@@ -134,44 +137,44 @@ module.exports.createDocument = async (req, res) => {
     const body = omit(req.body, ["roleId", "userId", "userName"]);
     const document = await DocumentModel.create(body);
     console.log('created',document);
-    for(let i of appName){
-      console.log(appName);
-      console.log(i,i.name,i['name']);
-      const userName= i.name
-      const designation=true;
-      // const status=false;
 
       req.body.docName=req.body.title;
       req.body.docDepartmentId=req.body.departmentId;
       req.body.docDepartmentName=req.body.departmentName;
       req.body.masterDocumentCode=req.body.masterDocumentId;
       req.body.masterDocumentName=req.body.masterDocumentId;
-      req.body.userName=userName; 
-      req.body.designation=designation; 
-      req.body.status=status;
+      req.body.approverId = appName.map(approver => approver.id).join(', ');
+      req.body.reviewerId = revName.map(reviewer => reviewer.id).join(', ');
+      req.body.approver = appName.map(approver => approver.name).join(', ');
+      req.body.reviewer = revName.map(reviewer => reviewer.name).join(', ');
+
+      req.body.approverStatus = Array.from({ length: appName.length }).map(() => 0).join(', ');
+      req.body.reviewerStatus = Array.from({ length: revName.length }).map(() => 0).join(', ');;
+
+       req.body.status=null;
       const establishments = await EstablishmentModel.create(req.body);
-console.log(establishments);
+      console.log(establishments);
 
-     }
-     for(let i of revName){
-      console.log(revName);
-      console.log(i,i.name,i['name']);
-      const userName= i.name
-      const designation=false;
-      // const status=false;
+     
+//      for(let i of revName){
+//       console.log(revName);
+//       console.log(i,i.name,i['name']);
+//       const userName= i.name
+//       const designation=false;
+//        const status=false;
 
-      req.body.docName=req.body.title;
-      req.body.docDepartmentId=req.body.departmentId;
-      req.body.docDepartmentName=req.body.departmentName;
-      req.body.masterDocumentCode=req.body.masterDocumentId;
-      req.body.masterDocumentName=req.body.masterDocumentId;
-      req.body.userName=userName; 
-      req.body.designation=designation; 
-      req.body.status=status;
-      const establishments = await EstablishmentModel.create(req.body);
-console.log(establishments);
+//       req.body.docName=req.body.title;
+//       req.body.docDepartmentId=req.body.departmentId;
+//       req.body.docDepartmentName=req.body.departmentName;
+//       req.body.masterDocumentCode=req.body.masterDocumentId;
+//       req.body.masterDocumentName=req.body.masterDocumentId;
+//       req.body.userName=userName; 
+//       req.body.designation=designation; 
+//        req.body.status=status;
+//       const establishments = await EstablishmentModel.create(req.body);
+// console.log(establishments);
 
-     }
+    //  }
     await SystemLogModel.create({
       title: log,
       companyId: req?.body?.companyId,
@@ -262,6 +265,40 @@ console.log('helooo',updatedDocument);
     return res.status(200).send({ message: "Document uploaded" });
   } catch (err) {
     console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+module.exports.listEstablishment = async (req, res) => {
+  if(req.body.userId==1){
+    const establishment = await EstablishmentModel.findAll({
+      where: { companyId: req?.query?.companyId, 
+       
+      },
+     
+    });
+    return res.status(200).send(establishment);
+  }
+  try {
+    const establishment = await EstablishmentModel.findAll({
+      where: { companyId: req?.query?.companyId, 
+        [Sequelize.Op.or]: [
+          {
+            approverId: {
+              [Sequelize.Op.like]: `%${req?.query?.userId}%`
+            }
+          },
+          {
+            reviewerId: {
+              [Sequelize.Op.like]: `%${req?.query?.userId}%`
+            }
+          }
+        ]
+      },
+     
+    });
+    return res.status(200).send(establishment);
+  } catch (err) {
+    console.log('error',err.message);
     res.status(500).send({ message: err.message });
   }
 };

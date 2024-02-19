@@ -15,6 +15,24 @@ module.exports = {
           userName: {
             type: Sequelize.STRING,
           },
+          approver: {
+            type: Sequelize.STRING,
+          },
+          reviewer: {
+            type: Sequelize.STRING,
+          },
+          approverId: {
+            type: Sequelize.STRING,
+          },
+          reviewerId: {
+            type: Sequelize.STRING,
+          },
+          approverStatus: {
+            type: Sequelize.STRING,
+          },
+          reviewerStatus: {
+            type: Sequelize.STRING,
+          },
           status: {
             type: Sequelize.BOOLEAN,
           },
