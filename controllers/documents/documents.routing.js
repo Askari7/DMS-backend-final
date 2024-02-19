@@ -2,6 +2,7 @@ const {
   createMDR,
   createDocument,
   listDocuments,
+  listEstablishment,
   listMDR,
   createPermission,
   listPermission,
@@ -74,7 +75,7 @@ module.exports = {
   },
   "/establishment": {
     get: {
-      action: [validateToken, listEstabli],
+      action: [validateToken, listEstablishment],
       level: "public",
     },
 
