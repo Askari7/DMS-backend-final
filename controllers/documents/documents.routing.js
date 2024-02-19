@@ -2,6 +2,7 @@ const {
   createMDR,
   createDocument,
   listDocuments,
+  listEstablishment,
   listMDR,
   createPermission,
   listPermission,
@@ -78,12 +79,12 @@ module.exports = {
       level: "public",
     },
 
-    post: {
-      action: [validateToken, createMDR],
-      level: "public",
-    },
+  //   post: {
+  //     action: [validateToken, createMDR],
+  //     level: "public",
+  //   },
     
-  },
+  // },
   "/comments": {
     get: {
       action: [ listComments],
@@ -127,4 +128,4 @@ module.exports = {
       level:"public",
     }
   },
-};
+}};
