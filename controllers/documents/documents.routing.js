@@ -73,18 +73,18 @@ module.exports = {
     },
     
   },
-  "/establishment": {
-    get: {
-      action: [validateToken, listEstablishment],
-      level: "public",
-    },
+  // "/establishment": {
+  //   get: {
+  //     action: [validateToken, listEstablishment],
+  //     level: "public",
+  //   },
 
-    post: {
-      action: [validateToken, createMDR],
-      level: "public",
-    },
+  //   post: {
+  //     action: [validateToken, createMDR],
+  //     level: "public",
+  //   },
     
-  },
+  // },
   "/comments": {
     get: {
       action: [ listComments],
