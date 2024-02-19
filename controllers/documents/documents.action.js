@@ -121,6 +121,8 @@ module.exports.createDocument = async (req, res) => {
       }
     });
     const appName=JSON.parse(req.body.approver);
+    const revName=JSON.parse(req.body.reviewer);
+
     console.log('my approver names',appName);
   console.log(count);
 
@@ -137,7 +139,7 @@ module.exports.createDocument = async (req, res) => {
       console.log(i,i.name,i['name']);
       const userName= i.name
       const designation=true;
-      const status=false;
+      // const status=false;
 
       req.body.docName=req.body.title;
       req.body.docDepartmentId=req.body.departmentId;
@@ -151,7 +153,25 @@ module.exports.createDocument = async (req, res) => {
 console.log(establishments);
 
      }
-        
+     for(let i of revName){
+      console.log(revName);
+      console.log(i,i.name,i['name']);
+      const userName= i.name
+      const designation=false;
+      // const status=false;
+
+      req.body.docName=req.body.title;
+      req.body.docDepartmentId=req.body.departmentId;
+      req.body.docDepartmentName=req.body.departmentName;
+      req.body.masterDocumentCode=req.body.masterDocumentId;
+      req.body.masterDocumentName=req.body.masterDocumentId;
+      req.body.userName=userName; 
+      req.body.designation=designation; 
+      req.body.status=status;
+      const establishments = await EstablishmentModel.create(req.body);
+console.log(establishments);
+
+     }
     await SystemLogModel.create({
       title: log,
       companyId: req?.body?.companyId,
