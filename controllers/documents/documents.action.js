@@ -206,7 +206,7 @@ module.exports.updateMDR = async (req, res) => {
     console.log("body",req.body);
     const projectId= req?.query?.projectId ;
     const projectCode= req?.query?.projectCode ;
-console.log("codes",projectId,projectCode);
+    console.log("codes",projectId,projectCode);
     const update = await MDRModel.update(req.body, {
       where: { projectId, projectCode },
     });
