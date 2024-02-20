@@ -251,9 +251,12 @@ module.exports.uploadDoc = async (req, res) => {
     const log = `${req?.body?.userName} Uploaded Document ${req?.body?.title}`;
     // const body = omit(req.body, ["roleId", "userId", "userName"]);
 const status='Uploaded';
+
     // Update document if it exists, otherwise create a new one
     const updatedDocument = await DocumentModel.update({status}, {
-      where: { title: title }
+      where: { title:  {
+        [Sequelize.Op.like]: `%${title}%`
+      }}
     });
 
 console.log('helooo',updatedDocument);
@@ -278,6 +281,30 @@ module.exports.listEstablishment = async (req, res) => {
     });
     return res.status(200).send(establishment);
   }
+  if(req.query.docName){
+    try {
+      const establishment = await EstablishmentModel.findAll({
+        where: { companyId: req?.query?.companyId, docName:req.query.docName,
+          [Sequelize.Op.or]: [
+            {
+              approverId: {
+                [Sequelize.Op.like]: `%${req?.query?.userId}%`
+              }
+            },
+            {
+              reviewerId: {
+                [Sequelize.Op.like]: `%${req?.query?.userId}%`
+              }
+            }
+          ]
+        },
+      });
+      return res.status(200).send(establishment);
+    } catch (err) {
+      console.log('error',err.message);
+      res.status(500).send({ message: err.message });
+    } 
+  }
   try {
     const establishment = await EstablishmentModel.findAll({
       where: { companyId: req?.query?.companyId, 
@@ -294,7 +321,6 @@ module.exports.listEstablishment = async (req, res) => {
           }
         ]
       },
-     
     });
     return res.status(200).send(establishment);
   } catch (err) {

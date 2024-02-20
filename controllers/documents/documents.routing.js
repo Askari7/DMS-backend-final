@@ -2,7 +2,6 @@ const {
   createMDR,
   createDocument,
   listDocuments,
-  listEstablishment,
   listMDR,
   createPermission,
   listPermission,
@@ -84,7 +83,7 @@ module.exports = {
   //     level: "public",
   //   },
     
-  // },
+  },
   "/comments": {
     get: {
       action: [ listComments],
@@ -127,5 +126,5 @@ module.exports = {
       action:[getCodes],
       level:"public",
     }
-  },
-}};
+  }
+}
