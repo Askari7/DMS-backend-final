@@ -20,6 +20,7 @@ const Papa = require("papaparse");
 const { Sequelize } = require('sequelize');
 const { Op } = require('sequelize');
 const { reverse } = require("dns/promises");
+const { version } = require("os");
 
 module.exports.listDocuments = async (req, res) => {
   try {
@@ -337,10 +338,11 @@ reviewerStatus=req.body.revStatusArr;
 appArray=approverStatus.split(',');
 revArray=reviewerStatus.split(',');
 let status='Uploaded';
-
+let version='';
 if(revArray.every(num => num == 1)&&appArray.every(num => num == 0))
 {
 status='Reviewers Rejected'
+version='000.1';
 }
 else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
 {
@@ -349,12 +351,14 @@ status='Pending for Approval';
 else if(appArray.every(num => num == 1) &&revArray.every(num => num == 2))
 {
 status='Approvers Rejected'
+version='001';
+
 }
 else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
 {
 status='Approved(in-house)';
 }
-const updateDocStatus = await DocumentModel.update({status}, {
+const updateDocStatus = await DocumentModel.update({status,version}, {
   where: { title:  {
     [Sequelize.Op.like]: `%${docName}%`
   }}
