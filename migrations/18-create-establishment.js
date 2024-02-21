@@ -12,6 +12,9 @@ module.exports = {
           docName: {
             type: Sequelize.STRING,
           },
+          version: {
+            type: Sequelize.STRING,
+          },
           userName: {
             type: Sequelize.STRING,
           },

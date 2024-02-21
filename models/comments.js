@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
       docName: {
         type: DataTypes.STRING,
       },
+      version: {
+        type: DataTypes.STRING,
+      },
       comments: {
         type: DataTypes.JSON,
       },
