@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      delete:{
+        type:DataTypes.BOOLEAN,
+        allowNull:true
+      }
     },
     {
       sequelize,
