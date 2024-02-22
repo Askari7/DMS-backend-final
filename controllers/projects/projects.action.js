@@ -18,7 +18,6 @@ module.exports.createProject = async (req, res) => {
       console.log(req.body.title);
       console.log('check change',req.body);
       req.body.noOfUsers = 0
-      req.body.delete = false
       await ProjectModel.create(req?.body);
       await SystemLogModel.create({
         companyId: req?.body?.companyId,

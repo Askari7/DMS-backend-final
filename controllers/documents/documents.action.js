@@ -27,8 +27,6 @@ module.exports.listDocuments = async (req, res) => {
     const departmentId = req?.query?.department;
     const assignedTo = req?.query?.userId;
     const assignedBy = req?.query?.assignedBy;
-    console.log('hello');
-    console.log('hi',typeof(companyId));
 if(assignedTo=='1'){
   const documents = await DocumentModel.findAll({
     where: {
