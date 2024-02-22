@@ -76,6 +76,23 @@ module.exports.listDepartments = async (req, res) => {
   }
 };
 
+module.exports.listCounts = async (req, res) => {
+  try {
+    const department = await DepartmentModel.findOne({
+      where: { id: req?.query?.departmentId }
+    });
+
+    if (!department) {
+      return res.status(404).send({ message: 'Department not found' });
+    }
+
+    return res.status(200).send({ noOfUsers: department.noOfUsers });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
 
 module.exports.updateUser = async (req, res) => {
   try {

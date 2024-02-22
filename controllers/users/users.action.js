@@ -52,9 +52,21 @@ module.exports.updateUser = async (req, res) => {
   try {
     const { body } = req;
 
-    const [rowsAffected] = await UserModel.update(body, {
+    let updatedFields = {};
+    if (body.newPassword) {
+      body.newPassword = bcrypt.hashSync(body.newPassword, 8);
+      updatedFields.password = body.newPassword;
+    } else {
+      // If newPassword doesn't exist, update other fields
+      updatedFields = { ...body };
+      // Remove id field to prevent updating it accidentally
+      delete updatedFields.id;
+    }
+
+    const [rowsAffected] = await UserModel.update(updatedFields, {
       where: { id: req?.params?.id },
     });
+
     const token = jwt.sign({ id: req?.params?.id }, config.secret, {
       expiresIn: 1.577e8, // 24 hours
     });
@@ -63,8 +75,16 @@ module.exports.updateUser = async (req, res) => {
       where: { id: req?.params?.id },
     });
 
+    // Create a system log
+    let logTitle = '';
+    if (body.newPassword) {
+      logTitle = `${user?.firstName} ${user?.lastName}'s password has been updated`;
+    } else {
+      logTitle = `${user?.firstName} ${user?.lastName}'s record has been updated`;
+    }
+    // Uncomment to create a system log
     // await SystemLogModel.create({
-    //   title: `${user?.firstName} ${user?.lastName} Record Has Been Updated`,
+    //   title: logTitle,
     //   companyId: user?.companyId,
     // });
 
