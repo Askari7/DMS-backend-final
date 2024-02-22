@@ -30,6 +30,14 @@ module.exports.listDocuments = async (req, res) => {
     const assignedBy = req?.query?.assignedBy;
     console.log('hello');
     console.log('hi',typeof(companyId));
+    if(req.query.masterDocumentId){
+      const documents = await DocumentModel.findAll({
+        where: {
+          companyId: companyId,masterDocumentId:req.query.masterDocumentId,projectId:req.query.projectId
+        }
+      });
+      return res.status(200).send(documents);
+    }
 if(assignedTo=='1'){
   const documents = await DocumentModel.findAll({
     where: {
