@@ -126,5 +126,10 @@ module.exports = {
       action:[getCodes],
       level:"public",
     }
+<<<<<<< HEAD
   },
 };
+=======
+  }
+}
+>>>>>>> 23824f6d6ca0648e561b86cd671c0177485839e6
