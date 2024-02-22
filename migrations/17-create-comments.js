@@ -12,6 +12,9 @@ module.exports = {
       docName: {
         type: Sequelize.STRING,
       },
+      version: {
+        type: Sequelize.STRING,
+      },
       comments: {
         type: Sequelize.JSON,
       },

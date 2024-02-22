@@ -245,13 +245,16 @@ module.exports.updateMDR = async (req, res) => {
 module.exports.uploadDoc = async (req, res) => {
   try {
     const title = req.body.title;
-    console.log(title);
+    console.log(req.body,'chal');
     const log = `${req?.body?.userName} Uploaded Document ${req?.body?.title}`;
     // const body = omit(req.body, ["roleId", "userId", "userName"]);
 const status='Uploaded';
+
     // Update document if it exists, otherwise create a new one
     const updatedDocument = await DocumentModel.update({status}, {
-      where: { title: title }
+      where: { title:  {
+        [Sequelize.Op.like]: `%${title}%`
+      }}
     });
 
 console.log('helooo',updatedDocument);
@@ -276,6 +279,30 @@ module.exports.listEstablishment = async (req, res) => {
     });
     return res.status(200).send(establishment);
   }
+  if(req.query.docName){
+    try {
+      const establishment = await EstablishmentModel.findAll({
+        where: { companyId: req?.query?.companyId, docName:req.query.docName,
+          [Sequelize.Op.or]: [
+            {
+              approverId: {
+                [Sequelize.Op.like]: `%${req?.query?.userId}%`
+              }
+            },
+            {
+              reviewerId: {
+                [Sequelize.Op.like]: `%${req?.query?.userId}%`
+              }
+            }
+          ]
+        },
+      });
+      return res.status(200).send(establishment);
+    } catch (err) {
+      console.log('error',err.message);
+      res.status(500).send({ message: err.message });
+    } 
+  }
   try {
     const establishment = await EstablishmentModel.findAll({
       where: { companyId: req?.query?.companyId, 
@@ -292,11 +319,66 @@ module.exports.listEstablishment = async (req, res) => {
           }
         ]
       },
-     
     });
     return res.status(200).send(establishment);
   } catch (err) {
     console.log('error',err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+module.exports.updateDocStatus = async (req, res) => {
+  try {
+    console.log('########',req.body);
+    const docName = req.body.docName;
+approverStatus=req.body.appStatusArr;
+reviewerStatus=req.body.revStatusArr;
+appArray=approverStatus.split(',');
+revArray=reviewerStatus.split(',');
+let status='Uploaded';
+let version='';
+if(revArray.every(num => num == 1)&&appArray.every(num => num == 0))
+{
+status='Reviewers Rejected'
+version='000.1';
+}
+else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
+{
+status='Pending for Approval';
+}
+else if(appArray.every(num => num == 1) &&revArray.every(num => num == 2))
+{
+status='Approvers Rejected'
+version='001';
+
+}
+else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
+{
+status='Approved(in-house)';
+}
+const updateDocStatus = await DocumentModel.update({status,version}, {
+  where: { title:  {
+    [Sequelize.Op.like]: `%${docName}%`
+  }}
+});
+    console.log(docName);
+    // const log = `${req?.body?.userName} Uploaded Document ${req?.body?.title}`;
+    // const body = omit(req.body, ["roleId", "userId", "userName"]);
+
+    // Update document if it exists, otherwise create a new one
+    const updatedDocument = await EstablishmentModel.update({approverStatus,reviewerStatus}, {
+      where: { docName:docName
+      }
+    });
+
+console.log('helooo',updatedDocument);
+    // await SystemLogModel.create({
+    //   title: log,
+    //   companyId: req?.body?.companyId,
+    // });
+
+    return res.status(200).send({ message: "Document uploaded" });
+  } catch (err) {
+    console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
