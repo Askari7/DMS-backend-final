@@ -7,7 +7,7 @@ const {
   listPermission,
   updateDocumentFormat,
   exportMDRCsv,
-  getCodes,createComment, listComments, uploadDoc, uploadComment, assignDoc,updateMDR, listEstablishment, updateDocStatus
+  getCodes,createComment, listComments, uploadDoc, uploadComment, assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc
 } = require("./documents.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 
@@ -118,6 +118,12 @@ module.exports = {
   "/export/:id": {
     post: {
       action: [exportMDRCsv],
+      level: "public",
+    },
+  },
+  "/exportDoc": {
+    post: {
+      action: [exportDoc],
       level: "public",
     },
   },

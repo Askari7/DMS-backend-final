@@ -14,6 +14,9 @@ const { createPDF } = require("../../helpers/create-pdf");
 const { createWordFile } = require("../../helpers/create-docx");
 const path = require("path");
 const { omit } = require("lodash");
+const express = require('express');
+const router = express.Router();
+const json2csv = require('json2csv').parse;
 
 const fs = require("fs");
 const Papa = require("papaparse");
@@ -251,7 +254,18 @@ module.exports.updateMDR = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
-
+module.exports.exportDoc=async (req,res)=>{
+  try {
+    const data = req.body.data;
+    const csv = convertToCSV(data); // Assuming convertToCSV is a function that converts data to CSV format
+    res.header('Content-Type', 'text/csv');
+    res.attachment('export.csv');
+    res.send(csv);
+} catch (error) {
+    console.error('Error exporting CSV:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+}
+}
 
 module.exports.uploadDoc = async (req, res) => {
   try {
