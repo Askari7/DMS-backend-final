@@ -126,5 +126,6 @@ module.exports = {
       action:[getCodes],
       level:"public",
     }
-  }
-}
+<<<<<<< HEAD
+  },
+};
