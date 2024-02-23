@@ -30,6 +30,7 @@
     "html-pdf": "^3.0.1",
     "html-to-docx": "^1.8.0",
     "html-to-text": "^9.0.5",
+    "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "lumie": "^0.1.2",
