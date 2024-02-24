@@ -10,10 +10,9 @@ const app = express();
 
 app.use(cors());
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // parse application/json
-app.use(bodyParser.json());
 
 app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
