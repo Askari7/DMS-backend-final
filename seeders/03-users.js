@@ -12,7 +12,7 @@ module.exports = {
           email: "shoaib@pcec.com.pk",
           firstName: "Shoaib Mustafa",
           lastName: "Siddique",
-          password: bcrypt.hashSync("PEC1234!", 8),
+          password: bcrypt.hashSync("PEC12345!", 8),
           department: 'Project Management',
           departmentId: 1, // Project Management
           createdAt: new Date(),
@@ -25,7 +25,7 @@ module.exports = {
           email: "mzubair@pcec.com.pk",
           firstName: "Muhammad Zubair",
           lastName: "Khan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Mechanical',
           departmentId: 2, // Mechanical
           createdAt: new Date(),
@@ -38,7 +38,7 @@ module.exports = {
           email: "farrukh@pcec.com.pk",
           firstName: "Syed Farrukh",
           lastName: "Rehman",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Civil/Structure',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
@@ -51,7 +51,7 @@ module.exports = {
           email: "rabia@pcec.com.pk",
           firstName: "Syeda Rabia",
           lastName: "Shahid",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Civil/Structure',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
@@ -64,7 +64,7 @@ module.exports = {
           email: "bisma.naeem@pcec.com.pk",
           firstName: "Bisma",
           lastName: "Naeem",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Electrical',
           departmentId: 3, // Electrical
           createdAt: new Date(),
@@ -77,7 +77,7 @@ module.exports = {
           email: "yasra@pcec.com.pk",
           firstName: "Yasra",
           lastName: "Aslam",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Process',
           departmentId: 4, // Process
           createdAt: new Date(),
@@ -90,7 +90,7 @@ module.exports = {
           email: "daniyal@pcec.com.pk",
           firstName: "Muhammad",
           lastName: "Daniyal",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Mechanical',
           departmentId: 2, // Mechanical
           createdAt: new Date(),
@@ -103,7 +103,7 @@ module.exports = {
           email: "m.hassan@pcec.com.pk",
           firstName: "Muhammad Hassan",
           lastName: "Raza",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Mechanical',
           departmentId: 2, // Mechanical
           createdAt: new Date(),
@@ -116,7 +116,7 @@ module.exports = {
           email: "nabeel@pcec.com.pk",
           firstName: "Nabeel Rehman",
           lastName: "Hashmi",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Mechanical',
           departmentId: 2, // Mechanical
           createdAt: new Date(),
@@ -129,7 +129,7 @@ module.exports = {
           email: "yumn@pcec.com.pk",
           firstName: "Yumn",
           lastName: "Iqbal",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Process',
           departmentId: 4, // Process
           createdAt: new Date(),
@@ -142,7 +142,7 @@ module.exports = {
           email: "razia@pcec.com.pk",
           firstName: "Razia",
           lastName: "Jamil",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Process',
           departmentId: 4, // Process
           createdAt: new Date(),
@@ -155,7 +155,7 @@ module.exports = {
           email: "s.qamar@pcec.com.pk",
           firstName: "Syed Qamar",
           lastName: "Ali",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -168,7 +168,7 @@ module.exports = {
           email: "s.hamza@pcec.com.pk",
           firstName: "Syed",
           lastName: "Hamza",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -181,7 +181,7 @@ module.exports = {
           email: "maaz@pcec.com.pk",
           firstName: "Maaz",
           lastName: "Farrukh",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -194,7 +194,7 @@ module.exports = {
           email: "m.ali@pcec.com.pk",
           firstName: "Muhammad Ali",
           lastName: "Khan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Civil',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
@@ -207,7 +207,7 @@ module.exports = {
           email: "mustaqeem@pcec.com.pk",
           firstName: "Muhammad",
           lastName: "Mustaqeem",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Civil',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
@@ -220,7 +220,7 @@ module.exports = {
           email: "m.hamza@pcec.com.pk",
           firstName: "Muhammad",
           lastName: "Hamza",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Civil',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
@@ -233,7 +233,7 @@ module.exports = {
           email: "ayan@pcec.com.pk",
           firstName: "Ayan",
           lastName: "Khan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -246,7 +246,7 @@ module.exports = {
           email: "m.waqas@pcec.com.pk",
           firstName: "Muhammad Waqas Ali",
           lastName: "Khan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -259,7 +259,7 @@ module.exports = {
           email: "s.waris@pcec.com.pk",
           firstName: "Syed Waris",
           lastName: "Hassan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -272,7 +272,7 @@ module.exports = {
           email: "akif@pcec.com.pk",
           firstName: "Akif",
           lastName: "Shoaib",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -285,7 +285,7 @@ module.exports = {
           email: "m.hammad@pcec.com.pk",
           firstName: "Muhammad Hammad",
           lastName: "Khan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -298,7 +298,7 @@ module.exports = {
           email: "sm.ammar@pcec.com.pk",
           firstName: "Syed Muhammad",
           lastName: "Ammar",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Mechanical',
           departmentId: 2, // Mechanical
           createdAt: new Date(),
@@ -311,7 +311,7 @@ module.exports = {
           email: "rayyan@pcec.com.pk",
           firstName: "Muhammad",
           lastName: "Rayyan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Electrical',
           departmentId: 3, // Electrical
           createdAt: new Date(),
@@ -324,7 +324,7 @@ module.exports = {
           email: "raza@pcec.com.pk",
           firstName: "Ahmad",
           lastName: "Raza",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Instrumentation',
           departmentId: 7, // Instrumentation
           createdAt: new Date(),
@@ -337,7 +337,7 @@ module.exports = {
           email: "arooba@pcec.com.pk",
           firstName: "Hafiza Arooba",
           lastName: "Fatima",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Electrical',
           departmentId: 3, // Electrical
           createdAt: new Date(),
@@ -350,7 +350,7 @@ module.exports = {
           email: "shahid@pcec.com.pk",
           firstName: "Muhammad",
           lastName: "Shahid",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -363,7 +363,7 @@ module.exports = {
           email: "taimoor@pcec.com.pk",
           firstName: "Syed Taimoor",
           lastName: "Iqbal",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -376,7 +376,7 @@ module.exports = {
           email: "hafeez@pcec.com.pk",
           firstName: "Abdul",
           lastName: "Hafeez",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Civil/Structure',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
@@ -389,7 +389,7 @@ module.exports = {
           email: "roshan@pcec.com.pk",
           firstName: "Muhammad",
           lastName: "Roshan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Mechanical',
           departmentId: 2, // Mechanical
           createdAt: new Date(),
@@ -402,7 +402,7 @@ module.exports = {
           email: "ayesha@pcec.com.pk",
           firstName: "Ayesha",
           lastName: "Farooq",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Electrical',
           departmentId: 3, // Electrical
           createdAt: new Date(),
@@ -415,7 +415,7 @@ module.exports = {
           email: "mustafa@pcec.com.pk",
           firstName: "Mustafa",
           lastName: "Khan",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Mechanical',
           departmentId: 2, // Mechanical
           createdAt: new Date(),
@@ -428,7 +428,7 @@ module.exports = {
           email: "ahsan@pcec.com.pk",
           firstName: "Ahsan",
           lastName: "Samdani",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Electrical',
           departmentId: 3, // Electrical
           createdAt: new Date(),
@@ -441,7 +441,7 @@ module.exports = {
           email: "waleed@pcec.com.pk",
           firstName: "Waleed",
           lastName: "Ahmad",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -454,7 +454,7 @@ module.exports = {
           email: "anas@pcec.com.pk",
           firstName: "Anas",
           lastName: "Hamid",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Piping',
           departmentId: 5, // Piping
           createdAt: new Date(),
@@ -467,7 +467,7 @@ module.exports = {
           email: "ovais@pcec.com.pk",
           firstName: "Muhammad",
           lastName: "Ovais",
-          password: bcrypt.hashSync("PEC123!", 8),
+          password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Civil',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
