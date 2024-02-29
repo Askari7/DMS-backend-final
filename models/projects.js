@@ -23,10 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      departmentId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
+      // departmentId: {
+      //   type: DataTypes.INTEGER,
+      //   allowNull: false,
+      // },
       authorId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -50,6 +50,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       status: {
         type: DataTypes.STRING,
+      },
+      startedDate: {
+        type: DataTypes.DATE,
+      },
+      endedDate: {
+        type: DataTypes.DATE,
       },
       noOfUsers: {
         type: DataTypes.INTEGER,

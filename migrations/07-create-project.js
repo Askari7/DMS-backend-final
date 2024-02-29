@@ -9,10 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      departmentId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
+      // departmentId: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      // },
       companyId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -45,6 +45,14 @@ module.exports = {
         type: Sequelize.DATE,
       },
       updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      startedDate: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      endedDate: {
         allowNull: false,
         type: Sequelize.DATE,
       },

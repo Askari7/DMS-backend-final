@@ -28,7 +28,7 @@ lumie.load(app, {
 
  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const server = app.listen(8083, "0.0.0.0", () => {
+const server = app.listen(8083, "127.0.0.1", () => {
   const { address, port } = server.address();
   console.log("Example app listening at http://%s:%s", address, port);
 });

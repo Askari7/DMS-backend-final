@@ -7,30 +7,13 @@ const MDRModel = db.master_document_registers;
 
 module.exports.createProject = async (req, res) => {
   try {
-    if(Array.isArray(req.body.departmentId)){
-      console.log(req.body.departmentId.length);
-      var deptArray=req.body.departmentId;
-     for (let index = 0; index < deptArray.length; index++) {
-
-      let element = deptArray[index];
-      console.log(element)
-      req.body.departmentId=element
-      console.log(req.body.title);
-      console.log('check change',req.body);
+    console.log(req.body.startedDate,req.body.endedDate,"dates",typeof(req.body.startedDate));
       req.body.noOfUsers = 0
       await ProjectModel.create(req?.body);
       await SystemLogModel.create({
         companyId: req?.body?.companyId,
         title: `${req?.body?.authorName} Created Project ${req?.body?.title}`,
       });
-    } }
-    else {
-      const project = await ProjectModel.create(req?.body);
-      await SystemLogModel.create({
-        title: `${req?.body?.authorName} Created Project ${req?.body?.title}`,
-        companyId: req?.body?.companyId,
-      });
-    }
     return res.status(200).send({ message: "Projects Created" });
   } catch (err) {
     console.log(err.message);
