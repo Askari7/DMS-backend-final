@@ -32,7 +32,7 @@ module.exports.listDocuments = async (req, res) => {
     const assignedTo = req?.query?.userId;
     const assignedBy = req?.query?.assignedBy;
     console.log('hello');
-    console.log('hi',typeof(companyId));
+    console.log('hi',typeof(companyId),req.query.masterDocumentId,req.query.projectId);
     if(req.query.masterDocumentId){
       const documents = await DocumentModel.findAll({
         where: {
@@ -66,7 +66,7 @@ else{
            { assignedFrom: assignedTo // Matches assignedTo from query param
           },
           {
-            assignedTo: assignedTo // Matches assignedTo from query param
+            assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
           }
         ]
         
@@ -215,6 +215,7 @@ module.exports.assignDoc = async (req, res) => {
   try {
     const title= req?.query?.docName ;
     const assignedTo=req?.query?.assignedTo ;
+    console.log(assignedTo,"assigned Employees");
     const assignedBy=req?.query?.assignedBy ;
     const assignedFrom=req?.query?.assignedFrom ;
 

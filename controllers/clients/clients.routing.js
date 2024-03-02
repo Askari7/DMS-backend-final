@@ -11,5 +11,11 @@ const { listClients, createClient } = require("./clients.action");
         level: "public",
       },
     },
+    // "/official": {
+    //   post: {
+    //     action: [validateToken, createClientOfficial],
+    //     level: "public",
+    //   },
+    // },
   };
   

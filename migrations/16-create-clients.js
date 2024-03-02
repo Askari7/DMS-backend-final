@@ -10,12 +10,16 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       companyId: {
+        allowNull: false,
         type: Sequelize.INTEGER,
       },
-      email: {
+      companyName: {
         type: Sequelize.STRING,
       },
-      clientName: {
+      companyAddress: {
+        type: Sequelize.STRING,
+      },
+      companyContact: {
         type: Sequelize.STRING,
       },
       createdAt: {
