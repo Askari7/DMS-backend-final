@@ -44,6 +44,12 @@ module.exports = (sequelize, DataTypes) => {
       reviewerStatus: {
         type: DataTypes.STRING,
       },
+      approverComment: {
+        type: DataTypes.STRING,
+      },
+      reviewerComment: {
+        type: DataTypes.STRING,
+      },
       version: {
         type: DataTypes.STRING,
       },
