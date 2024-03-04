@@ -1,8 +1,9 @@
+const Sequelize = require('sequelize');
 const db = require("../../models/index");
 const DepartmentModel = db.departments;
+const UserModel = db.users;
 const SystemLogModel = db.system_logs;
 const DepartmentUserAssociation = db.department_user_associations;
-
 module.exports.createDepartment = async (req, res) => {
   try {
     console.log('dept body',req.body);
@@ -69,8 +70,28 @@ module.exports.listDepartments = async (req, res) => {
     const departments = await DepartmentModel.findAll({
       where: { companyId: req?.query?.companyId },
     });
-    return res.status(200).send(departments);
-  } catch (err) {
+    const departmentCounts = await UserModel.findAll({
+      where:{companyId:req?.query?.companyId},
+      attributes: ['department', [Sequelize.fn('COUNT', Sequelize.literal('1')), 'count']],
+      group: ['department'],
+    });
+    const usersDepartmentCount = {};
+    departmentCounts.forEach((department) => {
+      usersDepartmentCount[department.department] = department.get('count');
+    });
+
+    console.log(usersDepartmentCount,"counts");
+    const updatedDepartments = departments.map((department) => {
+      const departmentName = department.get('title'); // Adjust the field name accordingly
+      return {
+        ...department.toJSON(),
+        noOfUsers: usersDepartmentCount[departmentName] || 0,
+      };
+    });
+    
+    console.log(updatedDepartments, 'updated departments');
+    return res.status(200).send(updatedDepartments);
+    } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }

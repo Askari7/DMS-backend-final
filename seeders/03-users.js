@@ -195,7 +195,7 @@ module.exports = {
           firstName: "Muhammad Ali",
           lastName: "Khan",
           password: bcrypt.hashSync("PEC1234!", 8),
-          department: 'Civil',
+          department: 'Civil/Structure',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -208,7 +208,7 @@ module.exports = {
           firstName: "Muhammad",
           lastName: "Mustaqeem",
           password: bcrypt.hashSync("PEC1234!", 8),
-          department: 'Civil',
+          department: 'Civil/Structure',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -221,7 +221,7 @@ module.exports = {
           firstName: "Muhammad",
           lastName: "Hamza",
           password: bcrypt.hashSync("PEC1234!", 8),
-          department: 'Civil',
+          department: 'Civil/Structure',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -468,7 +468,7 @@ module.exports = {
           firstName: "Muhammad",
           lastName: "Ovais",
           password: bcrypt.hashSync("PEC1234!", 8),
-          department: 'Civil',
+          department: 'Civil/Structure',
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
           updatedAt: new Date(),

@@ -358,8 +358,15 @@ module.exports.updateDocStatus = async (req, res) => {
     const docName = req.body.docName;
 approverStatus=req.body.appStatusArr;
 reviewerStatus=req.body.revStatusArr;
+
+approverComment=req.body.approverComment;
+reviewerComment=req.body.reviewerComment;
+
+
 appArray=approverStatus.split(',');
 revArray=reviewerStatus.split(',');
+appComment=approverComment.split(',');
+revComment=reviewerComment.split(',');
 let status='Uploaded';
 let version='';
 if(revArray.every(num => num == 1)&&appArray.every(num => num == 0))
@@ -391,7 +398,7 @@ const updateDocStatus = await DocumentModel.update({status,version}, {
     // const body = omit(req.body, ["roleId", "userId", "userName"]);
 
     // Update document if it exists, otherwise create a new one
-    const updatedDocument = await EstablishmentModel.update({approverStatus,reviewerStatus}, {
+    const updatedDocument = await EstablishmentModel.update({approverStatus,reviewerStatus,approverComment,reviewerComment}, {
       where: { docName:docName
       }
     });

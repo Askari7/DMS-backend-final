@@ -36,6 +36,12 @@ module.exports = {
           reviewerStatus: {
             type: Sequelize.STRING,
           },
+          approverComment: {
+            type: Sequelize.STRING,
+          },
+          reviewerComment: {
+            type: Sequelize.STRING,
+          },
           status: {
             type: Sequelize.BOOLEAN,
           },
