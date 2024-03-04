@@ -45,3 +45,17 @@ module.exports.listClients = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+module.exports.fetchOfficials = async (req, res) => {
+  try {
+    console.log(req.query.companyId,"id");
+    const users = await ClientOfficialModel.findAll({
+      where: { companyId: req?.query?.companyId },
+    });
+    console.log(users);
+    return res.status(200).send(users);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};

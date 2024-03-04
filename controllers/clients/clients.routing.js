@@ -1,5 +1,5 @@
 const { validateToken, authorize } = require("../../helpers/authorize");
-const { listClients, createClient } = require("./clients.action");
+const { listClients, createClient,fetchOfficials } = require("./clients.action");
   module.exports = {
     "/": {
       get: {
@@ -11,11 +11,15 @@ const { listClients, createClient } = require("./clients.action");
         level: "public",
       },
     },
-    // "/official": {
-    //   post: {
-    //     action: [validateToken, createClientOfficial],
-    //     level: "public",
-    //   },
-    // },
+    "/official": {
+      // post: {
+      //   action: [validateToken, createClientOfficial],
+      //   level: "public",
+      // },
+      get:{
+         action: [validateToken, fetchOfficials],
+         level: "public",
+      }
+    },
   };
   
