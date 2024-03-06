@@ -70,28 +70,43 @@ module.exports.listDepartments = async (req, res) => {
     const departments = await DepartmentModel.findAll({
       where: { companyId: req?.query?.companyId },
     });
+
+    const leads = await UserModel.findAll({
+      where: { companyId: req?.query?.companyId },
+    });
+
+    const headLeads = leads.filter((lead) => lead.roleId === 2 && departments.some(dep => dep.title === lead.department));
+
     const departmentCounts = await UserModel.findAll({
-      where:{companyId:req?.query?.companyId},
+      where: { companyId: req?.query?.companyId },
       attributes: ['department', [Sequelize.fn('COUNT', Sequelize.literal('1')), 'count']],
       group: ['department'],
     });
+
     const usersDepartmentCount = {};
     departmentCounts.forEach((department) => {
       usersDepartmentCount[department.department] = department.get('count');
     });
 
-    console.log(usersDepartmentCount,"counts");
     const updatedDepartments = departments.map((department) => {
-      const departmentName = department.get('title'); // Adjust the field name accordingly
+      const departmentName = department.get('title');
+
+      // Find headLeads for the current department
+      const departmentHeadLeads = headLeads
+        .filter((lead) => lead.department === departmentName)
+        .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
+        .join(', ');
+
       return {
         ...department.toJSON(),
         noOfUsers: usersDepartmentCount[departmentName] || 0,
+        headLeads: departmentHeadLeads,
       };
     });
-    
+
     console.log(updatedDepartments, 'updated departments');
     return res.status(200).send(updatedDepartments);
-    } catch (err) {
+  } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }

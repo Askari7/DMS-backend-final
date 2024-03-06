@@ -36,7 +36,28 @@ module.exports.createUser = async (req, res) => {
     console.log(body);
     const password = generateRandomPassword(10);
     body.password = bcrypt.hashSync(password, 8);
-   
+    
+
+    const role = req.body.roleId
+    const department = req.body.department
+    
+    if(role!==2){
+    const report = await UserModel.findOne({
+      where:{department:department,roleId:2}
+    })
+    req.body.reported_to = `${report.firstName} ${report.lastName}`
+  }
+    else{
+      const ceo = await UserModel.findOne({
+        where:{roleId:1}
+      })
+      req.body.reported_to = `${ceo.firstName} ${ceo.lastName}`
+    }
+
+    console.log(req.body.reported_to,"reporting");
+    
+
+    console.log(role,department,"things");
     const users = await UserModel.create(body);
     body.password = password;
     await sendEmail(body);
@@ -112,45 +133,54 @@ module.exports.getUser = async (req, res) => {
 
 module.exports.listUsers = async (req, res) => {
   try {
-    const users = await UserModel.findAll({
-      where: { companyId: req?.query?.companyId },
-      raw: true,
-    });
-   
-    const data = [];
-    for (const item of users) {
-      console.log(item.id);
-      let roleTitle = "";
-      
-      const department = await DepartmentUserAssociation.findOne({
-        where: { userId: item.id },
+
+    if (req.query.department) {
+      const users = await UserModel.findAll({
+        where: { companyId: req?.query?.companyId ,department:req.query.department},
+      });
+      return res.status(200).send(users);  
+    } else {
+      const users = await UserModel.findAll({
+        where: { companyId: req?.query?.companyId },
         raw: true,
       });
-      console.log(department);
-
-      if (item.roleId == 1) roleTitle = "CEO";
-      else if (item.roleId == 2) roleTitle = "Head";
-      else if (item.roleId == 3) roleTitle = "Senior";
-      else if (item.roleId == 4) roleTitle = "Junior";
-      else if (item.roleId == 5) roleTitle = "Designer";
-
-      else roleTitle == "Client";
-      if(department!== null){
-      
-        console.log('hi');
-        userDepartmentId=department.departmentId;
-        var departmentName = await DepartmentModel.findOne({
-          where: { id: userDepartmentId },
+     
+      const data = [];
+      for (const item of users) {
+        console.log(item.id);
+        let roleTitle = "";
+        
+        const department = await DepartmentUserAssociation.findOne({
+          where: { userId: item.id },
           raw: true,
         });
-        departmentName=departmentName.title;
-        data.push({ ...item, roleTitle,departmentName });
+        console.log(department);
+  
+        if (item.roleId == 1) roleTitle = "CEO";
+        else if (item.roleId == 2) roleTitle = "Head";
+        else if (item.roleId == 3) roleTitle = "Senior";
+        else if (item.roleId == 4) roleTitle = "Junior";
+        else if (item.roleId == 5) roleTitle = "Designer";
+  
+        else roleTitle == "Client";
+        if(department!== null){
+        
+          console.log('hi');
+          userDepartmentId=department.departmentId;
+          var departmentName = await DepartmentModel.findOne({
+            where: { id: userDepartmentId },
+            raw: true,
+          });
+          departmentName=departmentName.title;
+          data.push({ ...item, roleTitle,departmentName });
+        }
+        else{
+        data.push({ ...item, roleTitle });}
       }
-      else{
-      data.push({ ...item, roleTitle });}
+      console.log('mydata',data);
+      return res.status(200).send(data);  
     }
-    console.log('mydata',data);
-    return res.status(200).send(data);
+    
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

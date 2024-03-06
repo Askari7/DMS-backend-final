@@ -34,11 +34,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       companyAddress: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       companyContact: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
