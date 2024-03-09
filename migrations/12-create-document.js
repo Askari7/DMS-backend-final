@@ -12,6 +12,9 @@ module.exports = {
       title: {
         type: Sequelize.STRING,
       },
+      docTitle: {
+        type: Sequelize.STRING,
+      },
       companyId: {
         type: Sequelize.INTEGER,
       },

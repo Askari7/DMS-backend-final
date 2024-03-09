@@ -124,6 +124,8 @@ module.exports.createDocument = async (req, res) => {
     //     return res.status(403).send({ message: "Permission denied" });
     //   }
     // }
+    const docTitle = req.body.docTitle
+
     const projectCode = req.query.projectCode;
     const areaCode = req.query.areaCode;
     const deptSuffix = req.query.deptSuffix;
@@ -147,7 +149,9 @@ module.exports.createDocument = async (req, res) => {
     const log = `${req?.body?.userName} Created Document ${req?.body?.title}`;
     console.log("mybody ",req.body);
     const body = omit(req.body, ["roleId", "userId", "userName"]);
+    console.log("body",body)
     const document = await DocumentModel.create(body);
+
     console.log('created',document);
 
       req.body.docName=req.body.title;
