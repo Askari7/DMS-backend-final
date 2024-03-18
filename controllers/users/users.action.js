@@ -41,16 +41,17 @@ module.exports.createUser = async (req, res) => {
     const role = req.body.roleId
     const department = req.body.department
     
-    if(role!==2){
+    if(role!=="2"){
     const report = await UserModel.findOne({
-      where:{department:department,roleId:2}
+      where:{department:department,roleId:2,companyId:req.body.companyId}
     })
     req.body.reported_to = `${report.firstName} ${report.lastName}`
   }
     else{
       const ceo = await UserModel.findOne({
-        where:{roleId:1}
+        where:{roleId:1,companyId:req.body.companyId}
       })
+      console.log(ceo,"ceo");
       req.body.reported_to = `${ceo.firstName} ${ceo.lastName}`
     }
 

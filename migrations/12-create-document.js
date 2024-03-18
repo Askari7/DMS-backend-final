@@ -54,6 +54,16 @@ module.exports = {
       assignedFrom: {
         type: Sequelize.STRING,
       },
+      startedDate: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now'), // Set the default value to the current timestamp
+      },
+      expectedEndedDate: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        defaultValue: null, // Set the default value to null
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

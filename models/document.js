@@ -72,6 +72,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         //   values:['pending,']
       },
+      startedDate: {
+        type: DataTypes.DATE,
+        allowNull:true,
+      },
+      expectedEndedDate: {
+        type: DataTypes.DATE,
+        allowNull:true
+      },
     },
     {
       sequelize,

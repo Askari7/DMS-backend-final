@@ -99,7 +99,8 @@ module.exports.listInformation = async (req, res) => {
       where: { companyId: req?.query?.companyId },
     });
 
-    console.log("projects",projects);
+    console.log("projects", projects);
+
     const mdr = await MDRModel.findAll({
       where: { companyId: req?.query?.companyId },
     });
@@ -107,34 +108,40 @@ module.exports.listInformation = async (req, res) => {
     const mdr_projects = mdr.map(mdr => mdr.dataValues.projectId);
     console.log("mdrProjects", mdr_projects);
 
+    const documents = await DocumentModel.findAll({
+      where: {
+        companyId: req?.query?.companyId,
+        masterDocumentId: mdr.map(m => m.dataValues.mdrCode), // Get masterDocumentIds from MDR
+      },
+    });
+
     // Combine projects with mdr based on projectId
     const combinedProjects = projects.map(project => {
       const matchingMdr = mdr.find(mdrItem => mdrItem.dataValues.projectId === project.dataValues.id);
+      
+      // Filter documents based on mdrCode and masterDocumentId
+      const matchingDocuments = documents.filter(doc =>
+        doc.masterDocumentId === (matchingMdr ? matchingMdr.dataValues.mdrCode : null)
+      );
+
       return {
-        project: project.dataValues,
-        mdr: matchingMdr ? matchingMdr.dataValues : null,
+        ...project.dataValues,
+        ...(matchingMdr
+          ? {
+              departmentId: matchingMdr.dataValues.departmentId,
+              departmentName: matchingMdr.dataValues.departmentName,
+              mdrCode: matchingMdr.dataValues.mdrCode,
+              noOfDocuments: matchingMdr.dataValues.noOfDocuments,
+              projectCode: matchingMdr.dataValues.projectCode,
+              title: matchingMdr.dataValues.title,
+            }
+          : null),
+        documents: matchingDocuments,
       };
     });
 
-      console.log("combinedProjects", combinedProjects);
-      res.send(combinedProjects)
-    // const mdr_projects = mdr.map(mdr => mdr.dataValues.projectId);
-    // console.log("mdrProjects",mdr_projects);
-    // const mdrId = mdr.map(mdr => mdr.dataValues.id);
-    // console.log("mdrId",mdrId);
-    // const mdrCodes = mdr.map(mdr => mdr.dataValues.mdrCode);
-    // console.log("mdrCodes",mdrCodes);
-    // const mdr_departments = mdr.map(mdr => mdr.dataValues.departmentId);
-    // console.log("mdrDepartments",mdr_departments);
-    // const mdr_departments_name = mdr.map(mdr => mdr.dataValues.departmentName);
-    // console.log("mdrDepartmentNames",mdr_departments_name);
-    // const documents = await DocumentModel.findAll({
-    //   where: { companyId: req?.query?.companyId },
-    // });
-    // const document = documents.map(documents => documents.dataValues.title);
-    // console.log("mdrDocuments",document);
-
-    // res.send({"projects":projects,"mdr":mdr})
+    console.log("combinedProjects", combinedProjects);
+    res.send(combinedProjects);
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

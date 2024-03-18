@@ -34,5 +34,5 @@ app.use(express.static(path.join(__dirname, "client/build")));
   res.sendFile(path.join(__dirname, "client/build", "index.html"));});
 const server = app.listen(8083, "0.0.0.0", () => {
   const { address, port } = server.address();
-  console.log("Example app listening at http://%s:%s", address, port);
+  console.log("DMS app listening at http://%s:%s", address, port);
 });
