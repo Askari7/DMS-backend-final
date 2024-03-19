@@ -134,11 +134,15 @@ module.exports.getUser = async (req, res) => {
 
 module.exports.listUsers = async (req, res) => {
   try {
-
-    if (req.query.department) {
+    const departmentId = req?.query?.departmentId
+    const companyId =  req?.query?.companyId
+    console.log(departmentId,"ayiiii");
+    if (departmentId) {
+      // console.log(departmentId,"ayiiiiiiiiiiiiii");
       const users = await UserModel.findAll({
-        where: { companyId: req?.query?.companyId ,department:req.query.department},
+        where: {  companyId,departmentId},
       });
+      console.log(users,"users");
       return res.status(200).send(users);  
     } else {
       const users = await UserModel.findAll({

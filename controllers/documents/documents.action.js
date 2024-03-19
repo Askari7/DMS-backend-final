@@ -111,6 +111,8 @@ module.exports.createMDR = async (req, res) => {
 };
 module.exports.createDocument = async (req, res) => {
   try {
+    console.log("working");
+    
     // if (req?.body?.roleId != 1) {
     //   const permissionExist = await DocumentPermssionModel.findOne({
     //     where: {
@@ -244,14 +246,19 @@ module.exports.updateMDR = async (req, res) => {
   try {
     
     console.log("body",req.body);
-    const projectId= req?.query?.projectId ;
-    const projectCode= req?.query?.projectCode ;
-    console.log("codes",projectId,projectCode);
+    const recordData = JSON.parse(req.body.record);
+    const { projectId, projectCode } = recordData;
+
+    console.log("projectId:", projectId);
+    console.log("projectCode:", projectCode);
+    // const projectId= req?.query?.projectId ;
+    // const projectCode= req?.query?.projectCode ;
+    // console.log("codes",projectId,projectCode);
+    delete req.body.record;
     const update = await MDRModel.update(req.body, {
       where: { projectId, projectCode },
     });
 
-    console.log(projectCode,projectId);
 
     return res.status(200).send({ message: "MDR Updated" });
   } catch (err) {
@@ -259,6 +266,7 @@ module.exports.updateMDR = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
 module.exports.exportDoc=async (req,res)=>{
   try {
     const data = req.body.data;
