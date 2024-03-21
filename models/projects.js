@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      clientEmail: {
+      clientId: {
         type: DataTypes.STRING,
         allowNull: false,
       },

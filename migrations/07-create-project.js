@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      clientEmail: {
+      clientId: {
         type: Sequelize.STRING,
         allowNull: false,
       },

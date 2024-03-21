@@ -58,6 +58,7 @@ module.exports.createDepartment = async (req, res) => {
 
 module.exports.listProjects = async (req, res) => {
   try {
+    
     const projects = await ProjectModel.findAll({
       where: { companyId: req?.query?.companyId },
     });

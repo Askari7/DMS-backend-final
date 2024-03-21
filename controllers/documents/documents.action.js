@@ -247,16 +247,15 @@ module.exports.updateMDR = async (req, res) => {
     
     console.log("body",req.body);
     const recordData = JSON.parse(req.body.record);
-    const { projectId, projectCode } = recordData;
+    console.log(recordData,"recordData");
+    const { projectId, projectCode,mdrCode } = recordData;
 
     console.log("projectId:", projectId);
     console.log("projectCode:", projectCode);
-    // const projectId= req?.query?.projectId ;
-    // const projectCode= req?.query?.projectCode ;
-    // console.log("codes",projectId,projectCode);
+
     delete req.body.record;
     const update = await MDRModel.update(req.body, {
-      where: { projectId, projectCode },
+      where: { projectId, projectCode,mdrCode },
     });
 
 
@@ -525,6 +524,23 @@ module.exports.updateDocumentFormat = async (req, res) => {
       where: { id: req?.query?.companyId },
     });
     res.status(200).send({ message: "Document Format Updated" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
+module.exports.getDocumentFormat = async (req, res) => {
+  try {
+    const  companyId  = req.query.companyId;
+
+    const companyformat = await CompanyModel.findOne({
+      where: { id: req?.query?.companyId },
+    });
+    if (companyformat) {
+      const { documentNumberFormat,name } = companyformat.dataValues;
+      res.status(200).send({ documentNumberFormat,name });
+    } 
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

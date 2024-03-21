@@ -13,7 +13,7 @@ module.exports = {
           firstName: "Shoaib Mustafa",
           lastName: "Siddique",
           password: bcrypt.hashSync("PEC12345!", 8),
-          department: 'Project Management',
+          department: '',
           departmentId: 1, // Project Management
           createdAt: new Date(),
           updatedAt: new Date(),
