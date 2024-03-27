@@ -3,6 +3,7 @@ const {
   signin,
   changePassword,
   checkDuplicateUsernameOrEmail,
+  changeProfile
 } = require("./auth.action.js");
 
 module.exports = {
@@ -22,6 +23,12 @@ module.exports = {
   "/change-password": {
     post: {
       action: changePassword,
+      level: "public",
+    },
+  },
+  "/change-profile": {
+    post: {
+      action: changeProfile,
       level: "public",
     },
   },

@@ -15,6 +15,24 @@ module.exports = {
       details: {
         type: Sequelize.TEXT,
       },
+      owner: {
+        type: Sequelize.STRING,
+      },
+      ownerEmail: {
+        type: Sequelize.STRING,
+      },
+      address: {
+        type: Sequelize.STRING,
+      },
+      contact: {
+        type: Sequelize.STRING,
+      },
+      companyEmail: {
+        type: Sequelize.STRING,
+      },
+      socialLinks: {
+        type: Sequelize.STRING,
+      },
       industry: {
         type: Sequelize.STRING,
       },

@@ -27,6 +27,24 @@ module.exports = (sequelize, DataTypes) => {
       industry: {
         type: DataTypes.STRING,
       },
+      owner: {
+        type: DataTypes.STRING,
+      },
+      ownerEmail: {
+        type: DataTypes.STRING,
+      },
+      address: {
+        type: DataTypes.STRING,
+      },
+      contact: {
+        type: DataTypes.STRING,
+      },
+      companyEmail: {
+        type: DataTypes.STRING,
+      },
+      socialLinks: {
+        type: DataTypes.STRING,
+      },
       documentNumberFormat: {
         type: DataTypes.STRING,
       },

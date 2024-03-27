@@ -1,6 +1,7 @@
 const path = require("path");
 const lumie = require("lumie");
 const express = require("express");
+const multer  = require('multer')
 var bodyParser = require("body-parser");
 
 const cors = require("cors");
@@ -23,6 +24,9 @@ lumie.load(app, {
   ignore: ["*.spec", "*.action"],
   controllers_path: path.join(__dirname, "controllers"),
 });
+
+const upload = multer({ dest: 'uploads/' })
+
 // Serve static files (your React frontend)
 app.use(express.static(path.join(__dirname, "client/build")));
 
@@ -36,3 +40,8 @@ const server = app.listen(8083, "0.0.0.0", () => {
   const { address, port } = server.address();
   console.log("DMS app listening at http://%s:%s", address, port);
 });
+
+
+app.post("/upload",upload.single("profileImage"),(req,res)=>{
+  console.log(req.body);
+})

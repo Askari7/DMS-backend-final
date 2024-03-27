@@ -1,4 +1,4 @@
-const { createProject, listProjects,listInformation } = require("./projects.action");
+const { createProject, listProjects,listInformation ,list} = require("./projects.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 module.exports = {
   "/": {
@@ -14,6 +14,12 @@ module.exports = {
   "information": {
     get: {
       action: [validateToken, listInformation],
+      level: "public",
+    },
+  },
+  "info": {
+    get: {
+      action: [validateToken, list],
       level: "public",
     },
   },

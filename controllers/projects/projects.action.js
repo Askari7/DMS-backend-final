@@ -164,3 +164,28 @@ module.exports.listInformation = async (req, res) => {
 
 
 
+module.exports.list=async(req,res)=>{
+  const id = req.query.companyId
+  try {
+    const projectCount = await ProjectModel.count({ where: { companyId: id } });
+    const mdrCount = await MDRModel.count({ where: { companyId: id } });
+    
+    const projects = await ProjectModel.findAll({ where: { companyId: id } });
+    const mdrs = await MDRModel.findAll({ where: { companyId: id } });
+
+    const projectsStatusCounts = projects.reduce((acc, project) => {
+      acc[project.status] = (acc[project.status] || 0) + 1;
+      return acc;
+    }, {});
+    
+    const mdrsStatusCounts = mdrs.reduce((acc, mdr) => {
+      acc[mdr.status] = (acc[mdr.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    console.log(projectCount,mdrCount,projects,mdrs,projectsStatusCounts,mdrsStatusCounts,"counts");
+    return res.status(200).send({projectCount:projectCount,mdrCount:mdrCount,projects:projects,mdrs:mdrs,projectsStatusCounts,mdrsStatusCounts})
+  } catch (error) {
+    console.error(error)
+  }
+}

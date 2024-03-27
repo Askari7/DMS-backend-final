@@ -138,3 +138,12 @@ module.exports.changePassword = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+
+module.exports.changeProfile = async(req,res)=>{
+  try {
+    console.log(req);
+  } catch (error) {
+    console.error(error)
+  }
+}
