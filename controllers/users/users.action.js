@@ -171,7 +171,7 @@ module.exports.listUsers = async (req, res) => {
         if(department!== null){
         
           console.log('hi');
-          userDepartmentId=department.departmentId;
+          const userDepartmentId=department.departmentId;
           var departmentName = await DepartmentModel.findOne({
             where: { id: userDepartmentId },
             raw: true,

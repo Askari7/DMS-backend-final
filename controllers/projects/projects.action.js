@@ -4,6 +4,7 @@ const SystemLogModel = db.system_logs;
 const DepartmentModel = db.departments
 const DocumentModel = db.documents
 const MDRModel = db.master_document_registers;
+const EstablishmentModel = db.establishments;
 
 module.exports.createProject = async (req, res) => {
   try {
@@ -172,6 +173,8 @@ module.exports.list=async(req,res)=>{
     
     const projects = await ProjectModel.findAll({ where: { companyId: id } });
     const mdrs = await MDRModel.findAll({ where: { companyId: id } });
+    const departments = await DepartmentModel.findAll({where:{companyId:id}})
+    const establishments = await EstablishmentModel.findAll({where:{companyId:id}})
 
     const projectsStatusCounts = projects.reduce((acc, project) => {
       acc[project.status] = (acc[project.status] || 0) + 1;
@@ -182,9 +185,22 @@ module.exports.list=async(req,res)=>{
       acc[mdr.status] = (acc[mdr.status] || 0) + 1;
       return acc;
     }, {});
+    // Extract project IDs
+    const projectIds = projects.map(project => project.id);
 
-    console.log(projectCount,mdrCount,projects,mdrs,projectsStatusCounts,mdrsStatusCounts,"counts");
-    return res.status(200).send({projectCount:projectCount,mdrCount:mdrCount,projects:projects,mdrs:mdrs,projectsStatusCounts,mdrsStatusCounts})
+    const documentsByProject = [];
+    // Iterate over each project and find associated documents
+    for (const projectId of projectIds) {
+      const documents = await DocumentModel.findAll({ where: { projectId } });
+      console.log(documents);
+      // Flatten documents array before pushing it
+      documentsByProject.push(documents);
+    }
+
+    console.log("data",documentsByProject,projectIds);
+    return res.status(200).send({projectCount:projectCount,mdrCount:mdrCount
+      ,projects:projects,mdrs:mdrs,projectsStatusCounts
+      ,mdrsStatusCounts,documents:documentsByProject,departments,establishments})
   } catch (error) {
     console.error(error)
   }
