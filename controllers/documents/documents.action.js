@@ -97,6 +97,11 @@ module.exports.createMDR = async (req, res) => {
   try {
     console.log(req.body);
 
+    const id = req.body.projectId
+    const fetchProject = await ProjectModel.findOne({where:{id}})
+    console.log(fetchProject,id,"hurrah");
+    req.body.departmentId = fetchProject.departmentIds
+    req.body.departmentName = fetchProject.departmentTitle
     const mdr = await MDRModel.create(req?.body);
     console.log(mdr);
     await SystemLogModel.create({
@@ -132,6 +137,15 @@ module.exports.createDocument = async (req, res) => {
     const areaCode = req.query.areaCode;
     const deptSuffix = req.query.deptSuffix;
 
+    const projectId = req.body.projectId
+    console.log(projectId,"Id Check ");
+
+    const projectDepartments =await ProjectModel.findOne({where:{id:projectId}})
+    console.log(projectDepartments,'Departments bhi ha');
+    req.body.departmentId = projectDepartments.departmentIds
+
+    console.log(req.body,"ye body ha ab");
+
     const count = await DocumentModel.count({
       where: {
         masterDocumentId: req.body.masterDocumentId
@@ -152,6 +166,7 @@ module.exports.createDocument = async (req, res) => {
     console.log("mybody ",req.body);
     const body = omit(req.body, ["roleId", "userId", "userName"]);
     console.log("body",body)
+
     const document = await DocumentModel.create(body);
 
     console.log('created',document);

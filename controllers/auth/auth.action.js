@@ -9,10 +9,10 @@ const CompanyModel = db.company;
 //middlewares
 
 module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
-  // Username
   UserModel.findOne({
     where: {
       email: req.body.email,
+      // companyId:req.body.companyId
     },
   }).then((user) => {
     if (user) {

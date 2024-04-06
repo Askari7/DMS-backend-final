@@ -15,14 +15,29 @@ const { sendEmail } = require("../../helpers/send-email");
 
 module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
   // Username
+  console.log(req.body.companyId, "req");
+  const roleId = req.body.roleId;
+  const department = req.body.department;
+  const companyId = req.body.companyId
+  if (roleId === "2") {
+    // If roleId is 2, check if user exists with the provided roleId and department
+    const existingUser = await UserModel.findOne({ where: { roleId, department,companyId } });
+    if (existingUser) {
+      res.send({ message: "Failed! Lead already exists!" });
+      return;
+    }
+  }
+
+  // Check if user exists with the provided email and companyId
   UserModel.findOne({
     where: {
       email: req.body.email,
-    },
+      companyId: req.body.companyId
+    }
   }).then((user) => {
     if (user) {
       res.send({
-        message: "Failed! Email already exists!",
+        message: "Failed! Email already exists!"
       });
       return;
     }
@@ -30,17 +45,35 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
   });
 };
 
+
 module.exports.createUser = async (req, res) => {
   try {
     const { body } = req;
-    console.log(body);
+
+    const findUser = await UserModel.findOne({ department: body.department, companyId: body.companyId });
+    console.log(findUser,'findUser');
+
+
     const password = generateRandomPassword(10);
     body.password = bcrypt.hashSync(password, 8);
-    
-
     const role = req.body.roleId
     const department = req.body.department
-    
+    const companyId = req.body.companyId
+
+    console.log(department,'department');
+    const findDepartment = await DepartmentModel.findOne({where:{title: department,companyId} });
+    console.log(findDepartment,"findDepartment");
+// Check if the department exists
+if (findDepartment) {
+    // Increment the noOfUsers count by one
+    findDepartment.noOfUsers += 1;
+
+    // Save the updated department
+    await findDepartment.save();
+} else {
+    // Department not found, handle the case accordingly
+    console.log('Department not found');
+}
     if(role!=="2"){
     const report = await UserModel.findOne({
       where:{department:department,roleId:2,companyId:req.body.companyId}

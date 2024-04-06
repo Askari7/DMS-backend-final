@@ -8,8 +8,14 @@ const EstablishmentModel = db.establishments;
 
 module.exports.createProject = async (req, res) => {
   try {
-    console.log(req.body.startedDate,req.body.endedDate,"dates",typeof(req.body.startedDate));
+    console.log(req.body);
       req.body.noOfUsers = 0
+      const departments = req.body.departments
+      const departmentId = req.body.departmentId
+      req.body.departmentIds = departmentId.join(",")
+      req.body.departmentSuffix = departments.map(department => department.suffix).join(', ');
+      req.body.departmentTitle = departments.map(department => department.title).join(', ');
+      console.log(req.body);
       await ProjectModel.create(req?.body);
       await SystemLogModel.create({
         companyId: req?.body?.companyId,

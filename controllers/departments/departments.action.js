@@ -126,9 +126,9 @@ module.exports.listCounts = async (req, res) => {
     });
     console.log(department,"department proejct");
     
-    const mdr = await MDRModel.count({
+    const mdr = await ProjectModel.count({
       where: {
-        departmentId: {
+        departmentIds: {
           [Op.substring]: `${department.id}`
         }
       }

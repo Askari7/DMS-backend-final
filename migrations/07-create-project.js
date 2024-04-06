@@ -9,10 +9,18 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      // departmentId: {
-      //   type: Sequelize.INTEGER,
-      //   allowNull: false,
-      // },
+      departmentIds: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      departmentTitle: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      departmentSuffix: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       companyId: {
         type: Sequelize.INTEGER,
         allowNull: false,
