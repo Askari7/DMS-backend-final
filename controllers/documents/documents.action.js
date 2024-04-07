@@ -180,7 +180,8 @@ module.exports.createDocument = async (req, res) => {
       req.body.reviewerId = revName.map(reviewer => reviewer.id).join(', ');
       req.body.approver = appName.map(approver => approver.name).join(', ');
       req.body.reviewer = revName.map(reviewer => reviewer.name).join(', ');
-
+      req.body.approverComment = Array.from({ length: appName.length }).map(() => '').join(', ');
+      req.body.reviewerComment  = Array.from({ length: revName.length }).map(() => '').join(', ');
       req.body.approverStatus = Array.from({ length: appName.length }).map(() => 0).join(', ');
       req.body.reviewerStatus = Array.from({ length: revName.length }).map(() => 0).join(', ');;
 
@@ -395,8 +396,12 @@ module.exports.updateDocStatus = async (req, res) => {
     
     const approverComment=req.body.approverComment;
     const reviewerComment=req.body.reviewerComment;
-    appComment=approverComment.split(',');
-    revComment=reviewerComment.split(',');
+
+    if(approverComment || reviewerComment){
+      var appComment=approverComment.split(',');
+      var revComment=reviewerComment.split(',');
+    }
+
 
 
 let status='Uploaded';
