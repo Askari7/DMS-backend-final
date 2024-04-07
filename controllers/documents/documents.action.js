@@ -259,11 +259,15 @@ module.exports.assignDoc = async (req, res) => {
 
 module.exports.updateMDR = async (req, res) => {
   try {
-    
-    console.log("body",req.body);
+    const id = req.body.projectId
+   
     const recordData = JSON.parse(req.body.record);
     console.log(recordData,"recordData");
     const { projectId, projectCode,mdrCode } = recordData;
+
+    const fetchProject = await ProjectModel.findOne({where:{id:projectId}})
+    req.body.departmentId = fetchProject.departmentIds
+    req.body.departmentName = fetchProject.departmentTitle
 
     console.log("projectId:", projectId);
     console.log("projectCode:", projectCode);
@@ -382,17 +386,19 @@ module.exports.updateDocStatus = async (req, res) => {
   try {
     console.log('########',req.body);
     const docName = req.body.docName;
-approverStatus=req.body.appStatusArr;
-reviewerStatus=req.body.revStatusArr;
-
-approverComment=req.body.approverComment;
-reviewerComment=req.body.reviewerComment;
+    const approverStatus=req.body.appStatusArr;
+    const reviewerStatus=req.body.revStatusArr;
 
 
-appArray=approverStatus.split(',');
-revArray=reviewerStatus.split(',');
-appComment=approverComment.split(',');
-revComment=reviewerComment.split(',');
+    appArray=approverStatus.split(',');
+    revArray=reviewerStatus.split(',');
+    
+    const approverComment=req.body.approverComment;
+    const reviewerComment=req.body.reviewerComment;
+    appComment=approverComment.split(',');
+    revComment=reviewerComment.split(',');
+
+
 let status='Uploaded';
 let version='';
 if(revArray.every(num => num == 1)&&appArray.every(num => num == 0))
@@ -441,6 +447,7 @@ console.log('helooo',updatedDocument);
     res.status(500).send({ message: err.message });
   }
 };
+
 module.exports.createPermission = async (req, res) => {
   try {
     if (req?.body?.createDocument) req.body.reviewDocument = 1;
