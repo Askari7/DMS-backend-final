@@ -84,6 +84,37 @@ departments.forEach(department => {
 });
 console.log(departmentMap);
 console.log(departmentNames);
+
+
+const projectIds = projects.map(project => project.dataValues.id);
+
+// Calculate document progress for each project
+const documentProgress = projectIds.map(async projectId => {
+// Fetch total counts of documents for the project
+const totalDocuments = await DocumentModel.count({
+where: { projectId }
+});
+
+console.log(documentProgress,"totalDocuments");
+
+// Fetch counts of completed documents for the project
+const completedDocuments = await DocumentModel.count({
+where: { projectId, status: 'Completed' }
+});
+console.log(completedDocuments,"completedDocuments");
+
+// Calculate percentage of completed documents
+const percentage = (completedDocuments / totalDocuments) * 100;
+
+return { projectId, percentage };
+});
+
+// Await all document progress calculations to complete
+const documentProgressResults = await Promise.all(documentProgress);
+
+console.log(documentProgressResults,'results aye ');
+
+
 const combinedData = projects.map(project => {
   const departmentName = departmentMap[project.dataValues.departmentId];
   return {
@@ -91,9 +122,16 @@ const combinedData = projects.map(project => {
     departmentName: departmentName || 'Unknown' // Handle cases where departmentName is not found
   };
 });
-
+const combinedDataWithPercentage = combinedData.map(item => {
+  const percentageObj = documentProgressResults.find(p => p.projectId === item.id);
+  return {
+    ...item,
+    percentage: percentageObj ? percentageObj.percentage : 0
+  };
+});
+console.log(combinedDataWithPercentage,"combinedData");
 console.log(combinedData);
-    return res.status(200).send(combinedData);
+    return res.status(200).send(combinedDataWithPercentage);
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
@@ -211,3 +249,18 @@ module.exports.list=async(req,res)=>{
     console.error(error)
   }
 }
+
+module.exports.progress = async (req, res) => {
+  try {
+    
+
+
+
+    res.status(200).json({
+      documentProgressResults
+    })
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
