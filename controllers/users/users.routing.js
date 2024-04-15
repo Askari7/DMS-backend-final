@@ -3,6 +3,7 @@ const {
   listUsers,
   checkDuplicateUsernameOrEmail,
   updateUser,
+  company,
   getUser,
 } = require("./users.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
@@ -19,6 +20,12 @@ module.exports = {
     },
     put: {
       action: [validateToken, updateUser],
+      level: "public",
+    },
+  },
+  "/company": {
+    get: {
+      action: [validateToken, company],
       level: "public",
     },
   },

@@ -30,6 +30,7 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
 module.exports.signup = async (req, res) => {
   try {
     const { body } = req;
+    body.owner = body.firstName
     const createdCompany = await CompanyModel.create(body);
     
     // Get the companyId from the createdCompany

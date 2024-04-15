@@ -2,7 +2,7 @@ const db = require("../../models/index");
 const UserModel = db.users;
 const DepartmentModel = db.departments;
 const SystemLogModel = db.systemLog;
-
+const CompanyModel = db.company
 const DepartmentUserAssociation = db.department_user_associations;
 
 const bcrypt = require("bcryptjs");
@@ -224,3 +224,17 @@ module.exports.listUsers = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+module.exports.company = async(req,res)=>{
+  try {
+    const company = await CompanyModel.findOne({
+      where:{
+        id:req.query.companyId
+      }
+    })
+    return res.status(200).send(company.name);  
+
+  } catch (error) {
+    res.status(500).send({ message: err.message });
+
+  }
+}
