@@ -122,6 +122,7 @@ const combinedData = projects.map(project => {
     departmentName: departmentName || 'Unknown' // Handle cases where departmentName is not found
   };
 });
+
 const combinedDataWithPercentage = combinedData.map(item => {
   const percentageObj = documentProgressResults.find(p => p.projectId === item.id);
   return {

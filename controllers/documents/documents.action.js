@@ -81,17 +81,182 @@ else{
   }
 };
 
+// module.exports.listMDR = async (req, res) => {
+//   try {
+//     const mdr = await MDRModel.findAll({
+//       where: { companyId: req?.query?.companyId },
+//     });
+
+//     console.log(mdr,"mdr");
+//     const projectIds = mdr.map(project => project.dataValues.projectId);
+
+//     console.log(projectIds,"projectIds hain ");
+    
+// // // Calculate document progress for each project
+// const documentProgress = projectIds.map(async projectId => {
+// // Fetch total counts of documents for the project
+// const totalDocuments = await DocumentModel.count({
+// where: { projectId }
+// });
+
+// console.log(documentProgress,"totalDocuments");
+
+// // Fetch counts of completed documents for the project
+// const completedDocuments = await DocumentModel.count({
+// where: { projectId, status: 'Completed' }
+// });
+// console.log(completedDocuments,"completedDocuments");
+
+// // Calculate percentage of completed documents
+// const percentage = (completedDocuments / totalDocuments) * 100;
+
+// return { projectId, percentage };
+// });
+
+// // // // Await all document progress calculations to complete
+// const documentProgressResults = await Promise.all(documentProgress);
+
+// console.log(documentProgressResults,'results aye ');
+// const combinedData = results.map(result => {
+//   const mdrEntry = mdr.find(entry => entry.id === result.projectId);
+//   return { ...result, ...mdrEntry };
+// });
+
+// console.log(combinedData);
+
+
+
+//     return res.status(200).send(mdr);
+//   } catch (err) {
+//     console.log(err.message);
+//     res.status(500).send({ message: err.message });
+//   }
+// };
+
+
 module.exports.listMDR = async (req, res) => {
   try {
     const mdr = await MDRModel.findAll({
       where: { companyId: req?.query?.companyId },
     });
-    return res.status(200).send(mdr);
+
+    console.log(mdr, "mdr");
+
+    // Extract project IDs from MDR data
+    const projectIds = mdr.map(project => project.dataValues.projectId);
+
+    console.log(projectIds, "projectIds");
+
+    // Calculate document progress for each project
+    const documentProgress = await Promise.all(projectIds.map(async projectId => {
+      // Fetch total counts of documents for the project
+      const totalDocuments = await DocumentModel.count({ where: { projectId } });
+      console.log(totalDocuments, "totalDocuments");
+
+      // Fetch counts of completed documents for the project
+      const completedDocuments = await DocumentModel.count({ where: { projectId, status: 'Completed' } });
+      console.log(completedDocuments, "completedDocuments");
+
+      // Calculate percentage of completed documents
+      const percentage = totalDocuments === 0 ? 0 : (completedDocuments / totalDocuments) * 100;
+
+      return { projectId, percentage };
+    }));
+
+    console.log(documentProgress, 'documentProgressResults');
+
+    // Combine document progress with MDR data
+    const combinedData = mdr.map(entry => {
+      const progressEntry = documentProgress.find(progress => progress.projectId === entry.projectId);
+      return { ...entry.dataValues, ...progressEntry };
+    });
+
+    console.log(combinedData, 'combinedData');
+
+    return res.status(200).send(combinedData);
   } catch (err) {
-    console.log(err.message);
+    console.error(err.message);
     res.status(500).send({ message: err.message });
   }
 };
+
+
+
+// module.exports.listProjects = async (req, res) => {
+//   try {
+    
+//     const projects = await ProjectModel.findAll({
+//       where: { companyId: req?.query?.companyId },
+//     });
+//     const departmentIds = projects.map(project => project.dataValues.departmentId);
+
+// console.log(departmentIds);
+// const departments = await DepartmentModel.findAll({
+//   where: {
+//     id: departmentIds
+//   }
+// });
+// const departmentNames = departments.map(department => (department.dataValues.id,department.dataValues.title));
+// const departmentMap = {};
+// departments.forEach(department => {
+//   departmentMap[department.dataValues.id] = department.dataValues.title;
+// });
+// console.log(departmentMap);
+// console.log(departmentNames);
+
+
+// const projectIds = projects.map(project => project.dataValues.id);
+
+// // Calculate document progress for each project
+// const documentProgress = projectIds.map(async projectId => {
+// // Fetch total counts of documents for the project
+// const totalDocuments = await DocumentModel.count({
+// where: { projectId }
+// });
+
+// console.log(documentProgress,"totalDocuments");
+
+// // Fetch counts of completed documents for the project
+// const completedDocuments = await DocumentModel.count({
+// where: { projectId, status: 'Completed' }
+// });
+// console.log(completedDocuments,"completedDocuments");
+
+// // Calculate percentage of completed documents
+// const percentage = (completedDocuments / totalDocuments) * 100;
+
+// return { projectId, percentage };
+// });
+
+// // Await all document progress calculations to complete
+// const documentProgressResults = await Promise.all(documentProgress);
+
+// console.log(documentProgressResults,'results aye ');
+
+
+// const combinedData = projects.map(project => {
+//   const departmentName = departmentMap[project.dataValues.departmentId];
+//   return {
+//     ...project.dataValues,
+//     departmentName: departmentName || 'Unknown' // Handle cases where departmentName is not found
+//   };
+// });
+
+// const combinedDataWithPercentage = combinedData.map(item => {
+//   const percentageObj = documentProgressResults.find(p => p.projectId === item.id);
+//   return {
+//     ...item,
+//     percentage: percentageObj ? percentageObj.percentage : 0
+//   };
+// });
+// console.log(combinedDataWithPercentage,"combinedData");
+// console.log(combinedData);
+//     return res.status(200).send(combinedDataWithPercentage);
+//   } catch (err) {
+//     console.log(err.message);
+//     res.status(500).send({ message: err.message });
+//   }
+// };
 
 module.exports.createMDR = async (req, res) => {
   try {
