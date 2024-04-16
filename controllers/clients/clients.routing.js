@@ -1,5 +1,5 @@
 const { validateToken, authorize } = require("../../helpers/authorize");
-const { listClients, createClient,fetchOfficials ,fetchCompany,UpdateCompany} = require("./clients.action");
+const { listClients, createClient,fetchOfficials ,fetchCompany,UpdateCompany, sendEmailClient} = require("./clients.action");
   module.exports = {
     "/": {
       get: {
@@ -20,6 +20,16 @@ const { listClients, createClient,fetchOfficials ,fetchCompany,UpdateCompany} = 
          action: [validateToken, fetchOfficials],
          level: "public",
       }
+    },
+    "/send-email-client": {
+      // post: {
+      //   action: [validateToken, createClientOfficial],
+      //   level: "public",
+      // },
+      post: {
+        action: [validateToken, sendEmailClient],
+        level: "public",
+      },
     },
     "/company": {
 

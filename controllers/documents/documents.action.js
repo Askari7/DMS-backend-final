@@ -32,6 +32,7 @@ module.exports.listDocuments = async (req, res) => {
     const assignedTo = req?.query?.userId;
     const assignedBy = req?.query?.assignedBy;
     console.log('hello');
+    console.log('tttt',req.query);
     console.log('hi',typeof(companyId),req.query.masterDocumentId,req.query.projectId);
     if(req.query.masterDocumentId){
       const documents = await DocumentModel.findAll({
@@ -72,7 +73,7 @@ else{
         
       }
     });
-
+console.log('///////////////////////',documents);
     return res.status(200).send(documents);
   }
   } catch (err) {

@@ -8,6 +8,7 @@ const ProjectModel = db.projects;
 const CompanyModal = db.company;
 
 const config = require("../../config/auth.config");
+const { sendEmail, sendClientEmail } = require('../../helpers/send-email-client');
 
 module.exports.createClient = async (req, res) => {
   try {
@@ -20,6 +21,18 @@ module.exports.createClient = async (req, res) => {
       const clients = await ClientModel.create(body);
       return res.status(200).send({ message: "Client has been Created" });
     }    
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+module.exports.sendEmailClient = async (req, res) => {
+  try {
+    const { body } = req;
+    console.log('api hit bodu',body);
+    await sendClientEmail(body);
+      return res.status(200).send({ message: "Email sent to client" });
+      
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

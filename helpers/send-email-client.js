@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
-const { template } = require("../lang/template");
+const { clientTemplate } = require("../lang/client-template");
 
-module.exports.sendEmail = async (body) => {
+module.exports.sendClientEmail = async (body) => {
   try {
     // Create a nodemailer transporter using SMTP
     const transporter = nodemailer.createTransport({
@@ -15,7 +15,6 @@ module.exports.sendEmail = async (body) => {
     });
 
     console.log(
-      template(),
       body,
       process.env.SMTP_HOST,
       process.env.SMTP_PORT,
@@ -26,9 +25,9 @@ module.exports.sendEmail = async (body) => {
     console.log(body, "body");
     const mailOptions = {
       from: "salar@gmail.com",
-      to: body?.email,
-      subject: "Account Creation Notification",
-      html: template(body),
+      to: body?.clientName,
+      subject: "Document ready to view notification",
+      html: clientTemplate(body),
     };
 
     transporter.sendMail(mailOptions, function (err, data) {
