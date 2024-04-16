@@ -42,7 +42,7 @@ module.exports.listDocuments = async (req, res) => {
       });
       return res.status(200).send(documents);
     }
-if(assignedTo=='1'){
+if(assignedTo=='1' || assignedBy=='1'){
   const documents = await DocumentModel.findAll({
     where: {
       companyId: companyId,
