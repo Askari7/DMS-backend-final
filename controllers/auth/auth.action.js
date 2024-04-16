@@ -9,10 +9,10 @@ const CompanyModel = db.company;
 //middlewares
 
 module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
-  // Username
   UserModel.findOne({
     where: {
       email: req.body.email,
+      // companyId:req.body.companyId
     },
   }).then((user) => {
     if (user) {
@@ -30,6 +30,7 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
 module.exports.signup = async (req, res) => {
   try {
     const { body } = req;
+    body.owner = body.firstName
     const createdCompany = await CompanyModel.create(body);
     
     // Get the companyId from the createdCompany

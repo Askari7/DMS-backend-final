@@ -1,6 +1,12 @@
+const { Op } = require('sequelize');
+
 const Sequelize = require('sequelize');
 const db = require("../../models/index");
 const DepartmentModel = db.departments;
+const MDRModel = db.master_document_registers;
+
+const ProjectModel = db.projects;
+
 const UserModel = db.users;
 const SystemLogModel = db.system_logs;
 const DepartmentUserAssociation = db.department_user_associations;
@@ -114,15 +120,33 @@ module.exports.listDepartments = async (req, res) => {
 
 module.exports.listCounts = async (req, res) => {
   try {
+    console.log(req.query.userId,"userId by front");
     const department = await DepartmentModel.findOne({
       where: { id: req?.query?.departmentId }
+    });
+    console.log(department,"department proejct");
+    
+    const mdr = await ProjectModel.count({
+      where: {
+        departmentIds: {
+          [Op.substring]: `${department.id}`
+        }
+      }
+    });
+    console.log(mdr,"mdr project check");
+
+    const mdrAssigned = await MDRModel.count({
+      where: {
+        status: "Assigned",
+        authorId: req.query.userId// Assuming authorId is a numeric field
+      }
     });
 
     if (!department) {
       return res.status(404).send({ message: 'Department not found' });
     }
 
-    return res.status(200).send({ noOfUsers: department.noOfUsers });
+    return res.status(200).send({ noOfUsers: department.noOfUsers,departmentProjects:mdr ,mdrAssigned:mdrAssigned});
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

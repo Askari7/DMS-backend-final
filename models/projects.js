@@ -23,10 +23,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      // departmentId: {
-      //   type: DataTypes.INTEGER,
-      //   allowNull: false,
-      // },
+      departmentIds: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      departmentTitle: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      departmentSuffix: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       authorId: {
         type: DataTypes.INTEGER,
         allowNull: false,
