@@ -48,6 +48,10 @@ module.exports = (sequelize, DataTypes) => {
       documentNumberFormat: {
         type: DataTypes.STRING,
       },
+      logo: {
+        type: DataTypes.STRING, // Assuming you want to store the image as binary data in the database
+        allowNull: true,
+      },
     },
     {
       sequelize,

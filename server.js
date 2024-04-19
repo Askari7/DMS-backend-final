@@ -1,12 +1,13 @@
+const db = require("./models/index");
+
 const path = require("path");
 const lumie = require("lumie");
 const express = require("express");
-const multer  = require('multer')
 var bodyParser = require("body-parser");
-
 const cors = require("cors");
+const multer  = require('multer')
+const CompanyModel = db.company
 
-// app
 const app = express();
 
 app.use(cors());
@@ -25,7 +26,6 @@ lumie.load(app, {
   controllers_path: path.join(__dirname, "controllers"),
 });
 
-const upload = multer({ dest: 'uploads/' })
 
 // Serve static files (your React frontend)
 app.use(express.static(path.join(__dirname, "client/build")));
@@ -42,6 +42,50 @@ const server = app.listen(8083, "127.0.0.1", () => {
 });
 
 
-app.post("/upload",upload.single("profileImage"),(req,res)=>{
-  console.log(req.body);
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '../DMS-frontend-final/src/uploadedLogos')
+  },
+
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now()
+    cb(null, uniqueSuffix+file.originalname)
+  }
+})
+
+const upload = multer({ storage: storage })
+
+
+app.post('/getLogo',async(req, res)=>{
+  console.log("heat");
+  try {
+    const uploadLogo = await CompanyModel.findOne(
+      { where: { id: req.body.companyId } }
+    );
+    console.log(uploadLogo);
+    res.json({"msg":uploadLogo})
+  } catch (error) {
+    console.error(error)
+    res.json({"msg":"Failed"})
+
+  }
+})
+
+
+
+app.put('/logo', upload.single('image'), async(req, res)=>{
+  console.log(req.file.filename);
+  const logo = req.file.filename
+  try {
+    const uploadLogo = await CompanyModel.update(
+      { logo: logo },
+      { where: { id: req.body.companyId } }
+    );
+
+    res.json({"msg":"Updated"})
+  } catch (error) {
+    console.error(error)
+    res.json({"msg":"Failed"})
+
+  }
 })

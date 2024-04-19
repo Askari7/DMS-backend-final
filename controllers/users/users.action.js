@@ -8,6 +8,10 @@ const DepartmentUserAssociation = db.department_user_associations;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../../config/auth.config");
+
+
+
+
 const {
   generateRandomPassword,
 } = require("../../helpers/generate-user-password");
@@ -238,3 +242,51 @@ module.exports.company = async(req,res)=>{
 
   }
 }
+
+
+module.exports.uploadImage = (req, res) => {
+  upload.single('image')(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(500).json({ error: err.message });
+    } else if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    try {
+      const imageInfo = req.file.filename;
+      console.log(imageInfo, "imageInfo");
+
+      const userId = req.body.id;
+      const image = await UserModel.update(
+        { profileImage: imageInfo },
+        { where: { id: userId } }
+      );
+
+      console.log(image, "image");
+
+      res.status(200).send("Image uploaded successfully");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error uploading image");
+    }
+  });
+};
+
+
+module.exports.profile = async (req, res) => {
+  try {
+    console.log(req.query, 'Request query parameters');
+    // const userId = req.query.id;
+    // const image = await UserModel.findOne({ where: { id: userId } });
+    // console.log(image, "Retrieved image");
+
+    // if (!image) {
+    //   return res.status(404).json({ message: "User not found" });
+    // }
+
+    res.status(200).json({ status: "Ok", image: image.profileImage });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error retrieving user profile" });
+  }
+};

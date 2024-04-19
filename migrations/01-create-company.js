@@ -47,6 +47,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      logo: {
+        type: Sequelize.STRING, // Assuming you want to store the image as binary data in the database
+        allowNull: true,
+      },
     });
   },
   async down(queryInterface, Sequelize) {

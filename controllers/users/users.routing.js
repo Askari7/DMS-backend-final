@@ -5,6 +5,8 @@ const {
   updateUser,
   company,
   getUser,
+  profile,
+  uploadImage,
 } = require("./users.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 module.exports = {
@@ -39,4 +41,14 @@ module.exports = {
       level: "public",
     },
   },
+  "/upload": {
+    get: {
+      action: [validateToken, profile],
+      level: "public",
+    },
+    put: {
+      action: [validateToken, uploadImage],
+      level: "public",
+    },
+  }
 };
