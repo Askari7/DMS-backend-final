@@ -580,6 +580,8 @@ version='000.1';
 else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
 {
 status='Pending for Approval';
+version='000';
+
 }
 else if(appArray.every(num => num == 1) &&revArray.every(num => num == 2))
 {
@@ -590,6 +592,8 @@ version='001';
 else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
 {
 status='Approved(in-house)';
+version='000';
+
 }
 const updateDocStatus = await DocumentModel.update({status,version}, {
   where: { title:  {
