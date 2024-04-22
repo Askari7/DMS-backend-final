@@ -24,6 +24,7 @@ const { Sequelize } = require('sequelize');
 const { Op } = require('sequelize');
 const { reverse } = require("dns/promises");
 const { version } = require("os");
+const { title } = require("process");
 
 module.exports.listDocuments = async (req, res) => {
   try {
@@ -571,28 +572,29 @@ module.exports.updateDocStatus = async (req, res) => {
 
 
 let status='Uploaded';
-let version='';
-if(revArray.every(num => num == 1)&&appArray.every(num => num == 0))
-{
-status='Reviewers Rejected'
-version='000.1';
+// let version='';
+
+const document = await DocumentModel.findOne({ title: docName });
+let version = document ? document.version : null;
+
+if (revArray.every(num => num == 1) && appArray.every(num => num == 0)) {
+    status = 'Reviewers Rejected';
+    version = incrementVersion(version, true);
+} else if (appArray.every(num => num == 1) && revArray.every(num => num == 2)) {
+    status = 'Approvers Rejected';
+    version = incrementVersion(version, false);
 }
 else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
 {
 status='Pending for Approval';
-version='000';
+// version='000';
 
 }
-else if(appArray.every(num => num == 1) &&revArray.every(num => num == 2))
-{
-status='Approvers Rejected'
-version='001';
 
-}
 else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
 {
 status='Approved(in-house)';
-version='000';
+// version='000';
 
 }
 const updateDocStatus = await DocumentModel.update({status,version}, {
@@ -819,3 +821,25 @@ module.exports.exportMDRCsv = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+function incrementVersion(currentVersion, minor = true) {
+  // Split the version into major and minor parts
+  let [major, minorPart] = currentVersion.split('.');
+
+  // Convert to numbers for incrementing
+  major = parseInt(major);
+  minorPart = minorPart ? parseInt(minorPart) : 0;
+
+  // Increment the version based on minor or major condition
+  if (minor) {
+      minorPart++;
+  } else {
+      major++;
+  }
+
+  // Format the version back to XXX or XXX.X
+  if (minorPart > 0) {
+      return `${major.toString().padStart(3, '0')}.${minorPart.toString().padStart(1, '0')}`;
+  } else {
+      return major.toString().padStart(3, '0');
+  }
+}
