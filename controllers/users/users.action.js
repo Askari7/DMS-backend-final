@@ -65,6 +65,8 @@ module.exports.createUser = async (req, res) => {
     const companyId = req.body.companyId
 
     console.log(department,'department');
+    const companyName = await CompanyModel.findOne({where:{id: companyId} });
+    body['companyName']=companyName.name;
     const findDepartment = await DepartmentModel.findOne({where:{title: department,companyId} });
     console.log(findDepartment,"findDepartment");
 // Check if the department exists
