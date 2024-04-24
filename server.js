@@ -36,7 +36,7 @@ app.use(express.static(path.join(__dirname, "client/build")));
 
  app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client/build", "index.html"));});
-const server = app.listen(8083, "0.0.0.0", () => {
+const server = app.listen(8083, "127.0.0.1", () => {
   const { address, port } = server.address();
   console.log("DMS app listening at http://%s:%s", address, port);
 });
