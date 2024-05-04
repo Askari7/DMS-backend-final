@@ -27,6 +27,15 @@ module.exports = (sequelize, DataTypes) => {
       comments: {
         type: DataTypes.JSON,
       },
+      Inhouse: {
+        type: DataTypes.BOOLEAN,
+      },
+      Resolved: {
+        type: DataTypes.BOOLEAN,
+      },
+      Approved: {
+        type: DataTypes.BOOLEAN,
+      },
     },
     {
       sequelize,

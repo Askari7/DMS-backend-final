@@ -175,13 +175,13 @@ module.exports.listUsers = async (req, res) => {
   try {
     const departmentId = req?.query?.departmentId
     const companyId =  req?.query?.companyId
-    console.log(departmentId,"ayiiii");
+    // console.log(departmentId,"ayiiii");
     if (departmentId) {
       // console.log(departmentId,"ayiiiiiiiiiiiiii");
       const users = await UserModel.findAll({
         where: {  companyId,departmentId},
       });
-      console.log(users,"users");
+      // console.log(users,"users");
       return res.status(200).send(users);  
     } else {
       const users = await UserModel.findAll({
@@ -198,7 +198,7 @@ module.exports.listUsers = async (req, res) => {
           where: { userId: item.id },
           raw: true,
         });
-        console.log(department);
+        // console.log(department);
   
         if (item.roleId == 1) roleTitle = "CEO";
         else if (item.roleId == 2) roleTitle = "Head";
@@ -209,7 +209,7 @@ module.exports.listUsers = async (req, res) => {
         else roleTitle == "Client";
         if(department!== null){
         
-          console.log('hi');
+          // console.log('hi');
           const userDepartmentId=department.departmentId;
           var departmentName = await DepartmentModel.findOne({
             where: { id: userDepartmentId },
@@ -221,7 +221,7 @@ module.exports.listUsers = async (req, res) => {
         else{
         data.push({ ...item, roleTitle });}
       }
-      console.log('mydata',data);
+      // console.log('mydata',data);
       return res.status(200).send(data);  
     }
     
@@ -292,3 +292,6 @@ module.exports.profile = async (req, res) => {
     res.status(500).json({ message: "Error retrieving user profile" });
   }
 };
+
+
+

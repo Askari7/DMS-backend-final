@@ -7,6 +7,7 @@ const {
   listPermission,
   updateDocumentFormat,
   exportMDRCsv,
+  gettingEstablishment,
   getCodes,createComment, listComments, uploadDoc, uploadComment, getDocumentFormat,assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc
 } = require("./documents.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
@@ -82,7 +83,10 @@ module.exports = {
       action: [validateToken, updateDocStatus],
       level: "public",
     },
-    
+    post: {
+      action: [validateToken, gettingEstablishment],
+      level: "public",
+    },
   },
   "/comments": {
     get: {
