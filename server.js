@@ -45,7 +45,7 @@ const server = app.listen(8083, "0.0.0.0", () => {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../DMS-frontend-final-main/src/uploadedLogos/')
+    cb(null, '../DMS-frontend-final/src/uploadedLogos/')
   },
 
   filename: function (req, file, cb) {
