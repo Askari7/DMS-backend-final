@@ -4,6 +4,7 @@ const DepartmentModel = db.departments;
 const SystemLogModel = db.systemLog;
 const CompanyModel = db.company
 const DepartmentUserAssociation = db.department_user_associations;
+const multer  = require('multer')
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -49,11 +50,31 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
   });
 };
 
+// app.put('/user', upload.single('image'), async(req, res)=>{
+//   console.log(req.file.filename);
+//   const logo = req.file.filename
+//   try {
+//     const uploadLogo = await CompanyModel.update(
+//       { logo: logo },
+//       { where: { id: req.body.companyId } }
+//     );
+
+//     res.json({"msg":"Updated"})
+//   } catch (error) {
+//     console.error(error)
+//     res.json({"msg":"Failed"})
+
+//   }
+// })
+
+
 
 module.exports.createUser = async (req, res) => {
+
   try {
     const { body } = req;
-
+    console.log(body,"ye dekhle");
+  // const logo = req.file.filename
     const findUser = await UserModel.findOne({ department: body.department, companyId: body.companyId });
     console.log(findUser,'findUser');
 

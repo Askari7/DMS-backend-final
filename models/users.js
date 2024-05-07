@@ -57,8 +57,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      profileImage: {
-        type: DataTypes.BLOB, // Assuming you want to store the image as binary data in the database
+      image: {
+        type: DataTypes.STRING, // Assuming you want to store the image as binary data in the database
         allowNull: true,
       },
     },

@@ -7,6 +7,7 @@ var bodyParser = require("body-parser");
 const cors = require("cors");
 const multer  = require('multer')
 const CompanyModel = db.company
+const UserModel = db.users
 
 const app = express();
 
@@ -36,7 +37,7 @@ app.use(express.static(path.join(__dirname, "client/build")));
 
  app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client/build", "index.html"));});
-const server = app.listen(8083, "0.0.0.0", () => {
+const server = app.listen(8083, "127.0.0.1", () => {
   const { address, port } = server.address();
   console.log("DMS app listening at http://%s:%s", address, port);
 });
@@ -44,7 +45,7 @@ const server = app.listen(8083, "0.0.0.0", () => {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../DMS-frontend-final/src/uploadedLogos')
+    cb(null, '../DMS-frontend-final-main/src/uploadedLogos/')
   },
 
   filename: function (req, file, cb) {
@@ -71,7 +72,20 @@ app.post('/getLogo',async(req, res)=>{
   }
 })
 
+app.post('/getProfile',async(req, res)=>{
+  console.log("heat");
+  try {
+    const uploadLogo = await UserModel.findOne(
+      { where: { id: req.body.userId } }
+    );
+    console.log(uploadLogo,"uploadLogo");
+    res.json({"msg":uploadLogo})
+  } catch (error) {
+    console.error(error)
+    res.json({"msg":"Failed"})
 
+  }
+})
 
 app.put('/logo', upload.single('image'), async(req, res)=>{
   console.log(req.file.filename);
@@ -89,3 +103,38 @@ app.put('/logo', upload.single('image'), async(req, res)=>{
 
   }
 })
+
+app.put('/profile', upload.single('image'), async(req, res)=>{
+  console.log(req.file.filename);
+  const logo = req.file.filename
+  try {
+    const uploadLogo = await UserModel.update(
+      { image: logo },
+      { where: { companyId: req.body.companyId ,id:req.body.userId} }
+    );
+
+    res.json({"msg":"Updated"})
+  } catch (error) {
+    console.error(error)
+    res.json({"msg":"Failed"})
+
+  }
+})
+
+
+// app.put('/user', upload.single('image'), async(req, res)=>{
+//   console.log(req.file.filename);
+//   const logo = req.file.filename
+//   try {
+//     const uploadLogo = await CompanyModel.update(
+//       { logo: logo },
+//       { where: { id: req.body.companyId } }
+//     );
+
+//     res.json({"msg":"Updated"})
+//   } catch (error) {
+//     console.error(error)
+//     res.json({"msg":"Failed"})
+
+//   }
+// })

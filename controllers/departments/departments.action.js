@@ -42,7 +42,7 @@ module.exports.createDepartment = async (req, res) => {
       title: `${req?.body?.authorName} Created Department ${req?.body?.title}`,
     });
   }
-    return res.status(200).send({ message: "Departments Created" });
+    return res.status(200).send({ message: "Department has been Created" });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

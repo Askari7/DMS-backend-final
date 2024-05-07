@@ -21,7 +21,7 @@ module.exports.createProject = async (req, res) => {
         companyId: req?.body?.companyId,
         title: `${req?.body?.authorName} Created Project ${req?.body?.title}`,
       });
-    return res.status(200).send({ message: "Projects Created" });
+    return res.status(200).send({ message: "Project has been Created" });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

@@ -288,7 +288,7 @@ module.exports.createMDR = async (req, res) => {
       title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
       companyId: req?.body?.companyId,
     });
-    return res.status(200).send({ message: "Master Document Register Created" });
+    return res.status(200).send({ message: "Master Document Register Assigned" });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

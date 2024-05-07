@@ -15,11 +15,11 @@ module.exports.createClient = async (req, res) => {
     const { body } = req;
     if(body.clientName){
       const clients = await ClientOfficialModel.create(body);
-      return res.status(200).send({ message: "Client Official has been Created" });
+      return res.status(200).send({ message: "Client Official has been Added" });
     }
     else{
       const clients = await ClientModel.create(body);
-      return res.status(200).send({ message: "Client has been Created" });
+      return res.status(200).send({ message: "Client Company has been Created" });
     }    
   } catch (err) {
     console.log(err.message);

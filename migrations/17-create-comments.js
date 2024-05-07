@@ -26,6 +26,15 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      Inhouse: {
+        type: Sequelize.BOOLEAN,
+      },
+      Resolved: {
+        type: Sequelize.BOOLEAN,
+      },
+      Approved: {
+        type: Sequelize.BOOLEAN,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
