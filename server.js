@@ -16,6 +16,7 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // parse application/json
+app.use(express.static("uploadedLogos"))
 
 app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
@@ -45,7 +46,7 @@ const server = app.listen(8083, "0.0.0.0", () => {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../DMS-frontend-final-main/src/uploadedLogos/')
+    cb(null, './uploadedLogos/')
   },
 
   filename: function (req, file, cb) {

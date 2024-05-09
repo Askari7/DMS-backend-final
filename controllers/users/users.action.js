@@ -5,7 +5,6 @@ const SystemLogModel = db.systemLog;
 const CompanyModel = db.company
 const DepartmentUserAssociation = db.department_user_associations;
 const multer  = require('multer')
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../../config/auth.config");

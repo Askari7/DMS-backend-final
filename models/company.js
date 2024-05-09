@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
       logo: {
-        type: DataTypes.STRING, // Assuming you want to store the image as binary data in the database
+        type: DataTypes.BLOB('long'),        
         allowNull: true,
       },
     },
