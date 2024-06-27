@@ -9,6 +9,42 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Company.hasMany(models.users, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Company.hasMany(models.clients, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Company.hasMany(models.documents, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
+
+
+      Company.hasMany(models.departments, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      
+      Company.hasMany(models.establishments, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Company.hasMany(models.projects, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
+
     }
   }
   Company.init(
@@ -54,6 +90,8 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+
+
       sequelize,
       modelName: "company",
       freezeTableName: true,

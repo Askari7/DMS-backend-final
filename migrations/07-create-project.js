@@ -13,24 +13,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      departmentTitle: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      departmentSuffix: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       companyId: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      authorId: {
+      creatorId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      authorName: {
-        type: Sequelize.STRING,
         allowNull: false,
       },
       clientId: {

@@ -15,15 +15,6 @@ module.exports = {
           version: {
             type: Sequelize.STRING,
           },
-          userName: {
-            type: Sequelize.STRING,
-          },
-          approver: {
-            type: Sequelize.STRING,
-          },
-          reviewer: {
-            type: Sequelize.STRING,
-          },
           approverId: {
             type: Sequelize.STRING,
           },
@@ -42,25 +33,30 @@ module.exports = {
           reviewerComment: {
             type: Sequelize.STRING,
           },
+
+          
+          clientId: {
+            type: Sequelize.STRING,
+          },
+          clientStatus: {
+            type: Sequelize.STRING,
+          },
+          clientComment: {
+            type: Sequelize.STRING,
+          },
           status: {
             type: Sequelize.BOOLEAN,
           },
-          designation: {
-            type: Sequelize.BOOLEAN,
+          documentId: {
+            type: Sequelize.STRING,
+          },
+          projectId: {
+            type: Sequelize.STRING,
+          },
+          mdrId: {
+            type: Sequelize.STRING,
           },
           companyId: {
-            type: Sequelize.STRING,
-          },
-          docDepartmentId: {
-            type: Sequelize.STRING,
-          },
-          docDepartmentName: {
-            type: Sequelize.STRING,
-          },
-          masterDocumentCode: {
-            type: Sequelize.STRING,
-          },
-          masterDocumentName: {
             type: Sequelize.STRING,
           },
       createdAt: {

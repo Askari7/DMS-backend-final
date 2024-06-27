@@ -16,9 +16,6 @@ module.exports = {
         type: Sequelize.STRING,
       },
       companyId: {
-        type: Sequelize.INTEGER,
-      },
-      departmentId: {
         type: Sequelize.STRING,
       },
       projectId: {
@@ -26,12 +23,6 @@ module.exports = {
       },
       masterDocumentId: {
         type: Sequelize.STRING,
-      },
-      masterDocumentName: {
-        type: Sequelize.STRING,
-      },
-      content: {
-        type: Sequelize.TEXT,
       },
       extension: {
         type: Sequelize.STRING,

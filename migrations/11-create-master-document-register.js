@@ -16,21 +16,11 @@ module.exports = {
       companyId: {
         type: Sequelize.INTEGER,
       },
-      departmentId: {
-        type: Sequelize.STRING,
-      },
-      departmentName: {
-        type: Sequelize.STRING,
-      },
-      projectId: {
-        type: Sequelize.INTEGER,
-      },
-      projectCode: { type: Sequelize.STRING },
       authorId: {
         type: Sequelize.INTEGER,
       },
-      authorName: {
-        type: Sequelize.STRING,
+      projectId: {
+        type: Sequelize.INTEGER,
       },
       noOfDocuments: {
         type: Sequelize.INTEGER,
@@ -46,6 +36,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+
     });
   },
   async down(queryInterface, Sequelize) {

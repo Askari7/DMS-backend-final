@@ -14,8 +14,13 @@ module.exports = (sequelize, DataTypes) => {
         targetKey:'id',
         onDelete: 'CASCADE', // You can adjust onDelete based on your requirements
       });
+      Clients.hasMany(models.clientOfficials, {
+        foreignKey: 'companyIdOfClient',
+        targetKey:'id',
+        onDelete: 'CASCADE', // You can adjust onDelete based on your requirements
+      });
+
     }
-    
   }
   Clients.init(
     {
@@ -42,6 +47,8 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+
+
       sequelize,
       modelName: "clients",
     }

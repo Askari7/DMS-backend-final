@@ -13,14 +13,6 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      authorId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      authorName: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       title: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -28,9 +20,6 @@ module.exports = {
       suffix: {
         type: Sequelize.STRING,
         allowNull: false,
-      },
-      parentId: {
-        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,

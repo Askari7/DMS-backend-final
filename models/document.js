@@ -8,7 +8,29 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // define association 
+      Document.belongsTo(models.company, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
+      Document.belongsTo(models.projects, {
+        foreignKey: 'projectId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
+      Document.belongsTo(models.master_document_registers, {
+        foreignKey: 'masterDocumentId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Document.hasOne(models.establishments, {
+        foreignKey: 'documentId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
     }
   }
   Document.init(
@@ -29,9 +51,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
       companyId: {
-        type: DataTypes.INTEGER,
-      },
-      departmentId: {
         type: DataTypes.STRING,
       },
       projectId: {
@@ -39,12 +58,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       masterDocumentId: {
         type: DataTypes.STRING,
-      },
-      masterDocumentName: {
-        type: DataTypes.STRING,
-      },
-      content: {
-        type: DataTypes.TEXT,
       },
       extension: {
         type: DataTypes.STRING,
@@ -82,8 +95,11 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+
+
       sequelize,
       modelName: "documents",
+
     }
   );
   return Document;

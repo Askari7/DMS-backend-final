@@ -9,6 +9,23 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      MasterDocumentRegister.belongsTo(models.projects, {
+        foreignKey: 'projectId',
+        targetKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
+      MasterDocumentRegister.hasMany(models.documents, {
+        foreignKey: 'masterDocumentId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      MasterDocumentRegister.hasMany(models.establishments, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
     }
   }
   MasterDocumentRegister.init(
@@ -28,23 +45,11 @@ module.exports = (sequelize, DataTypes) => {
       companyId: {
         type: DataTypes.INTEGER,
       },
-      departmentId: {
-        type: DataTypes.STRING,
-      },
-      departmentName: {
-        type: DataTypes.STRING,
-      },
       projectId: {
         type: DataTypes.INTEGER,
       },
-      projectCode: {
-        type: DataTypes.STRING,
-      },
       authorId: {
         type: DataTypes.INTEGER,
-      },
-      authorName: {
-        type: DataTypes.STRING,
       },
       noOfDocuments: {
         type: DataTypes.INTEGER,
@@ -54,8 +59,11 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+
       sequelize,
       modelName: "master_document_registers",
+
+
     }
   );
   return MasterDocumentRegister;

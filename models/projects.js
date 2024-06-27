@@ -9,6 +9,29 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Projects.belongsTo(models.company, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Projects.hasOne(models.master_document_registers, {
+        foreignKey: 'projectId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Projects.hasMany(models.documents, {
+        foreignKey: 'projectId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
+      
+      Projects.hasMany(models.establishments, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
     }
   }
   Projects.init(
@@ -27,20 +50,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      departmentTitle: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      departmentSuffix: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      authorId: {
+      creatorId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      authorName: {
-        type: DataTypes.STRING,
         allowNull: false,
       },
       clientId: {
@@ -71,8 +82,11 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+
       sequelize,
+
       modelName: "projects",
+
     }
   );
   return Projects;

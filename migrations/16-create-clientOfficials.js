@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      companyId: {
+      companyIdOfClient: {
         allowNull: false,
         type: Sequelize.INTEGER,
       },

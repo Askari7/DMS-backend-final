@@ -9,6 +9,27 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Establishments.belongsTo(models.documents, {
+        foreignKey: 'documentId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Establishments.belongsTo(models.projects, {
+        foreignKey: 'projectId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Establishments.belongsTo(models.company, {
+        foreignKey: 'companyId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+      Establishments.belongsTo(models.master_document_registers, {
+        foreignKey: 'mdrId',
+        sourceKey: 'id',
+        onDelete: 'CASCADE',
+      });
+
     }
   }
   Establishments.init(
@@ -22,22 +43,12 @@ module.exports = (sequelize, DataTypes) => {
       docName: {
         type: DataTypes.STRING,
       },
-      userName: {
-        type: DataTypes.STRING,
-      },
-      reviewer: {
-        type: DataTypes.STRING,
-      },
-      approver: {
-        type: DataTypes.STRING,
-      },
       approverId: {
         type: DataTypes.STRING,
       },
       reviewerId: {
         type: DataTypes.STRING,
       },
-
       approverStatus: {
         type: DataTypes.STRING,
       },
@@ -50,36 +61,40 @@ module.exports = (sequelize, DataTypes) => {
       reviewerComment: {
         type: DataTypes.STRING,
       },
+      clientId: {
+        type: DataTypes.STRING,
+      },
+      clientStatus: {
+        type: DataTypes.STRING,
+      },
+      clientComment: {
+        type: DataTypes.STRING,
+      },
       version: {
         type: DataTypes.STRING,
       },
       status: {
         type: DataTypes.BOOLEAN,
       },
-      designation: {
-        type: DataTypes.BOOLEAN,
+      documentId: {
+        type: DataTypes.STRING,
       },
       companyId: {
         type: DataTypes.STRING,
       },
-      docDepartmentId: {
+      projectId: {
         type: DataTypes.STRING,
       },
-      docDepartmentName: {
+      mdrId: {
         type: DataTypes.STRING,
       },
-      masterDocumentCode: {
-        type: DataTypes.STRING,
-      },
-      masterDocumentName: {
-        type: DataTypes.STRING,
-      },
-     
-     
     },
     {
+
+
       sequelize,
       modelName: "establishments",
+
     }
   );
   return Establishments;

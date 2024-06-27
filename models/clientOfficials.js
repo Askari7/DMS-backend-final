@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       ClientOfficials.belongsTo(models.clients, {
-        foreignKey: 'companyId',
+        foreignKey: 'companyIdOfClient',
         targetKey:'id',
         onDelete: 'CASCADE', // You can adjust onDelete based on your requirements
       });
@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      companyId: {
+      companyIdOfClient: {
         type: DataTypes.INTEGER,
         allowNull:false,
       },

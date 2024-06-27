@@ -15,9 +15,6 @@ module.exports = {
       roleId: {
         type: Sequelize.INTEGER,
       },
-      department: {
-        type: Sequelize.STRING,
-      },
       departmentId: {
         type: Sequelize.STRING,
       },

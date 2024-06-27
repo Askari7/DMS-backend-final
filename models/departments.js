@@ -9,6 +9,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Departments.hasMany(models.users, {
+        foreignKey: 'departmentId',
+        sourceKey:'id',
+        onDelete: 'CASCADE', // You can adjust onDelete based on your requirements
+      });
+
+      Departments.belongsTo(models.company, {
+        foreignKey: 'companyId',
+        sourceKey:'id',
+        onDelete: 'CASCADE', // You can adjust onDelete based on your requirements
+      });
+      
     }
   }
   Departments.init(
@@ -22,14 +34,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      authorId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      authorName: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       title: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -38,16 +42,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      parentId: {
-        type: DataTypes.INTEGER,
-      },
       noOfUsers: {
         type: DataTypes.INTEGER,
       },
     },
     {
+
+
       sequelize,
       modelName: "departments",
+
     }
   );
   return Departments;

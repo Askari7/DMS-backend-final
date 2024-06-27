@@ -1,9 +1,10 @@
-const { createProject, listProjects,listInformation ,list,progress} = require("./projects.action");
+const { createProject,listInformation,DocumentTreeData ,FetchDepartmentProjectAndMDR,list,progress,FetchClientsDepartmentsAndProjects,createMDRThrough} = require("./projects.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
+const { get } = require("lodash");
 module.exports = {
   "/": {
     get: {
-      action: [validateToken, listProjects],
+      action: [validateToken, FetchClientsDepartmentsAndProjects],
       level: "public",
     },
     post: {
@@ -13,7 +14,7 @@ module.exports = {
   },
   "information": {
     get: {
-      action: [validateToken, listInformation],
+      action: [validateToken,listInformation],
       level: "public",
     },
   },
@@ -23,10 +24,14 @@ module.exports = {
       level: "public",
     },
   },
-  "progress": {
-    get: {
-      action: [validateToken, progress],
+  "mdr":{
+    post: {
+      action: [validateToken, createMDRThrough],
       level: "public",
     },
-  },
+    get: {
+      action: [FetchDepartmentProjectAndMDR],
+      level: "public",
+    },
+  }
 };
