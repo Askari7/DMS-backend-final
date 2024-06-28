@@ -1791,156 +1791,315 @@ module.exports.listEstablishment = async (req, res) => {
 
 
 
+// module.exports.updateDocStatus = async (req, res) => {
+//   try {
+//     const versionIn = req.query.version.trim();
+//     const approverId = req.query.approverId.trim();
+//     const reviewerId = req.query.reviewerId.trim();
+//     const companyId = req.query.companyId.trim();
+//     const role = req.query.yourRole.trim();
+//     const docName = req.body.docName.trim();
+//     const approverStatus = req.body.appStatusArr.trim();
+//     const reviewerStatus = req.body.revStatusArr.trim();
+    
+//     console.log({
+//       versionIn,
+//       approverId,
+//       reviewerId,
+//       companyId,
+//       role,
+//       docName,
+//       approverStatus,
+//       reviewerStatus,
+//       data: "data"
+//     });
+    
+//     const updateCheck = await EstablishmentModel.findOne({
+//       where: { docName: docName }
+//     });
+    
+//     console.log(updateCheck, "updateCheck");
+    
+//     if (!updateCheck) {
+//       console.log("check1 - Document not found");
+//       return res.status(404).send({ message: "Document not found" });
+//     }
+    
+//     console.log("reviewerStatus:", updateCheck.reviewerStatus);
+//     console.log("includes('0'):", updateCheck.reviewerStatus.includes('0'));
+//     console.log("role === 'Approver':", role === "Approver");
+    
+//     if (updateCheck.reviewerStatus && updateCheck.reviewerStatus.includes('0') && role === "Approver") {
+//       console.log("check2 - Reviewer Status is not completed yet");
+//       return res.status(200).send({ message: "Reviewer Status is not completed yet" });
+//     }
+        
+//     function incrementVersion(versionIn) {
+//       // Define the current version prefix and increment value
+//       const currentPrefix = '000';
+//       const incrementValue = '.1';
+    
+//       // Check if the incoming version starts with the current prefix and is exactly '000'
+//       if (versionIn === currentPrefix) {
+//         // If version is '000', increment it to '000.1'
+//         return currentPrefix + incrementValue;
+//       } else if (versionIn.startsWith(currentPrefix + '.')) {
+//         // If version is in the form '000.x', increment the numeric part
+//         const numericPart = versionIn.slice(currentPrefix.length + 1); // Extract the numeric part after '000.'
+//         const incrementedNumeric = parseInt(numericPart) + 1; // Parse and increment the numeric part
+//         return currentPrefix + '.' + incrementedNumeric.toString(); // Construct the updated version
+//       } else {
+//         // Return the original version if it does not match the expected format
+//         return versionIn;
+//       }
+//     }
+//     const updatedVersion = incrementVersion(versionIn);
+
+//     appArray=approverStatus.split(',');
+//     revArray=reviewerStatus.split(',');
+
+//     const approverComment=req.body.approverComment;
+//     const reviewerComment=req.body.reviewerComment;
+
+//     if(approverComment || reviewerComment){
+//       var appComment=approverComment.split(',');
+//       var revComment=reviewerComment.split(',');
+//     }
+
+//     console.log(appComment,revComment);
+
+
+// let status='Uploaded';
+
+// const document = await DocumentModel.findOne({where:{ title: docName }});
+// let version = document ? document.version : null;
+
+// if (revArray.every(num => num == 1) && appArray.every(num => num == 0)) {
+//     status = 'Reviewers Rejected';
+//     version = incrementVersion(version);
+// } else if (appArray.every(num => num == 1) && revArray.every(num => num == 2)) {
+//     status = 'Approvers Rejected';
+//     version = incrementVersion(version);
+// }
+// else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
+// {
+// status='Pending for Approval';
+// // version='000';
+
+// }
+
+// else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
+// {
+// status='Approved(in-house)';
+// // version='000';
+// }
+// const updateDocStatus = await DocumentModel.update({status,version}, {
+//   where: { title:  {
+//     [Sequelize.Op.like]: `%${docName}%`
+//   }}
+// });
+//   console.log(docName);
+    
+//     // Update document with new status values
+//     await EstablishmentModel.update(
+//       { reviewerStatus,approverStatus, approverComment, reviewerComment,version:updatedVersion },
+//       { where: { docName: docName ,version:versionIn } }
+//     );
+    
+// //     // Retrieve updated document
+//     const updatedDocument = await EstablishmentModel.findOne({
+//       where: { docName: docName }
+//     });
+    
+//     if (updatedDocument.reviewerStatus.every(status => status === '0') && updatedDocument.approverStatus.every(status => status === '0')) {
+//       const updatedVersion = incrementVersion(versionIn);
+//       console.log("Updated Version:", updatedVersion);
+    
+//       // Add your logic here to handle the updated version, e.g., saving to the database
+//     }
+//     if (!updatedDocument) {
+//       return res.status(404).send({ message: "Document not found after update" });
+//     }
+
+//     const reviewerStatusParts = updatedDocument.reviewerStatus.split(',');
+//     const approverStatusParts = updatedDocument.approverStatus.split(',');
+    
+//     const allReviewersApproved = reviewerStatusParts.every(part => part.trim() === '1');
+//     const allApproversApproved = approverStatusParts.every(part => part.trim() === '1');
+    
+//     // If any status is not '1', request a new version
+//     if (allReviewersApproved) {
+// //       console.log(record, "record");
+// //       console.log(record.reviewerId,record.approverId,'Ids');
+// // Check if 'approverId' exists and is a string before splitting
+//       const countApp = appArray.length || 0;
+
+//       // Check if 'reviewerId' exists and is a string before splitting
+//       const countRev = revArray.length || 0;
+
+//       // Update 'approverComment' and 'reviewerComment' based on the count
+//       const approverComment = Array.from({ length: countApp }).map(() => '').join(', ');
+//       const reviewerComment = Array.from({ length: countRev }).map(() => '').join(', ');
+
+//       // Update 'approverStatus' and 'reviewerStatus' based on the count
+//       const approverStatuses = Array.from({ length: countApp }).map(() => 0).join(', ');
+//       const reviewerStatuses = Array.from({ length: countRev }).map(() => 0).join(', ');
+    
+//     const recordData = {
+//       docName: docName,
+//       version:updatedVersion,
+//       approverId,reviewerId,
+//       approverStatus:approverStatuses,reviewerStatus:reviewerStatuses,approverComment,reviewerComment,companyId
+//     };
+//     const newRecord = await EstablishmentModel.create(recordData)
+//   return res.status(200).send({ message: "Document Status updated" });
+//   } catch (err) {
+//     console.log(err.message);
+//     res.status(500).send({ message: err.message });
+//   }
+// };
+
 module.exports.updateDocStatus = async (req, res) => {
   try {
-    const versionIn = req.query.version
-    const approverId = req.query.approverId 
-    const reviewerId = req.query.reviewerId 
-    const companyId = req.query.companyId 
-    const role = req.query.yourRole 
-    const docName = req.body.docName;
-    const approverStatus=req.body.appStatusArr;
-    const reviewerStatus=req.body.revStatusArr;
+    const versionIn = req.query.version.trim();
+    const approverId = req.query.approverId.trim();
+    const reviewerId = req.query.reviewerId.trim();
+    const companyId = req.query.companyId.trim();
+    const role = req.query.yourRole.trim();
+    const docName = req.body.docName.trim();
+    const approverStatus = req.body.appStatusArr.trim();
+    const reviewerStatus = req.body.revStatusArr.trim();
+    const approverComment = req.body.approverComment.trim();
+    const reviewerComment = req.body.reviewerComment.trim();
 
-    console.log(versionIn,approverId,reviewerId,role,docName,approverStatus,reviewerStatus,"data");
-    function incrementVersion(versionIn) {
-      // Define the current version prefix and increment value
-      const currentPrefix = '000';
-      const incrementValue = '.1';
-    
-      // Check if the incoming version starts with the current prefix and is exactly '000'
-      if (versionIn === currentPrefix) {
-        // If version is '000', increment it to '000.1'
-        return currentPrefix + incrementValue;
-      } else if (versionIn.startsWith(currentPrefix + '.')) {
-        // If version is in the form '000.x', increment the numeric part
-        const numericPart = versionIn.slice(currentPrefix.length + 1); // Extract the numeric part after '000.'
-        const incrementedNumeric = parseInt(numericPart) + 1; // Parse and increment the numeric part
-        return currentPrefix + '.' + incrementedNumeric.toString(); // Construct the updated version
-      } else {
-        // Return the original version if it does not match the expected format
-        return versionIn;
-      }
-    }
-    if(versionIn){
-      const updatedVersion = incrementVersion(versionIn);
-    }
-    appArray=approverStatus.split(',');
-    revArray=reviewerStatus.split(',');
-
-    const approverComment=req.body.approverComment;
-    const reviewerComment=req.body.reviewerComment;
-
-    if(approverComment || reviewerComment){
-      var appComment=approverComment.split(',');
-      var revComment=reviewerComment.split(',');
-    }
-
-    console.log(appComment,revComment);
-
-
-let status='Uploaded';
-
-const document = await DocumentModel.findOne({where:{ title: docName }});
-let version = document ? document.version : null;
-
-if (revArray.every(num => num == 1) && appArray.every(num => num == 0)) {
-    status = 'Reviewers Rejected';
-    version = incrementVersion(version, true);
-} else if (appArray.every(num => num == 1) && revArray.every(num => num == 2)) {
-    status = 'Approvers Rejected';
-    version = incrementVersion(version, false);
-}
-else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
-{
-status='Pending for Approval';
-// version='000';
-
-}
-
-else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
-{
-status='Approved(in-house)';
-// version='000';
-
-}
-const updateDocStatus = await DocumentModel.update({status,version}, {
-  where: { title:  {
-    [Sequelize.Op.like]: `%${docName}%`
-  }}
-});
-    console.log(docName);
+    console.log({
+      versionIn,
+      approverId,
+      reviewerId,
+      companyId,
+      role,
+      docName,
+      approverStatus,
+      reviewerStatus,
+      approverComment,
+      reviewerComment,
+      data: "data"
+    });
 
     const updateCheck = await EstablishmentModel.findOne({
       where: { docName: docName }
     });
-    
+
+    console.log(updateCheck, "updateCheck");
+
     if (!updateCheck) {
+      console.log("check1 - Document not found");
       return res.status(404).send({ message: "Document not found" });
     }
-    // Check reviewerStatus for any '0'
+
+    console.log("reviewerStatus:", updateCheck.reviewerStatus);
+    console.log("includes('0'):", updateCheck.reviewerStatus.includes('0'));
+    console.log("role === 'Approver':", role == "Approver");
+
     if (updateCheck.reviewerStatus && updateCheck.reviewerStatus.includes('0') && role === "Approver") {
+      console.log("check2 - Reviewer Status is not completed yet");
       return res.status(200).send({ message: "Reviewer Status is not completed yet" });
     }
-    
-    // Update document with new status values
+
+
+    const appArray = approverStatus.split(',');
+    const revArray = reviewerStatus.split(',');
+
+    console.log(approverComment, reviewerComment);
+
+    let status = 'Uploaded';
+
+    const document = await DocumentModel.findOne({ where: { title: docName } });
+    let version = document ? document.version : null;
+
+    if (revArray.every(num => num == 1) && appArray.every(num => num == 0)) {
+      status = 'Reviewers Rejected';
+      version = incrementVersion(version);
+    } else if (appArray.every(num => num == 1) && revArray.every(num => num == 2)) {
+      status = 'Approvers Rejected';
+      version = incrementVersion(version);
+    } else if (revArray.every(num => num == 2) && appArray.every(num => num == 0)) {
+      status = 'Pending for Approval';
+    } else if (appArray.every(num => num == 2) && revArray.every(num => num == 2)) {
+      status = 'Approved(in-house)';
+    }
+
+    const updateDocStatus = await DocumentModel.update({ status, version }, {
+      where: {
+        title: {
+          [Sequelize.Op.like]: `%${docName}%`
+        }
+      }
+    });
+
+    console.log(docName);
+
     await EstablishmentModel.update(
-      { reviewerStatus,approverStatus, approverComment, reviewerComment },
-      { where: { docName: docName ,version:version } }
+      { reviewerStatus, approverStatus, approverComment, reviewerComment },
+      { where: { docName: docName, version: versionIn } }
     );
-    
+
     // Retrieve updated document
     const updatedDocument = await EstablishmentModel.findOne({
       where: { docName: docName }
     });
-    
+
     if (!updatedDocument) {
       return res.status(404).send({ message: "Document not found after update" });
     }
-    
-    // Check if all reviewerStatus and approverStatus are '1'
+
     const reviewerStatusParts = updatedDocument.reviewerStatus.split(',');
     const approverStatusParts = updatedDocument.approverStatus.split(',');
     
-    const allReviewersApproved = reviewerStatusParts.every(part => part.trim() === '1');
-    const allApproversApproved = approverStatusParts.every(part => part.trim() === '1');
-    
-    // If any status is not '1', request a new version
-    if (allReviewersApproved) {
-//       console.log(record, "record");
-//       console.log(record.reviewerId,record.approverId,'Ids');
-// Check if 'approverId' exists and is a string before splitting
-      const countApp = appArray.length || 0;
+    const allReviewersApproved = reviewerStatusParts.every(part => part.trim() == '1');
+    const allApproversApproved = approverStatusParts.every(part => part.trim() == '1');
 
-      // Check if 'reviewerId' exists and is a string before splitting
+    // If any status is not '1', request a new version
+    if (allReviewersApproved && allApproversApproved) {
+      const countApp = appArray.length || 0;
       const countRev = revArray.length || 0;
 
-      // Update 'approverComment' and 'reviewerComment' based on the count
       const approverComment = Array.from({ length: countApp }).map(() => '').join(', ');
       const reviewerComment = Array.from({ length: countRev }).map(() => '').join(', ');
 
-      // Update 'approverStatus' and 'reviewerStatus' based on the count
       const approverStatuses = Array.from({ length: countApp }).map(() => 0).join(', ');
       const reviewerStatuses = Array.from({ length: countRev }).map(() => 0).join(', ');
-      console.log(countApp,countRev,"counting");
-    const recordData = {
-      // Assign specific properties from 'record' to the new record
-      docName: docName,
-      version,
-      approverId,reviewerId,
-      approverStatus:approverStatuses,reviewerStatus:reviewerStatuses,approverComment,reviewerComment,companyId
-    };
+      var updatedVersion = ''
+      // Increment the version if needed
+      if (reviewerStatusParts.every(status => status == '0') && approverStatusParts.split(",").every(status => status == '0')) {
+        updatedVersion = incrementVersion(versionIn,true);
+        console.log("Updated Version:", updatedVersion);
       
-      const newRecord = await EstablishmentModel.create(recordData)
-
-      return res.status(200).send({ message: "Please upload a new version now!" });
-    }
+        // Add your logic here to handle the updated version, e.g., saving to the database
+        const recordData = {
+          docName: docName,
+          version: updatedVersion,
+          approverId,
+          reviewerId,
+          approverStatus: approverStatuses,
+          reviewerStatus: reviewerStatuses,
+          approverComment,
+          reviewerComment,
+          companyId,
+          projectId:updatedDocument.projectId
+        };
+  
+        const newRecord = await EstablishmentModel.create(recordData);
         return res.status(200).send({ message: "Document Status updated" });
+      }
+      }
+
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
+
 
 module.exports.createPermission = async (req, res) => {
   try {

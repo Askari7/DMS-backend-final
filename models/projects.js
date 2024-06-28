@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
 
       
       Projects.hasMany(models.establishments, {
-        foreignKey: 'companyId',
+        foreignKey: 'projectId',
         sourceKey: 'id',
         onDelete: 'CASCADE',
       });

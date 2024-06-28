@@ -29,7 +29,7 @@ module.exports.createProject = async (req, res) => {
 
 module.exports.createMDRThrough = async (req, res) => {
   try {
-    const record = JSON.parse(req.query.record);
+    const record = (req.query.record) || null;
     console.log(record, 'record');
 
     if (record && record.id && record.projectId) {
