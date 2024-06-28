@@ -464,7 +464,57 @@ module.exports.updateMDR = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+module.exports.updateReview = async (req, res) => {
+  try {
+    const body = req.body
+    const status = body.clientStatus
+    const commnent = body.clientComment
+    const version = body.version
+    const docName = body.docName
+    console.log(body,status,commnent,version,docName);
+    
+    function incrementVersion(versionIn) {
+      // Split the version string at the first period ('.')
+      const parts = versionIn.split('.');
+    
+      // Extract the prefix and validate it
+      const prefix = parts[0];
+    
+      if (/^\d{3}$/.test(prefix)) {
+        // Increment the prefix
+        const incrementedPrefix = (parseInt(prefix) + 1).toString().padStart(3, '0');
+        return incrementedPrefix;
+      } else {
+        // Return the original version if it does not match the expected format
+        return versionIn;
+      }
+    }
+    var incrementFunc;
+    if(status=="Reject"){
+      incrementFunc = incrementVersion(version)||version
+    }
 
+    const document = await DocumentModel.findOne({where:{ title: docName }});
+
+    const updateDocStatus = await DocumentModel.update({version}, {
+      where: { title:  {
+        [Sequelize.Op.like]: `%${docName}%`
+      }}
+    });
+
+    await EstablishmentModel.update(
+      { clientStatus:status, clientComment:commnent,version:incrementFunc },
+      { where: { docName: docName ,version:version } }
+    );
+
+
+    console.log(EstablishmentModel);
+
+    } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
 module.exports.exportDoc=async (req,res)=>{
   try {
     const data = req.body.data;
@@ -545,8 +595,20 @@ module.exports.listEstablishment = async (req, res) => {
       },
      
     });
+    
     const latestDocuments = getLatestDocuments(establishment);
 
+    return res.status(200).send(latestDocuments);
+  }
+
+  if(req.query.roleId == 6){
+    const establishment = await EstablishmentModel.findAll({
+      where: { companyId: req?.query?.companyId, 
+      },
+     
+    });
+  
+    const latestDocuments = getLatestDocuments(establishment);
     return res.status(200).send(latestDocuments);
   }
 

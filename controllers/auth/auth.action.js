@@ -63,11 +63,14 @@ module.exports.signup = async (req, res) => {
 
 module.exports.signin = async (req, res) => {
   try {
+    console.log("here");
     const user = await UserModel.findOne({
       where: {
         email: req.body.email,
       },
     });
+
+    console.log(user,"client");
 
     if (!user) {
       return res.status(404).send({ message: "User Not found." });

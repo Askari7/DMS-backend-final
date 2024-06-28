@@ -50,6 +50,16 @@ module.exports = (sequelize, DataTypes) => {
       reviewerComment: {
         type: DataTypes.STRING,
       },
+      clientId: {
+        type: DataTypes.STRING,
+      },
+
+      clientStatus: {
+        type: DataTypes.STRING,
+      },
+      clientComment: {
+        type: DataTypes.STRING,
+      },
       version: {
         type: DataTypes.STRING,
       },

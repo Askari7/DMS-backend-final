@@ -6,15 +6,29 @@ const ClientOfficialModel = db.clientOfficials;
 const MDRModel = db.master_document_registers;
 const ProjectModel = db.projects;
 const CompanyModal = db.company;
+const UserModel = db.users;
 
+const bcrypt = require("bcryptjs")
 const config = require("../../config/auth.config");
-const { sendEmail, sendClientEmail } = require('../../helpers/send-email-client');
+const { sendClientEmail } = require('../../helpers/send-email-client');
+const { generateRandomPassword } = require('../../helpers/generate-user-password');
+const { sendEmail } = require("../../helpers/send-email");
 
 module.exports.createClient = async (req, res) => {
   try {
     const { body } = req;
     if(body.clientName){
       const clients = await ClientOfficialModel.create(body);
+      const password = generateRandomPassword(10);
+      body.password = bcrypt.hashSync(password, 8);
+      body.roleId = 6
+      body.firstName = body.clientName
+      body.lastName = body.clientName
+
+      body.email=body.Email
+      const users = await UserModel.create(body);
+      body.password = password;
+      await sendEmail(body);
       return res.status(200).send({ message: "Client Official has been Added" });
     }
     else{
