@@ -471,8 +471,12 @@ module.exports.updateReview = async (req, res) => {
     const commnent = body.clientComment
     const version = body.version
     const docName = body.docName
+    const app = req.body.app
+    const rev = req.body.rev
+    const myrecord = req.body.myrecord
+
     console.log(body,status,commnent,version,docName);
-    
+    console.log(app,rev,"yreocr",myrecord)
     function incrementVersion(versionIn) {
       // Split the version string at the first period ('.')
       const parts = versionIn.split('.');
@@ -492,9 +496,7 @@ module.exports.updateReview = async (req, res) => {
     var incrementFunc;
     if(status=="Reject"){
       incrementFunc = incrementVersion(version)||version
-    }
-
-    const document = await DocumentModel.findOne({where:{ title: docName }});
+      const document = await DocumentModel.findOne({where:{ title: docName }});
 
     const updateDocStatus = await DocumentModel.update({version}, {
       where: { title:  {
@@ -503,10 +505,39 @@ module.exports.updateReview = async (req, res) => {
     });
 
     await EstablishmentModel.update(
-      { clientStatus:status, clientComment:commnent,version:incrementFunc },
+      { clientStatus:status, clientComment:commnent },
       { where: { docName: docName ,version:version } }
     );
 
+    const revsId = myrecord.reviewerId.split(",")
+    const appsId = myrecord.approverId.split(",")
+    const reviewerStatus = Array.from({ length: revsId.length }).map(() => '').join(', ');
+    const approverStatus = Array.from({ length: appsId.length }).map(() => '').join(', ');
+
+    const approverComment = Array.from({ length: revsId.length }).map(() => '').join(', ');
+    const reviewerComment = Array.from({ length: appsId.length }).map(() => '').join(', ');
+    await EstablishmentModel.create({
+      docName:myrecord.docName,
+      version:incrementFunc,
+      reviewer:myrecord.reviewer,
+      approver:myrecord.approver,
+      approverId:myrecord.approverId,
+      reviewerId:myrecord.reviewerId,
+      clientStatus:'',
+      clientComment:'',
+      approverStatus,
+      reviewerStatus,
+      approverComment,
+      reviewerComment
+    }
+    );
+    }
+    else{
+      await EstablishmentModel.update(
+        { clientStatus:status},
+        { where: { docName: docName } }
+      );
+    }
 
     console.log(EstablishmentModel);
 
