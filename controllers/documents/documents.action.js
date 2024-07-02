@@ -5,6 +5,7 @@ const EstablishmentModel = db.establishments;
 
 const DepartmentModel = db.departments;
 const ProjectModel = db.projects;
+const UserModel = db.users;
 
 const MDRModel = db.master_document_registers;
 const DocumentPermssionModel = db.user_document_permissions;
@@ -52,17 +53,37 @@ module.exports.listDocuments = async (req, res) => {
 
     else{
       if(assignedTo=='1' || assignedBy=='1'){
-        const documents = await DocumentModel.findAll({
+        let documents = await DocumentModel.findAll({
         where: {
           companyId: companyId,
         }
       });
       console.log('2',documents);
 
-      return res.status(200).send(documents);
-    }
+      const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
+  
+      const users = await UserModel.findAll({
+        where: {
+          id: myAssignedToUsers
+        }
+      });
+      console.log('my users', users);
+      
+      const myDocuments = await Promise.all(documents.map(async document => {
+        users.forEach(user => {
+          if (document.assignedTo == user.dataValues.id) {
+            document.dataValues["assignedToName"] = user.dataValues.firstName + user.dataValues.lastName;
+            console.log(document, 'doc');
+          }
+        });
+        return document;
+      }));
+      
+      console.log(myDocuments, 'mydocs');
+      
+      return res.status(200).send(myDocuments);    }
     else{
-        const documents = await DocumentModel.findAll({
+        let documents = await DocumentModel.findAll({
           where: {
             companyId: companyId,
             departmentId: {
@@ -86,8 +107,28 @@ module.exports.listDocuments = async (req, res) => {
           
         });
         console.log('3',documents);
-        return res.status(200).send(documents);
-    }
+        const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
+  
+        const users = await UserModel.findAll({
+          where: {
+            id: myAssignedToUsers
+          }
+        });
+        console.log('my users', users);
+        
+        const myDocuments = await Promise.all(documents.map(async document => {
+          users.forEach(user => {
+            if (document.assignedTo == user.dataValues.id) {
+              document.dataValues["assignedToName"] = user.dataValues.firstName + user.dataValues.lastName;
+              console.log(document, 'doc');
+            }
+          });
+          return document;
+        }));
+        
+        console.log(myDocuments, 'mydocs');
+        
+        return res.status(200).send(myDocuments);    }
   
   }
   } catch (err) {
@@ -169,7 +210,7 @@ module.exports.listMDR = async (req, res) => {
       console.log(totalDocuments, "totalDocuments");
 
       // Fetch counts of completed documents for the project
-      const completedDocuments = await DocumentModel.count({ where: { projectId, status: 'Completed' } });
+      const completedDocuments = await DocumentModel.count({ where: { projectId, status: 'Approved(in-house)' } });
       console.log(completedDocuments, "completedDocuments");
 
       // Calculate percentage of completed documents
@@ -496,9 +537,9 @@ module.exports.updateReview = async (req, res) => {
     var incrementFunc;
     if(status=="Reject"){
       incrementFunc = incrementVersion(version)||version
-      const document = await DocumentModel.findOne({where:{ title: docName }});
+      const document = await DocumentModel.findOne({where:{ title: docName, version }});
 
-    const updateDocStatus = await DocumentModel.update({version}, {
+    const updateDocStatus = await DocumentModel.update({version:incrementFunc}, {
       where: { title:  {
         [Sequelize.Op.like]: `%${docName}%`
       }}
@@ -511,11 +552,11 @@ module.exports.updateReview = async (req, res) => {
 
     const revsId = myrecord.reviewerId.split(",")
     const appsId = myrecord.approverId.split(",")
-    const reviewerStatus = Array.from({ length: revsId.length }).map(() => '').join(', ');
-    const approverStatus = Array.from({ length: appsId.length }).map(() => '').join(', ');
+    const reviewerStatus = Array.from({ length: revsId.length }).map(() => 0).join(', ');
+    const approverStatus = Array.from({ length: appsId.length }).map(() => 0).join(', ');
 
-    const approverComment = Array.from({ length: revsId.length }).map(() => '').join(', ');
-    const reviewerComment = Array.from({ length: appsId.length }).map(() => '').join(', ');
+    const approverComment = Array.from({ length: appsId.length }).map(() => '').join(', ');
+    const reviewerComment = Array.from({ length: revsId.length }).map(() => '').join(', ');
     await EstablishmentModel.create({
       docName:myrecord.docName,
       version:incrementFunc,
@@ -528,15 +569,24 @@ module.exports.updateReview = async (req, res) => {
       approverStatus,
       reviewerStatus,
       approverComment,
-      reviewerComment
+      reviewerComment,
+      companyId:myrecord.companyId,
+      docDepartmentId:myrecord.docDepartmentId,
+      masterDocumentCode:myrecord.masterDocumentCode,
+      masterDocumentName:myrecord.masterDocumentName,
+      userName:myrecord.userName
     }
     );
+    return res.status(200).send({ message: "Document Rejected" });
+
     }
     else{
       await EstablishmentModel.update(
         { clientStatus:status},
-        { where: { docName: docName } }
+        { where: { docName: docName,version:version } }
       );
+      return res.status(200).send({ message: "Document Approved" });
+
     }
 
     console.log(EstablishmentModel);
@@ -589,57 +639,63 @@ console.log('helooo',updatedDocument);
 
 
 module.exports.listEstablishment = async (req, res) => {
-  const getLatestDocuments = (documentList) => {
-    const groupedDocuments = {};
+//   const getLatestDocuments = (documentList) => {
+//     const groupedDocuments = {};
+//     // Group documents by docName
+//     documentList.forEach((doc) => {
+//         if (!groupedDocuments[doc.docName]) {
+//             groupedDocuments[doc.docName] = [];
+//         }
+//         console.log(groupedDocuments[doc.docName],'docNameAya');
+//         groupedDocuments[doc.docName].push(doc);
 
-    // Group documents by docName
-    documentList.forEach((doc) => {
-        if (!groupedDocuments[doc.docName]) {
-            groupedDocuments[doc.docName] = [];
-        }
-        groupedDocuments[doc.docName].push(doc);
-    });
+//     });
+//     console.log(groupedDocuments,'documentss');
+//     // Get the latest document for each docName based on version
+//     const latestDocuments = [];
+//     for (const docName in groupedDocuments) {
+//         const documents = groupedDocuments[docName];
+//         console.log(documents,'logging');
+//         // Sort documents by version in ascending order
+//         documents.sort((a, b) => {
+//             if (a.version < b.version) return -1;
+//             if (a.version > b.version) return 1;
+//             return 0;
+//         });
 
-    // Get the latest document for each docName based on version
-    const latestDocuments = [];
-    for (const docName in groupedDocuments) {
-        const documents = groupedDocuments[docName];
+//         // Get the latest (highest version) document
+//         const latestDocument = documents[documents.length - 1];
+//         console.log(latestDocument,'latestDoc');
+//         latestDocuments.push(latestDocument);
+//     }
+//     return latestDocuments;
+// };
 
-        // Sort documents by version in ascending order
-        documents.sort((a, b) => {
-            if (a.version < b.version) return -1;
-            if (a.version > b.version) return 1;
-            return 0;
-        });
 
-        // Get the latest (highest version) document
-        const latestDocument = documents[documents.length - 1];
-        latestDocuments.push(latestDocument);
-    }
 
-    return latestDocuments;
-};
   console.log(req.query.userId,"req.query.userId");
-  if(req.query.userId == 1){
+  console.log(req.query.roleId,"req.query.roleId");
+  if(req.query.roleId == 1){
     const establishment = await EstablishmentModel.findAll({
-      where: { companyId: req?.query?.companyId, 
-      },
-     
+      where: { companyId: req?.query?.companyId,},
     });
-    
-    const latestDocuments = getLatestDocuments(establishment);
 
+
+    
+    const latestDocuments = establishment;
+    console.log(latestDocuments,"latests only");
     return res.status(200).send(latestDocuments);
   }
 
   if(req.query.roleId == 6){
     const establishment = await EstablishmentModel.findAll({
-      where: { companyId: req?.query?.companyId, 
+      where: { companyId: req?.query?.companyId , sendToClient:true
       },
      
     });
-  
-    const latestDocuments = getLatestDocuments(establishment);
+    console.log(establishment,'establishing');
+    const latestDocuments = establishment;
+    console.log(latestDocuments,'lateststabling');
     return res.status(200).send(latestDocuments);
   }
 
@@ -661,7 +717,7 @@ module.exports.listEstablishment = async (req, res) => {
           ]
         },
       });
-      const latestDocuments = getLatestDocuments(establishment);
+      const latestDocuments = (establishment);
 
       return res.status(200).send(latestDocuments);
     } catch (err) {
@@ -692,7 +748,7 @@ module.exports.listEstablishment = async (req, res) => {
     
   
   // Call the function with the sample documents array
-  const latestDocuments = getLatestDocuments(establishment);
+  const latestDocuments = (establishment);
   
   // Output the latest documents
   console.log(latestDocuments,"latestones ");
@@ -701,6 +757,68 @@ module.exports.listEstablishment = async (req, res) => {
     return res.status(200).send(latestDocuments);
   } catch (err) {
     console.log('error',err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
+
+module.exports.Accept = async (req, res) => {
+  console.log("yaha aa");
+  try {
+    const docName = req.body.docName;
+    const approverStatus=req.body.appStatusArr;
+    const reviewerStatus=req.body.revStatusArr;
+    console.log(reviewerStatus,approverStatus,'status');
+    const versionIn= req.query.version;
+  
+    appArray=approverStatus.split(',');
+    revArray=reviewerStatus.split(',');
+
+const document = await DocumentModel.findOne({where:{ title: docName }});
+let version = document ? document.version : null;
+let status = 'Uploaded'
+if (revArray.every(num => num == 1) && appArray.every(num => num == 0)) {
+    status = 'Reviewers Rejected';
+} else if (appArray.every(num => num == 1) && revArray.every(num => num == 2)) {
+    status = 'Approvers Rejected';
+}
+else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
+{
+status='Pending for Approval';
+}
+
+else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
+{
+status='Approved(in-house)';
+}
+const updateDocStatus = await DocumentModel.update({status,version}, {
+  where: { title:  {
+    [Sequelize.Op.like]: `%${docName}%`
+  }}
+});
+
+    const updateCheck = await EstablishmentModel.findOne({
+      where: { docName: docName }
+    });
+    
+    if (!updateCheck) {
+      return res.status(404).send({ message: "Document not found" });
+    }
+    
+    // // Check reviewerStatus for any '0'
+    // if (updateCheck.reviewerStatus && updateCheck.reviewerStatus.includes('0') && role === "Approver") {
+    //   return res.status(200).send({ message: "Reviewer Status is not completed yet" });
+    // }
+    
+    // Update document with new status values
+    await EstablishmentModel.update(
+      { reviewerStatus,approverStatus },
+      { where: { docName: docName , version:versionIn } }
+    );
+        
+    return res.status(200).send({ message: "Document Status updated" });
+  } catch (err) {
+    console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
@@ -717,32 +835,37 @@ module.exports.updateDocStatus = async (req, res) => {
     const masterDocumentCode = req.query.masterDocumentCode 
     const masterDocumentName = req.query.masterDocumentName 
     const docDepartmentId = req.query.docDepartmentId 
-
     const role = req.query.yourRole 
     const docName = req.body.docName;
     const approverStatus=req.body.appStatusArr;
     const reviewerStatus=req.body.revStatusArr;
 
     function incrementVersion(versionIn) {
-      // Define the current version prefix and increment value
-      const currentPrefix = '000';
-      const incrementValue = '.1';
-    
-      // Check if the incoming version starts with the current prefix and is exactly '000'
-      if (versionIn === currentPrefix) {
-        // If version is '000', increment it to '000.1'
-        return currentPrefix + incrementValue;
-      } else if (versionIn.startsWith(currentPrefix + '.')) {
-        // If version is in the form '000.x', increment the numeric part
-        const numericPart = versionIn.slice(currentPrefix.length + 1); // Extract the numeric part after '000.'
-        const incrementedNumeric = parseInt(numericPart) + 1; // Parse and increment the numeric part
-        return currentPrefix + '.' + incrementedNumeric.toString(); // Construct the updated version
-      } else {
-        // Return the original version if it does not match the expected format
-        return versionIn;
+      const dotIndex = versionIn.indexOf('.');
+      const prefix = dotIndex === -1 ? versionIn : versionIn.substring(0, dotIndex);
+      console.log(prefix);
+      const incrementValue = 1;
+      // Check if the incoming version is exactly the prefix (no dot)
+      if (versionIn === prefix) {
+        console.log("yes");
+          // If version is the prefix without any numeric part, append '.1'
+          console.log(prefix+".1");
+          return prefix + '.1';
+      } else if (versionIn.startsWith(prefix + '.')) {
+        console.log("no");
+          // If version is in the form 'prefix.x', increment the numeric part
+          const numericPart = versionIn.slice(prefix.length + 1); // Extract the numeric part after 'prefix.'
+          console.log(numericPart,'numeric part');
+          const incrementedNumeric = parseInt(numericPart) + incrementValue; // Parse and increment the numeric part
+          console.log(incrementedNumeric,'incremented');
+          console.log(prefix + '.' + incrementedNumeric.toString(),'thats final');
+          return prefix + '.' + incrementedNumeric.toString(); // Construct the updated version
       }
-    }
-    
+      // Return the original version if it does not match the expected format
+      return versionIn;
+  }
+
+
     const updatedVersion = incrementVersion(versionIn);
 
     appArray=approverStatus.split(',');
@@ -809,7 +932,7 @@ const updateDocStatus = await DocumentModel.update({status,version}, {
     // Update document with new status values
     await EstablishmentModel.update(
       { reviewerStatus,approverStatus, approverComment, reviewerComment },
-      { where: { docName: docName } }
+      { where: { docName: docName,version:versionIn } }
     );
     
     // Retrieve updated document
@@ -958,25 +1081,99 @@ module.exports.uploadComment = async (req, res) => {
   }
 };
 
+
+module.exports.exportComments = async (req, res) => {
+  try {
+    console.log("Request received");
+    console.log(req?.query?.docName, req.query.version, "data");
+
+    const comments = await CommentsModel.findAll({
+      where: {
+        docName: req?.query?.docName ? `${req.query.docName}.pdf` : null,
+        version: req.query.version
+      }
+    });
+
+    // Convert Sequelize objects and their nested objects to plain JSON
+    const commentsJson = comments.map(comment => {
+      const plainComment = comment.toJSON();
+
+      // Remove specific keys from the nested objects
+      if (plainComment.comments && plainComment.comments.position) {
+        delete plainComment.comments.position.boundingRect;
+        delete plainComment.comments.position.rects;
+      }
+      if (plainComment.comments) {
+        delete plainComment.comments.content;
+      }
+
+      console.log(plainComment, 'plainComment');
+      return plainComment;
+    });
+
+    // Expand the nested objects into the top-level objects and remove specific keys
+    const expandedComments = commentsJson.map(obj => {
+      const { comments, ...rest } = obj; // Destructure comments from obj
+
+      return {
+        ...rest, // Spread rest of the object properties
+        ...comments, // Spread comments object properties
+        // Spread comment object properties directly into the object
+        ...comments.comment,
+        // Spread position object properties directly into the object
+        ...comments.position
+      };
+    }).map(obj => {
+      // Remove comments.comment and comments.position from the object
+      delete obj.comment;
+      delete obj.position;
+      return obj;
+    });
+
+    console.log(expandedComments, 'expandedComments');
+    return res.status(200).json(expandedComments); // Ensure JSON response
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ message: err.message }); // Ensure JSON error response
+  }
+};
+
+
+
+
+
+
 module.exports.listComments = async (req, res) => {
   try {
     const comments = await CommentsModel.findAll({
       where: { docName: req?.query?.docName },
     });
     console.log(comments,"comments");
-    let commentsObject = []
-    if (req.query.user == "1") {
-    commentsObject = comments
-    .filter(comment => comment.Inhouse == 0 && comment.Approved == 0)    
-    .map(comment => comment.comments) // Extract the 'comments' array from each comment object
-  // Filter comments where 'Inhouse' status is 0
 
-    }
-    else{
+    let commentsObject;
+
+if (req.query.user == "1") {
+
       commentsObject = comments
-      .filter(comment => comment.Resolved == 0)
-      .map(comment => comment.comments)    
-    }
+          .filter(comment => comment.Inhouse == 0 && comment.Approved == 0)
+          .map(comment => {
+              comment.comments.version = comment.version;
+              comment.comments.Inhouse = comment.Inhouse;
+
+              return comment.comments;
+          });
+  } else {
+      commentsObject = comments
+          .filter(comment => comment.Resolved == 0)
+          .map(comment => {
+              comment.comments.version = comment.version;
+              comment.comments.Inhouse = comment.Inhouse;
+
+              return comment.comments;
+          });
+  }
+  
+
 
     return res.status(200).send(commentsObject);
   } catch (err) {

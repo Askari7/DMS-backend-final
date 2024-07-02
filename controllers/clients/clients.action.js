@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 const db = require("../../models/index");
 const ClientModel = db.clients;
@@ -7,6 +7,7 @@ const MDRModel = db.master_document_registers;
 const ProjectModel = db.projects;
 const CompanyModal = db.company;
 const UserModel = db.users;
+const EstablishmentModel = db.establishments;
 
 const bcrypt = require("bcryptjs")
 const config = require("../../config/auth.config");
@@ -20,12 +21,12 @@ module.exports.createClient = async (req, res) => {
     if(body.clientName){
       const clients = await ClientOfficialModel.create(body);
       const password = generateRandomPassword(10);
-      body.password = bcrypt.hashSync(password, 8);
+      body.password = password;
       body.roleId = 6
       body.firstName = body.clientName
       body.lastName = body.clientName
-
       body.email=body.Email
+
       const users = await UserModel.create(body);
       body.password = password;
       await sendEmail(body);
@@ -43,6 +44,30 @@ module.exports.createClient = async (req, res) => {
 module.exports.sendEmailClient = async (req, res) => {
   try {
     const { body } = req;
+    const docName = body.docName
+    const version = body.docVersion
+    const record = body.parsedRecord
+    const Email = body.clientName
+    body.mainUrl = "http://localhost:3000/pages/authentication/login"
+    const Client = await UserModel.findOne(
+      {
+        where: {
+          email:Email,
+        }
+      }
+    );
+    body.password = Client.password
+console.log(record,'record aya ');    
+    const change = await EstablishmentModel.update(
+      { sendToClient: true },
+      {
+        where: {
+          docName: docName,
+          version: version
+        }
+      }
+    );
+
     console.log('api hit bodu',body);
     await sendClientEmail(body);
       return res.status(200).send({ message: "Email sent to client" });

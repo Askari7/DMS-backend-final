@@ -3,11 +3,12 @@ const {
   createDocument,
   listDocuments,
   listMDR,
+  exportComments,
   createPermission,
   updateReview,
   listPermission,
   updateDocumentFormat,
-  exportMDRCsv,
+  exportMDRCsv,Accept,
   gettingEstablishment,
   getCodes,createComment, listComments, uploadDoc, uploadComment, getDocumentFormat,assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc,
 } = require("./documents.action");
@@ -95,6 +96,10 @@ module.exports = {
       action: [validateToken,updateReview ],
       level: "public",
     },
+    post: {
+      action: [validateToken,Accept ],
+      level: "public",
+    },
   },
   "/comments": {
     get: {
@@ -108,6 +113,12 @@ module.exports = {
     },
     put: {
       action: [ uploadComment],
+      level: "public",
+    },
+  },
+  "/exportComments": {
+    get: {
+      action: [ exportComments],
       level: "public",
     },
   },

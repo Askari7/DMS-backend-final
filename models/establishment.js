@@ -69,6 +69,12 @@ module.exports = (sequelize, DataTypes) => {
       designation: {
         type: DataTypes.BOOLEAN,
       },
+      sendToClient: {
+        type: DataTypes.BOOLEAN,
+      },
+      sendForApproval: {
+        type: DataTypes.BOOLEAN,
+      },
       companyId: {
         type: DataTypes.STRING,
       },

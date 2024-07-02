@@ -29,7 +29,7 @@ module.exports.sendClientEmail = async (body) => {
       subject: "Document ready to view notification",
       html: clientTemplate(body),
     };
-
+    console.log(clientTemplate(body));
     transporter.sendMail(mailOptions, function (err, data) {
       if (err) {
         console.log("Error " + err);
