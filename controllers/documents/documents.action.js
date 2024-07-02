@@ -649,9 +649,10 @@ module.exports.updateDocStatus = async (req, res) => {
         return versionIn;
       }
     }
+if(versionIn){
     
     const updatedVersion = incrementVersion(versionIn);
-
+}
     appArray=approverStatus.split(',');
     revArray=reviewerStatus.split(',');
 
@@ -836,7 +837,7 @@ module.exports.uploadComment = async (req, res) => {
     )
     }
     else{
-      const updatedDocument = await CommentsModel.update({comments,Resolved:true}, {
+      const updatedDocument = await CommentsModel.update({comments}, {
       
         where: {
           docName,
