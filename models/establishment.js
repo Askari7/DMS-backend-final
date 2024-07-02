@@ -50,6 +50,16 @@ module.exports = (sequelize, DataTypes) => {
       reviewerComment: {
         type: DataTypes.STRING,
       },
+      clientId: {
+        type: DataTypes.STRING,
+      },
+
+      clientStatus: {
+        type: DataTypes.STRING,
+      },
+      clientComment: {
+        type: DataTypes.STRING,
+      },
       version: {
         type: DataTypes.STRING,
       },
@@ -57,6 +67,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
       },
       designation: {
+        type: DataTypes.BOOLEAN,
+      },
+      sendToClient: {
+        type: DataTypes.BOOLEAN,
+      },
+      sendForApproval: {
         type: DataTypes.BOOLEAN,
       },
       companyId: {

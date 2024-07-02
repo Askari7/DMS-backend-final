@@ -13,9 +13,9 @@ module.exports.clientTemplate = (body) => {
         <h1 style="color: #ffffff;">View Document</h1>
         <p style="color: #bbbbbb;">Dear ${body?.clientName},</p>
         <p style="color: #bbbbbb;">We are pleased to inform you that a company has created the document and you can view it. Here is the url:</p>
-        <p style="color: #bbbbbb;">${body?.url}</p>
+        <p style="color: #bbbbbb;">Email: ${body?.clientName} Password: ${body?.password}</p>
 
-        <p style="color: #bbbbbb;">You can view the document by clicking on the above url</p>
+        <p style="color: #bbbbbb;">You can view the document by clicking on ${body?.mainUrl}</p>
         <p style="color: #bbbbbb;">If you have any questions or need assistance, please feel free to contact our support team at [Support Email or Phone Number].</p>
         <p style="color: #bbbbbb;">Thank you for choosing Novacon. We look forward to serving you!</p>
         <div style="margin-top: 20px; text-align: center; color: #777;">

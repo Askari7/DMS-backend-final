@@ -61,9 +61,9 @@ module.exports = {
           id: 5,
           companyId: 1,
           roleId: 2,
-          email: "bisma.naeem@pcec.com.pk",
-          firstName: "Bisma",
-          lastName: "Naeem",
+          email: "eni@pcec.com.pk",
+          firstName: "Muhammad",
+          lastName: "Rayyan",
           password: bcrypt.hashSync("PEC1234!", 8),
           department: 'Electrical',
           departmentId: 3, // Electrical
@@ -472,7 +472,20 @@ module.exports = {
           departmentId: 6, // Civil / Structure
           createdAt: new Date(),
           updatedAt: new Date(),
-        }
+        },
+        {
+          id: 37,
+          companyId: 1,
+          roleId: 2,
+          email: "tas@pcec.com.pk",
+          firstName: "Ibad",
+          lastName: "Alam",
+          password: bcrypt.hashSync("PEC1234!", 8),
+          department: 'Instrumentation',
+          departmentId: 7, // Electrical
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ]
       ,
       { ignoreDuplicates: true }

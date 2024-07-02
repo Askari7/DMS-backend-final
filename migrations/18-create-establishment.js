@@ -45,6 +45,17 @@ module.exports = {
           status: {
             type: Sequelize.BOOLEAN,
           },
+
+          clientId: {
+            type: Sequelize.STRING,
+          },
+    
+          clientStatus: {
+            type: Sequelize.STRING,
+          },
+          clientComment: {
+            type: Sequelize.STRING,
+          },
           designation: {
             type: Sequelize.BOOLEAN,
           },

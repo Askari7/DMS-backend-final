@@ -3,6 +3,8 @@ const ProjectModel = db.projects;
 const SystemLogModel = db.system_logs;
 const DepartmentModel = db.departments
 const DocumentModel = db.documents
+const ClientModel = db.clients
+
 const MDRModel = db.master_document_registers;
 const EstablishmentModel = db.establishments;
 
@@ -70,21 +72,31 @@ module.exports.listProjects = async (req, res) => {
       where: { companyId: req?.query?.companyId },
     });
     const departmentIds = projects.map(project => project.dataValues.departmentId);
-
+    const clientId = projects.map(project => project.dataValues.clientId);
+    const clients = await ClientModel.findAll({
+      where: {
+        id: clientId
+      }
+    });
+    console.log('my clients',clients);
 console.log(departmentIds);
 const departments = await DepartmentModel.findAll({
   where: {
     id: departmentIds
   }
 });
-const departmentNames = departments.map(department => (department.dataValues.id,department.dataValues.title));
+
 const departmentMap = {};
 departments.forEach(department => {
   departmentMap[department.dataValues.id] = department.dataValues.title;
 });
+const clientName = clients.map(client => (client.dataValues.id,client.dataValues.companyName));
+const clientMap = {};
+clients.forEach(client => {
+  clientMap[client.dataValues.id] = client.dataValues.companyName;
+});
 console.log(departmentMap);
-console.log(departmentNames);
-
+console.log('clientMap',clientMap);
 
 const projectIds = projects.map(project => project.dataValues.id);
 
@@ -99,7 +111,7 @@ console.log(documentProgress,"totalDocuments");
 
 // Fetch counts of completed documents for the project
 const completedDocuments = await DocumentModel.count({
-where: { projectId, status: 'Completed' }
+where: { projectId, status: 'Approved(in-house)' }
 });
 console.log(completedDocuments,"completedDocuments");
 
@@ -117,8 +129,10 @@ console.log(documentProgressResults,'results aye ');
 
 const combinedData = projects.map(project => {
   const departmentName = departmentMap[project.dataValues.departmentId];
+  const clientName = clientMap[project.dataValues.clientId];
+
   return {
-    ...project.dataValues,
+    ...project.dataValues,clientName:clientName,
     departmentName: departmentName || 'Unknown' // Handle cases where departmentName is not found
   };
 });
@@ -132,14 +146,13 @@ const combinedDataWithPercentage = combinedData.map(item => {
 });
 console.log(combinedDataWithPercentage,"combinedData");
 console.log(combinedData);
+
     return res.status(200).send(combinedDataWithPercentage);
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
-
-
 module.exports.listInformation = async (req, res) => {
   try {
     const projects = await ProjectModel.findAll({

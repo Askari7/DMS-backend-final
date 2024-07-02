@@ -3,12 +3,14 @@ const {
   createDocument,
   listDocuments,
   listMDR,
+  exportComments,
   createPermission,
+  updateReview,
   listPermission,
   updateDocumentFormat,
-  exportMDRCsv,
+  exportMDRCsv,Accept,
   gettingEstablishment,
-  getCodes,createComment, listComments, uploadDoc, uploadComment, getDocumentFormat,assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc
+  getCodes,createComment, listComments, uploadDoc, uploadComment, getDocumentFormat,assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc,
 } = require("./documents.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 
@@ -29,6 +31,7 @@ const storage = multer.diskStorage({
   },
 });
 const uploadFile = multer({ storage: storage });
+
 
 module.exports = {
   "/": {
@@ -88,6 +91,16 @@ module.exports = {
       level: "public",
     },
   },
+  "/review": {
+    put: {
+      action: [validateToken,updateReview ],
+      level: "public",
+    },
+    post: {
+      action: [validateToken,Accept ],
+      level: "public",
+    },
+  },
   "/comments": {
     get: {
       action: [ listComments],
@@ -100,6 +113,12 @@ module.exports = {
     },
     put: {
       action: [ uploadComment],
+      level: "public",
+    },
+  },
+  "/exportComments": {
+    get: {
+      action: [ exportComments],
       level: "public",
     },
   },
