@@ -3,6 +3,12 @@ const UserModel = db.users;
 const DepartmentModel = db.departments;
 const SystemLogModel = db.systemLog;
 const CompanyModel = db.company
+const ProjectModel = db.projects
+const DocumentModel = db.documents
+const EstablishmentModel = db.establishments
+
+const MDRModel = db.master_document_registers;
+
 const DepartmentUserAssociation = db.department_user_associations;
 const multer  = require('multer')
 const bcrypt = require("bcryptjs");
@@ -16,38 +22,46 @@ const {
   generateRandomPassword,
 } = require("../../helpers/generate-user-password");
 const { sendEmail } = require("../../helpers/send-email");
+const { where } = require("sequelize");
 
-module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
-  // Username
-  console.log(req.body.companyId, "req");
-  const roleId = req.body.roleId;
-  const department = req.body.department;
-  const companyId = req.body.companyId
-  if (roleId === "2") {
-    // If roleId is 2, check if user exists with the provided roleId and department
-    const existingUser = await UserModel.findOne({ where: { roleId, department,companyId } });
-    if (existingUser) {
-      res.send({ message: "Failed! Lead already exists!" });
-      return;
-    }
-  }
+// module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
+//   // Username
+//   console.log(req.body.companyId, "req");
+//   const roleId = req.body.roleId;
+//   const department = req.body.department;
+//   const companyId = req.body.companyId
+//   if (roleId == "2") {
+//     // If roleId is 2, check if user exists with the provided roleId and department
+//     const [updatedCount, updatedUser] = await UserModel.update(
+//       { roleId: "3" }, // New roleId value to update to
+//       { 
+//         where: { roleId, department, companyId },
+//         returning: true, // Make sure to include returning true to get the updated user object
+//       }
+//     );
+        
+//     if (updatedUser) {
+//       res.send({ message: "Lead has been changed!" });
+//     }
+//   }
 
-  // Check if user exists with the provided email and companyId
-  UserModel.findOne({
-    where: {
-      email: req.body.email,
-      companyId: req.body.companyId
-    }
-  }).then((user) => {
-    if (user) {
-      res.send({
-        message: "Failed! Email already exists!"
-      });
-      return;
-    }
-    next();
-  });
-};
+//   UserModel.findOne({
+//     where: {
+//       email: req.body.email,
+//       companyId: req.body.companyId
+//     }
+//   }).then((user) => {
+//     if (user) {
+//       res.send({
+//         message: "Failed! Email already exists!"
+//       });
+//       return;
+//     }
+//     next();
+//   });
+// };
+
+
 
 // app.put('/user', upload.single('image'), async(req, res)=>{
 //   console.log(req.file.filename);
@@ -67,58 +81,148 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
 // })
 
 
-
-module.exports.createUser = async (req, res) => {
-
+module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
   try {
-    const { body } = req;
-    console.log(body,"ye dekhle");
-  // const logo = req.file.filename
-    const findUser = await UserModel.findOne({ department: body.department, companyId: body.companyId });
-    console.log(findUser,'findUser');
+    const { roleId, department, companyId, email } = req.body;
+    
+    // Check if the roleId is 2 and update the existing user's role to 3
+    if (roleId === "2") {
+      const [updatedCount, updatedUser] = await UserModel.update(
+        { roleId: "3" }, 
+        { 
+          where: { roleId, department, companyId },
+          returning: true 
+        }
+      );
 
-
-    const password = generateRandomPassword(10);
-    body.password = bcrypt.hashSync(password, 8);
-    const role = req.body.roleId
-    const department = req.body.department
-    const companyId = req.body.companyId
-
-    console.log(department,'department');
-    const companyName = await CompanyModel.findOne({where:{id: companyId} });
-    body['companyName']=companyName.name;
-    const findDepartment = await DepartmentModel.findOne({where:{title: department,companyId} });
-    console.log(findDepartment,"findDepartment");
-// Check if the department exists
-if (findDepartment) {
-    // Increment the noOfUsers count by one
-    findDepartment.noOfUsers += 1;
-
-    // Save the updated department
-    await findDepartment.save();
-} else {
-    // Department not found, handle the case accordingly
-    console.log('Department not found');
-}
-    if(role!=="2"){
-    const report = await UserModel.findOne({
-      where:{department:department,roleId:2,companyId:req.body.companyId}
-    })
-    req.body.reported_to = `${report.firstName} ${report.lastName}`
-  }
-    else{
-      const ceo = await UserModel.findOne({
-        where:{roleId:1,companyId:req.body.companyId}
-      })
-      console.log(ceo,"ceo");
-      req.body.reported_to = `${ceo.firstName} ${ceo.lastName}`
+      if (updatedCount > 0) {
+        res.send({ message: "Lead has been changed!" });
+        return;
+      }
     }
 
-    console.log(req.body.reported_to,"reporting");
-    
+    // Check for duplicate email
+    const existingUser = await UserModel.findOne({
+      where: { email, companyId }
+    });
 
-    console.log(role,department,"things");
+    if (existingUser) {
+      return res.status(400).send({ message: "Failed! Email already exists!" });
+    }
+
+    next();
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: "Server Error" });
+  }
+};
+
+
+// module.exports.createUser = async (req, res) => {
+
+//   try {
+//     const { body } = req;
+//     console.log(body,"ye dekhle");
+//   // const logo = req.file.filename
+//     const findUser = await UserModel.findOne({where:{department: body.department, companyId: body.companyId} });
+//     // console.log(findUser,'findUser');
+
+
+//     const password = generateRandomPassword(10);
+
+//     const role = req.body.roleId
+//     const department = req.body.department
+//     const companyId = req.body.companyId
+
+//     // console.log(department,'department');
+//     const companyName = await CompanyModel.findOne({where:{id: companyId} });
+//     body['companyName']=companyName.name;
+//     const findDepartment = await DepartmentModel.findOne({where:{title: department,companyId} });
+//     // console.log(findDepartment,"findDepartment");
+// // Check if the department exists
+// if (findDepartment) {
+//     // Increment the noOfUsers count by one
+//     findDepartment.noOfUsers += 1;
+
+//     // Save the updated department
+//     await findDepartment.save();
+// } else {
+//     // Department not found, handle the case accordingly
+//     console.log('Department not found');
+// }
+//     if(role!=="2"){
+//     const report = await UserModel.findOne({
+//       where:{department:department,roleId:2,companyId:req.body.companyId}
+//     })
+//     req.body.reported_to = `${report.firstName} ${report.lastName}`
+//   }
+//     else{
+//       const ceo = await UserModel.findOne({
+//         where:{roleId:1,companyId:req.body.companyId}
+//       })
+//       console.log(ceo,"ceo");
+//       req.body.reported_to = `${ceo.firstName} ${ceo.lastName}`
+//     }
+
+//     console.log(req.body.reported_to,"reporting");
+    
+//     body.password = bcrypt.hashSync(password, 8);
+
+//     console.log(role,department,"things");
+//     const users = await UserModel.create(body);
+//     body.password = password;
+//     await sendEmail(body);
+
+//     return res.status(200).send({ message: "User has been Created" });
+//   } catch (err) {
+//     console.log(err.message);
+//     res.status(500).send({ message: err.message });
+//   }
+// };
+
+
+module.exports.createUser = async (req, res) => {
+  try {
+    const { body } = req;
+    const { roleId, department, companyId } = body;
+
+    // Generate a random password
+    const password = generateRandomPassword(10);
+
+    // Fetch company name
+    const companyName = await CompanyModel.findOne({ where: { id: companyId } });
+    body['companyName'] = companyName.name;
+
+    // Fetch and update department's user count
+    const findDepartment = await DepartmentModel.findOne({ where: { title: department, companyId } });
+
+    if (findDepartment) {
+      findDepartment.noOfUsers += 1;
+      await findDepartment.save();
+    } else {
+      console.log('Department not found');
+    }
+
+    // Determine reporting user based on roleId
+    if (roleId !== "2") {
+      const report = await UserModel.findOne({
+        where: { department, roleId: 2, companyId }
+      });
+
+      req.body.reported_to = `${report.firstName} ${report.lastName}`;
+    } else {
+      const ceo = await UserModel.findOne({
+        where: { roleId: 1, companyId }
+      });
+
+      req.body.reported_to = `${ceo.firstName} ${ceo.lastName}`;
+    }
+
+    // Hash the password and create the user
+    body.password = bcrypt.hashSync(password, 8);
     const users = await UserModel.create(body);
+
+    // Send the password via email
     body.password = password;
     await sendEmail(body);
 
@@ -128,6 +232,10 @@ if (findDepartment) {
     res.status(500).send({ message: err.message });
   }
 };
+
+
+
+
 
 module.exports.updateUser = async (req, res) => {
   try {
@@ -225,7 +333,8 @@ module.exports.listUsers = async (req, res) => {
         else if (item.roleId == 3) roleTitle = "Senior";
         else if (item.roleId == 4) roleTitle = "Junior";
         else if (item.roleId == 5) roleTitle = "Designer";
-  
+        else if (item.roleId == 6) roleTitle = "Client";
+
         else roleTitle == "Client";
         if(department!== null){
         
@@ -250,6 +359,24 @@ module.exports.listUsers = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+
+// module.exports.notifications = async(req,res)=>{
+//   console.log('hitted ');
+//   try {
+//     const mdrs = await MDRModel.findAll({
+//       where:{
+//         companyId:req.query.companyId
+//       }
+//     })
+//     console.log(mdrs,'mdrssss');
+//   } catch (error) {
+//     res.status(500).send({ message: error.message });
+
+//   }
+// }
+
+
 module.exports.company = async(req,res)=>{
   try {
     const company = await CompanyModel.findOne({
@@ -297,7 +424,7 @@ module.exports.uploadImage = (req, res) => {
 
 module.exports.profile = async (req, res) => {
   try {
-    console.log(req.query, 'Request query parameters');
+    // console.log(req.query, 'Request query parameters');
     // const userId = req.query.id;
     // const image = await UserModel.findOne({ where: { id: userId } });
     // console.log(image, "Retrieved image");
@@ -314,4 +441,134 @@ module.exports.profile = async (req, res) => {
 };
 
 
+
+
+module.exports.deleting = async(req,res)=>{
+  console.log("hot");
+  try {
+    const deleting = req.query.delete
+    const recordId = req.query.recordId
+console.log(deleting,recordId,'ids');
+
+  if (deleting == "1") {
+    const user_to_delete = await UserModel.findOne({ where: { id: recordId } });
+    // console.log(user_to_delete, 'user_delete');
+  
+    const user = await UserModel.update(
+       {delete: true},{where: { id: recordId }},
+    );
+    // console.log(user,'user');
+  
+    const approvalCount = await EstablishmentModel.findAll({
+      where: {
+        companyId: req.query.companyId
+      }
+    });
+  
+    const updatePromises = approvalCount.map(async establishment => {
+      const id = establishment.dataValues.id;
+      const reviewerIds = establishment.dataValues.reviewerId.split(',').map(id => id.trim());
+      const approverIds = establishment.dataValues.approverId.split(',').map(id => id.trim());
+      const reviewerStatuses = establishment.dataValues.reviewerStatus.split(',').map(status => status.trim());
+      const approverStatuses = establishment.dataValues.approverStatus.split(',').map(status => status.trim());
+      const reviewerComments = establishment.dataValues.reviewerComment.split(',').map(comment => comment.trim());
+      const approverComments = establishment.dataValues.approverComment.split(',').map(comment => comment.trim());
+  
+      const reviewerIndex = reviewerIds.indexOf(recordId);
+      const approverIndex = approverIds.indexOf(recordId);
+      // console.log(reviewerIndex, approverIndex, 'Indexes');
+  
+      if (reviewerIndex !== -1) {
+        // Remove IDs and their positions from status and comments
+        reviewerIds.splice(reviewerIndex, 1);
+        reviewerStatuses.splice(reviewerIndex, 1);
+        reviewerComments.splice(reviewerIndex, 1);
+      }
+      if (approverIndex !== -1) {
+        approverIds.splice(approverIndex, 1);
+        approverStatuses.splice(approverIndex, 1);
+        approverComments.splice(approverIndex, 1);
+      }
+  
+      const approverId = approverIds.join(",");
+      const reviewerId = reviewerIds.join(",");
+      const approverStatus = approverStatuses.join(",");
+      const reviewerStatus = reviewerStatuses.join(",");
+      const approverComment = approverComments.join(",");
+      const reviewerComment = reviewerComments.join(",");
+  
+      await EstablishmentModel.update(
+        {
+          approverId, 
+          reviewerId, 
+          approverStatus, 
+          reviewerStatus, 
+          approverComment, 
+          reviewerComment
+        },
+        {
+          where: {
+            id: id
+          }
+        }
+      );
+    });
+  
+    await Promise.all(updatePromises);
+    return res.status(200).send({ message: "User Deleted" });
+  }    
+    if(deleting == "2"){
+      const department_to_delete = await DepartmentModel.findOne(
+        { where: { id: recordId } }
+      );
+      console.log(department_to_delete,'department_delete');
+        const department = await DepartmentModel.update(
+          { delete: true },
+          { where: { id: recordId } }
+        );
+        return res.status(200).send({ message: "Department Deleted" });
+
+    }
+    if(deleting == "3"){
+      const project_to_delete = await ProjectModel.findOne(
+        { where: { id: recordId } }
+      );
+      console.log(project_to_delete,'department_delete');
+        const project = await ProjectModel.update(
+          { delete: true },
+          { where: { id: recordId } }
+        );
+        return res.status(200).send({ message: "Project Deleted" });
+
+    }
+    if(deleting == "4"){
+      const mdr_to_delete = await MDRModel.findOne(
+        { where: { id: recordId } }
+      );
+      // console.log(mdr_to_delete,'department_delete');
+        const mdr = await MDRModel.update(
+          { delete: true },
+          { where: { id: recordId } }
+        );
+        return res.status(200).send({ message: "MDR Deleted" });
+
+    }
+
+    if(deleting == "5"){
+      const document_to_delete = await DocumentModel.findOne(
+        { where: { id: recordId } }
+      );
+      console.log(document_to_delete,'department_delete');
+        const document = await DocumentModel.update(
+          { delete: true },
+          { where: { id: recordId } }
+        );
+            return res.status(200).send({ message: "document Deleted" });
+    }
+    
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+}
 

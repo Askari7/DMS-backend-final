@@ -22,7 +22,7 @@ module.exports = {
             authorId:1, 
             authorName:'Shoaib Mustafa', 
             title:'Mechanical', 
-            suffix:'ME',
+            suffix:'TK',
             createdAt: new Date(),
             updatedAt: new Date(),
             noOfUsers:7

@@ -53,6 +53,10 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
       },
+      delete: {
+        type: DataTypes.BOOLEAN,
+        defaultValue:false
+      },
       reported_to: {
         type: DataTypes.STRING,
         allowNull: true,

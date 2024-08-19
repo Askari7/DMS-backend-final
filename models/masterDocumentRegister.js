@@ -52,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.STRING,
       },
+      delete: {
+        type: DataTypes.BOOLEAN,
+        defaultValue:false
+      },
     },
     {
       sequelize,

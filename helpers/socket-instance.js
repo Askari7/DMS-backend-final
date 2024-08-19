@@ -86,7 +86,7 @@ module.exports.socketInstance = (wss) => {
           }
         }
         await storeMessage(parseInt(content?.roomId), userId, message);
-        console.log(userTrack[`${userId}-${roomId}`]);
+        // console.log(userTrack[`${userId}-${roomId}`]);
         if (userTrack[`${userId}-${roomId}`] == 1) {
           await sendNotification(message);
         }

@@ -1,6 +1,5 @@
 module.exports.template = (body) => {
   console.log(
-    "here",
     body?.email,
     body?.password,
     body?.firstName,

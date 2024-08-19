@@ -59,12 +59,17 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.STRING,
       },
+      delete: {
+        type: DataTypes.BOOLEAN,
+        defaultValue:false
+      },
       startedDate: {
         type: DataTypes.DATE,
       },
       endedDate: {
         type: DataTypes.DATE,
       },
+
       noOfUsers: {
         type: DataTypes.INTEGER,
         allowNull: false,

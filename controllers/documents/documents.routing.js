@@ -8,7 +8,10 @@ const {
   updateDocumentFormat,
   exportMDRCsv,
   gettingEstablishment,
-  getCodes,createComment, listComments, uploadDoc, uploadComment, getDocumentFormat,assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc
+  getCodes,createComment, listComments, uploadDoc, uploadComment, getDocumentFormat,assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc,
+  updateReview,
+  Accept,
+  exportComments
 } = require("./documents.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 
@@ -85,6 +88,22 @@ module.exports = {
     },
     post: {
       action: [validateToken, gettingEstablishment],
+      level: "public",
+    },
+  },
+  "/review": {
+    put: {
+      action: [validateToken,updateReview ],
+      level: "public",
+    },
+    post: {
+      action: [validateToken,Accept ],
+      level: "public",
+    },
+  },
+  "/exportComments": {
+    get: {
+      action: [ exportComments],
       level: "public",
     },
   },

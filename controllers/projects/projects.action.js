@@ -11,8 +11,11 @@ module.exports.createProject = async (req, res) => {
     console.log(req.body);
       req.body.noOfUsers = 0
       const departments = req.body.departments
+      
       const departmentId = req.body.departmentId
       req.body.departmentIds = departmentId.join(",")
+      req.body.delete = false
+
       req.body.departmentSuffix = departments.map(department => department.suffix).join(', ');
       req.body.departmentTitle = departments.map(department => department.title).join(', ');
       console.log(req.body);
@@ -101,7 +104,7 @@ console.log(documentProgress,"totalDocuments");
 const completedDocuments = await DocumentModel.count({
 where: { projectId, status: 'Completed' }
 });
-console.log(completedDocuments,"completedDocuments");
+// console.log(completedDocuments,"completedDocuments");
 
 // Calculate percentage of completed documents
 const percentage = (completedDocuments / totalDocuments) * 100;
@@ -112,7 +115,7 @@ return { projectId, percentage };
 // Await all document progress calculations to complete
 const documentProgressResults = await Promise.all(documentProgress);
 
-console.log(documentProgressResults,'results aye ');
+// console.log(documentProgressResults,'results aye ');
 
 
 const combinedData = projects.map(project => {
@@ -130,8 +133,8 @@ const combinedDataWithPercentage = combinedData.map(item => {
     percentage: percentageObj ? percentageObj.percentage : 0
   };
 });
-console.log(combinedDataWithPercentage,"combinedData");
-console.log(combinedData);
+// console.log(combinedDataWithPercentage,"combinedData");
+// console.log(combinedData);
     return res.status(200).send(combinedDataWithPercentage);
   } catch (err) {
     console.log(err.message);
@@ -187,7 +190,7 @@ module.exports.listInformation = async (req, res) => {
       };
     });
 
-    console.log("combinedProjects", combinedProjects);
+    // console.log("combinedProjects", combinedProjects);
     res.send(combinedProjects);
   } catch (err) {
     console.log(err.message);
@@ -213,12 +216,20 @@ module.exports.listInformation = async (req, res) => {
 module.exports.list=async(req,res)=>{
   const id = req.query.companyId
   try {
-    const projectCount = await ProjectModel.count({ where: { companyId: id } });
-    const mdrCount = await MDRModel.count({ where: { companyId: id } });
+    const projectCount = await ProjectModel.count({ where: { companyId: id,delete: false}});
+    const mdrCount = await MDRModel.count({ where: { companyId: id,delete: false}});
     
-    const projects = await ProjectModel.findAll({ where: { companyId: id } });
+    const projects = await ProjectModel.findAll({ where: { companyId: id,delete: false}});
     const mdrs = await MDRModel.findAll({ where: { companyId: id } });
-    const departments = await DepartmentModel.findAll({where:{companyId:id}})
+    const { Op } = require('sequelize');
+
+    const departments = await DepartmentModel.findAll({
+      where: {
+        companyId: id,
+        delete: false
+      }
+    });
+
     const establishments = await EstablishmentModel.findAll({where:{companyId:id}})
 
     const projectsStatusCounts = projects.reduce((acc, project) => {
@@ -230,6 +241,7 @@ module.exports.list=async(req,res)=>{
       acc[mdr.status] = (acc[mdr.status] || 0) + 1;
       return acc;
     }, {});
+
     // Extract project IDs
     const projectIds = projects.map(project => project.id);
 

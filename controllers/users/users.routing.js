@@ -6,6 +6,7 @@ const {
   company,
   getUser,
   profile,
+  deleting,
   uploadImage,
 } = require("./users.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
@@ -22,6 +23,10 @@ module.exports = {
     },
     put: {
       action: [validateToken, updateUser],
+      level: "public",
+    },
+    delete: {
+      action: [validateToken, deleting],
       level: "public",
     },
   },

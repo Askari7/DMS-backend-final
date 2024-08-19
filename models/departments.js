@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
       parentId: {
         type: DataTypes.INTEGER,
       },
+      delete: {
+        type: DataTypes.BOOLEAN,
+        defaultValue:false
+      },
       noOfUsers: {
         type: DataTypes.INTEGER,
       },
