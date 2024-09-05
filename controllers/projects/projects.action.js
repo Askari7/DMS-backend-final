@@ -1,29 +1,52 @@
+const { where } = require("sequelize");
 const db = require("../../models/index");
 const ProjectModel = db.projects;
 const SystemLogModel = db.system_logs;
 const DepartmentModel = db.departments
+const ClientOfficialModel = db.clientOfficials;
+const ClientModel = db.clients;
+
 const DocumentModel = db.documents
 const MDRModel = db.master_document_registers;
 const EstablishmentModel = db.establishments;
+const UserModel = db.users;
 
 module.exports.createProject = async (req, res) => {
   try {
+
+
     console.log(req.body);
       req.body.noOfUsers = 0
       const departments = req.body.departments
       
       const departmentId = req.body.departmentId
       req.body.departmentIds = departmentId.join(",")
-      req.body.delete = false
+      req.body.removed = false
 
       req.body.departmentSuffix = departments.map(department => department.suffix).join(', ');
       req.body.departmentTitle = departments.map(department => department.title).join(', ');
       console.log(req.body);
       await ProjectModel.create(req?.body);
-      await SystemLogModel.create({
-        companyId: req?.body?.companyId,
-        title: `${req?.body?.authorName} Created Project ${req?.body?.title}`,
-      });
+      const departmentIds = req.body.departmentIds.split(',');
+
+      await Promise.all(
+        departmentIds.map(async (departmentId) => {
+          const user = await  UserModel.findOne({
+            where:{
+              roleId:2,
+              departmentId:departmentId
+            }
+          })
+          await SystemLogModel.create({
+            companyId: req.body.companyId,
+            typeOfLog: 5,
+            userId:user? user.id:"",
+            departmentId: departmentId.trim(), // Trim to remove any leading/trailing whitespace
+            title: `${req.body.authorName} Created Project ${req.body.title}`,
+          });
+        })
+      );
+
     return res.status(200).send({ message: "Project has been Created" });
   } catch (err) {
     console.log(err.message);
@@ -31,6 +54,24 @@ module.exports.createProject = async (req, res) => {
   }
 };
 
+module.exports.projectUpdate = async (req, res) => {
+  try {
+    console.log("here it isz");
+    
+    const body = req.body
+    const {companyId,id} = req.query
+    const findDepartment = await ProjectModel.findOne({where:{companyId,id}})
+    const update = await findDepartment.update({
+      title:body.title,
+      code:body.code
+    }) 
+
+    return res.status(200).send({message:"Department Updated Succesfully"});
+
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
 module.exports.createDepartment = async (req, res) => {
   try {
     console.log('dept body',req.body);
@@ -56,6 +97,7 @@ module.exports.createDepartment = async (req, res) => {
     await DepartmentModel.create(req?.body);
     await SystemLogModel.create({
       companyId: req?.body?.companyId,
+
       title: `${req?.body?.authorName} Created Department ${req?.body?.title}`,
     });
   }
@@ -66,83 +108,282 @@ module.exports.createDepartment = async (req, res) => {
   }
 };
 
+// module.exports.listProjects = async (req, res) => {
+//   try {
+//     const projects = await ProjectModel.findAll({
+//       where: { companyId: req?.query?.companyId },
+//     });
+//     const projectIds = projects.map(project => project.dataValues.id);
+//     console.log(projectIds,'projectIds');
+
+//     if (req.query.roleId==1) {
+//       let departmentMap = {};
+
+//       let departmentIds = projects.map(project => project.dataValues.departmentIds);
+//       for (let index = 0; index < departmentIds.length; index++) {
+//         const departmentId = departmentIds[index].split(",");
+//         for (let i = 0; i < departmentId.length; i++) {
+
+//           const department = await DepartmentModel.findAll({
+//           where: {
+//             id: departmentId[i]
+//           }
+//         });
+//         departmentMap[department.id] = department.title;
+//         }
+//       }  
+//       const combinedData = projects.map(project => {
+//         for (let index = 0; index < departmentIds.length; index++) {
+//           const departmentId = departmentIds[index].split(",");
+//           for (let i = 0; i < departmentId.length; i++) {
+//             const departmentName = departmentMap[departmentId[i]];
+//             const p = {...project.dataValues,departmentName: departmentName || 'Unknown'} 
+//             return p
+//           }
+//         }
+//       });
+       
+
+//       const documentProgress = projectIds.map(async projectId => {
+//         const totalDocuments = await DocumentModel.count({
+//         where: { projectId }
+//         });
+//         console.log(documentProgress,"totalDocuments");
+//         const completedDocuments = await DocumentModel.count({
+//         where: { projectId, status: 'Completed' }
+//         });
+//         const percentage = (completedDocuments / totalDocuments) * 100;
+//         return { projectId, percentage };
+//         });
+    
+//         // Await all document progress calculations to complete
+//         const documentProgressResults = await Promise.all(documentProgress);
+//         console.log(documentProgressResults,'results aye ');
+    
+
+//         const combinedDataWithPercentage = combinedData.map(item => {
+//           const percentageObj = documentProgressResults.find(p => p.projectId === item.id);
+//           return {
+//             ...item,
+//             percentage: percentageObj ? percentageObj.percentage : 0
+//           };
+//         });
+//         console.log(combinedDataWithPercentage,'combinedDataWithPercentage');
+        
+//         return res.status(200).send(combinedDataWithPercentage);
+        
+//         }    
+        
+
+
+//     else if(req.query.roleId==6){
+
+//     }
+//     else{
+//       const user = await UserModel.findOne({
+//         where:{
+//           id:req.query.id
+//         }
+//       })
+
+//     }
+//   } catch (err) {
+//     console.log(err.message);
+//     res.status(500).send({ message: err.message });
+//   }
+// };
+
+
 module.exports.listProjects = async (req, res) => {
   try {
+
     
     const projects = await ProjectModel.findAll({
       where: { companyId: req?.query?.companyId },
     });
-    const departmentIds = projects.map(project => project.dataValues.departmentId);
+    const projectIds = projects.map(project => project.dataValues.id);
+    console.log(projectIds, 'projectIds');
 
-console.log(departmentIds);
-const departments = await DepartmentModel.findAll({
-  where: {
-    id: departmentIds
-  }
-});
-const departmentNames = departments.map(department => (department.dataValues.id,department.dataValues.title));
-const departmentMap = {};
-departments.forEach(department => {
-  departmentMap[department.dataValues.id] = department.dataValues.title;
-});
-console.log(departmentMap);
-console.log(departmentNames);
+    if (req.query.roleId == 1) {
+      let departmentMap = {};
 
+      let departmentIds = projects.map(project => project.dataValues.departmentIds);
+      for (let index = 0; index < departmentIds.length; index++) {
+        const departmentId = departmentIds[index].split(",");
+        for (let i = 0; i < departmentId.length; i++) {
+          const department = await DepartmentModel.findOne({
+            where: { id: departmentId[i] }
+          });
+          departmentMap[department.id] = department.title;
+        }
+      }
 
-const projectIds = projects.map(project => project.dataValues.id);
+      const combinedData = projects.map(project => {
+        for (let index = 0; index < departmentIds.length; index++) {
+          const departmentId = departmentIds[index].split(",");
+          for (let i = 0; i < departmentId.length; i++) {
+            const departmentName = departmentMap[departmentId[i]];
+            const p = { ...project.dataValues, departmentName: departmentName || 'Unknown' };
+            return p;
+          }
+        }
+      });
 
-// Calculate document progress for each project
-const documentProgress = projectIds.map(async projectId => {
-// Fetch total counts of documents for the project
-const totalDocuments = await DocumentModel.count({
-where: { projectId }
-});
+      const documentProgress = projectIds.map(async projectId => {
+        const totalDocuments = await DocumentModel.count({
+          where: { projectId }
+        });
+        const completedDocuments = await DocumentModel.count({
+          where: { projectId, status: 'Completed' }
+        });
+        const percentage = (completedDocuments / totalDocuments) * 100;
+        return { projectId, percentage };
+      });
 
-console.log(documentProgress,"totalDocuments");
-
-// Fetch counts of completed documents for the project
-const completedDocuments = await DocumentModel.count({
-where: { projectId, status: 'Completed' }
-});
-// console.log(completedDocuments,"completedDocuments");
-
-// Calculate percentage of completed documents
-const percentage = (completedDocuments / totalDocuments) * 100;
-
-return { projectId, percentage };
-});
-
-// Await all document progress calculations to complete
-const documentProgressResults = await Promise.all(documentProgress);
-
-// console.log(documentProgressResults,'results aye ');
+      const documentProgressResults = await Promise.all(documentProgress);
+      console.log(documentProgressResults, 'results aye');
 
 
-const combinedData = projects.map(project => {
-  const departmentName = departmentMap[project.dataValues.departmentId];
-  return {
-    ...project.dataValues,
-    departmentName: departmentName || 'Unknown' // Handle cases where departmentName is not found
-  };
-});
+      const combinedDataWithPercentage = combinedData.map(item => {
+        const percentageObj = documentProgressResults.find(p => p.projectId === item.id);
+        return {
+          ...item,
+          percentage: percentageObj ? percentageObj.percentage : 0
+        };
+      });
+      console.log(combinedDataWithPercentage, 'combinedDataWithPercentage');
 
-const combinedDataWithPercentage = combinedData.map(item => {
-  const percentageObj = documentProgressResults.find(p => p.projectId === item.id);
-  return {
-    ...item,
-    percentage: percentageObj ? percentageObj.percentage : 0
-  };
-});
-// console.log(combinedDataWithPercentage,"combinedData");
-// console.log(combinedData);
-    return res.status(200).send(combinedDataWithPercentage);
+      return res.status(200).send(combinedDataWithPercentage);
+
+    } else if (req.query.roleId == 6) {
+      console.log(req.query.id,req.query.companyId,'companyId ai ha ye ');
+      
+      // Fetch the user details based on the provided id
+      const client = await ClientOfficialModel.findOne({
+        where: {
+          clientName: req.query.firstName
+        }
+      });
+      console.log(client,'client');
+
+      const user = await ClientModel.findOne({
+        where: {
+          id: client.companyId
+        }
+      });
+      console.log(user,'useruser');
+
+      // Filter projects where clientId matches user.id
+      const filteredProjects = projects.filter(project => project.dataValues.clientId == user.id);
+      console.log(filteredProjects,'filteredProjects');
+      
+      const projectIds = filteredProjects.map(project => project.dataValues.id);
+      console.log(projectIds,'projectIds');
+
+      let departmentMap = {};
+      let departmentIds = filteredProjects.map(project => project.dataValues.departmentIds);
+
+      for (let index = 0; index < departmentIds.length; index++) {
+        const departmentId = departmentIds[index].split(",");
+        for (let i = 0; i < departmentId.length; i++) {
+          const department = await DepartmentModel.findOne({
+            where: { id: departmentId[i] }
+          });
+          departmentMap[department.id] = department.title;
+        }
+      }
+
+      const combinedData = filteredProjects.map(project => {
+        for (let index = 0; index < departmentIds.length; index++) {
+          const departmentId = departmentIds[index].split(",");
+          for (let i = 0; i < departmentId.length; i++) {
+            const departmentName = departmentMap[departmentId[i]];
+            const p = { ...project.dataValues, departmentName: departmentName || 'Unknown' };
+            return p;
+          }
+        }
+      });
+
+      const documentProgress = projectIds.map(async projectId => {
+        const totalDocuments = await DocumentModel.count({
+          where: { projectId }
+        });
+        const completedDocuments = await DocumentModel.count({
+          where: { projectId, status: 'Completed' }
+        });
+        const percentage = (completedDocuments / totalDocuments) * 100;
+        return { projectId, percentage };
+      });
+
+      const documentProgressResults = await Promise.all(documentProgress);
+      console.log(documentProgressResults, 'results aye');
+
+      const combinedDataWithPercentage = combinedData.map(item => {
+        const percentageObj = documentProgressResults.find(p => p.projectId === item.id);
+        return {
+          ...item,
+          percentage: percentageObj ? percentageObj.percentage : 0
+        };
+      });
+      console.log(combinedDataWithPercentage, 'combinedDataWithPercentage');
+
+      return res.status(200).send(combinedDataWithPercentage);
+
+    }else if(req.query.companyId&&!req.query.id){
+      const projects = await ProjectModel.findAll({
+        where: { companyId: req?.query?.companyId },
+      });
+      return res.status(200).send(projects);
+
+    }
+    
+    else {
+      // Default case
+      const user = await UserModel.findOne({
+        where: {
+          id: req.query.id
+        }
+      });
+
+      let departmentMap = {};
+      let departmentIds = projects.map(project => project.dataValues.departmentIds);
+      let filteredProjects = [];
+
+      for (let index = 0; index < departmentIds.length; index++) {
+        const departmentId = departmentIds[index].split(",");
+        for (let i = 0; i < departmentId.length; i++) {
+          if (departmentId[i] == user.departmentId) {
+            const department = await DepartmentModel.findOne({
+              where: { id: departmentId[i] }
+            });
+            departmentMap[department.id] = department.title;
+
+            const p = { ...projects[index].dataValues, departmentName: department.title || 'Unknown' };
+            filteredProjects.push(p);
+
+            const totalDocuments = await DocumentModel.count({
+              where: { projectId: projects[index].dataValues.id }
+            });
+            const completedDocuments = await DocumentModel.count({
+              where: { projectId: projects[index].dataValues.id, status: 'Completed' }
+            });
+            const percentage = (completedDocuments / totalDocuments) * 100;
+
+            p.percentage = percentage || 0;
+          }
+        }
+      }
+
+      console.log(filteredProjects, 'filteredProjects');
+      return res.status(200).send(filteredProjects);
+    }
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
 
-
+  
 module.exports.listInformation = async (req, res) => {
   try {
     const projects = await ProjectModel.findAll({
@@ -216,17 +457,16 @@ module.exports.listInformation = async (req, res) => {
 module.exports.list=async(req,res)=>{
   const id = req.query.companyId
   try {
-    const projectCount = await ProjectModel.count({ where: { companyId: id,delete: false}});
-    const mdrCount = await MDRModel.count({ where: { companyId: id,delete: false}});
+    const projectCount = await ProjectModel.count({ where: { companyId: id,removed: false}});
+    const mdrCount = await MDRModel.count({ where: { companyId: id,removed: false}});
     
-    const projects = await ProjectModel.findAll({ where: { companyId: id,delete: false}});
+    const projects = await ProjectModel.findAll({ where: { companyId: id,removed: false}});
     const mdrs = await MDRModel.findAll({ where: { companyId: id } });
-    const { Op } = require('sequelize');
 
     const departments = await DepartmentModel.findAll({
       where: {
         companyId: id,
-        delete: false
+        removed: false
       }
     });
 

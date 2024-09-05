@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "migrate": "sequelize db:migrate",
+    "seed": "sequelize db:seed:all",
+    "rollback": "sequelize db:migrate:undo",
+    "rollback:all": "sequelize db:migrate:undo:all"
   },
   "author": "",
   "license": "ISC",

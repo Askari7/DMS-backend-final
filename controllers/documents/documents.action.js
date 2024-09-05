@@ -1513,29 +1513,39 @@ const { title } = require("process");
 
 module.exports.listDocuments = async (req, res) => {
   console.log("documents bhejoo");
-  console.log(req.query.assignedBy,req.query.userId,"assigned");
+  // console.log(req.query.assignedBy,req.query.userId,"assigned");
   try {
     const companyId = parseInt(req?.query?.companyId);
     const departmentId = req?.query?.department;
     const assignedTo = req?.query?.userId;
     const assignedBy = req?.query?.assignedBy;
+    console.log(departmentId,assignedTo,assignedBy,'ye ha asal ');
+    
 
+    if(departmentId==undefined && !assignedTo ==undefined&&!assignedBy==undefined){
+      const documents = await DocumentModel.findAll({
+        where: {
+          companyId: companyId,
+        }
+      });
+      console.log('1',documents);
+      return res.status(200).send(documents);
+    }
     console.log(companyId,departmentId,assignedBy,assignedTo,'information');
-    console.log('hello');
-    // console.log('tttt',req.query);
-    // console.log('hi',typeof(companyId),req.query.masterDocumentId,req.query.projectId);
+
     if(req.query.masterDocumentId){
+      console.log('2yaha aya');
       const documents = await DocumentModel.findAll({
         where: {
           companyId: companyId,masterDocumentId:req.query.masterDocumentId,projectId:req.query.projectId
         }
       });
       console.log('1',documents);
-
       return res.status(200).send(documents);
     }
 
     else{
+      console.log('3yaha aya');
       if(assignedTo=='1' || assignedBy=='1'){
         let documents = await DocumentModel.findAll({
         where: {
@@ -1543,61 +1553,119 @@ module.exports.listDocuments = async (req, res) => {
         }
       });
       console.log('2',documents);
-
       const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
-      
-  
       const users = await UserModel.findAll({
         where: {
           id: myAssignedToUsers
         }
       });
       
-      const myDocuments = await Promise.all(documents.map(async document => {
-        const assignedToIds = document.assignedTo.split(','); // Split the assignedTo field into an array of IDs
-        console.log(assignedToIds,'assignedToIds');
+      // const myDocuments = await Promise.all(documents.map(async document => {
+      //   const assignedToIds =document.assignedTo!= ''|| null && document.assignedTo.split(','); // Split the assignedTo field into an array of IDs
+      //   console.log(assignedToIds,'assignedToIds');
         
-        const assignedToNames = assignedToIds.map(id => {
-          console.log(id,'id');
+      //   const assignedToNames = assignedToIds.map(id => {
+      //     console.log(id,'id');
           
-          const user = users.find(user => user.id == id); // Find the user by ID
+      //     const user = users.find(user => user.id == id); // Find the user by ID
           
-          return user ? `${user.dataValues.firstName} ${user.dataValues.lastName}` : null; // Get the full name
-        }).filter(name => name !== null); // Remove any null values
+      //     return user ? `${user.dataValues.firstName} ${user.dataValues.lastName}` : null; // Get the full name
+      //   }).filter(name => name !== null); // Remove any null values
       
-        document.dataValues["assignedToName"] = assignedToNames.join(', '); // Join the names into a comma-separated string
+      //   document.dataValues["assignedToName"] = assignedToNames.join(', '); // Join the names into a comma-separated string
       
-        return document;
-      }));
+      //   return document;
+      // }));
       
       
-      return res.status(200).send(myDocuments);    
+      return res.status(200).send(documents);    
     }
     else{
+      console.log("LOG YAHA AYA");
+      
+        // let documents = await DocumentModel.findAll({
+        //   where: {
+        //     companyId: companyId,
+        //     departmentId: {
+        //       [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
+        //     },
+        //     [Op.or]: [
+                
+        //       {
+        //         assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+        //       }
+        //     ]
+            // [Op.or]: [
+            //   // {
+            //   //   assignedBy: {
+            //   //     [Op.gte]: assignedBy // Matches or greater than assignedBy from query param
+            //   //   }
+            //   // },
+            //   // { 
+            //   //   assignedFrom: assignedTo // Matches assignedTo from query param
+            //   // },
+            //   {
+            //     assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+            //   }
+            // ]
+        //   }
+          
+        // });
+// /////////////////////////KNOWLEDGE/////////////////////////////////////////////////////
+
+// assigned to is the user id to which doc is assigned
+// assignedBy is ROLEID who has assigned doc to user
+// assigned from is the user ID who has assigned doc to user
         let documents = await DocumentModel.findAll({
-          where: {
+     where: {
             companyId: companyId,
             departmentId: {
               [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
             },
-            
+            [Op.or]: [
+                
+              {
+                assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+              }
+            ],
             [Op.or]: [
               {
                 assignedBy: {
                   [Op.gte]: assignedBy // Matches or greater than assignedBy from query param
-                }},
-               { assignedFrom: assignedTo // Matches assignedTo from query param
+                }
+              },
+              { 
+                assignedFrom: assignedTo // Matches assignedTo from query param
               },
               {
                 assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
               }
             ]
-            
-            
           }
-          
         });
-        console.log('3',documents);
+        
+        console.log(documents,'documentsdocuments');
+        
+        // if (documents.length==0) {
+        //   console.log('documentsdocumentsdocumentsdocuments');
+          
+        //   documents = await DocumentModel.findAll({
+        //     where: {
+        //       companyId: companyId,
+            
+              
+        //       [Op.or]: [
+                
+        //         {
+        //           assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+        //         }
+        //       ]
+        //     }
+            
+        //   });
+          
+        // }
+        console.log('3 data aya ha ',documents);
         const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
   
         const users = await UserModel.findAll({
@@ -1643,12 +1711,32 @@ if (document.assignedTo) {
         }));
         
         console.log(myDocuments, 'mydocs');
-        
         return res.status(200).send(myDocuments);    }
-  
   }
   } catch (err) {
     console.log('error',err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
+
+
+
+module.exports.MDRUpdate = async (req, res) => {
+  try {
+    console.log("here it isz");
+    
+    const body = req.body
+    const {companyId,id} = req.query
+    const findDepartment = await MDRModel.findOne({where:{companyId,id}})
+    const update = await findDepartment.update({
+      title:body.title,
+      mdrCode:body.mdrCode
+    }) 
+
+    return res.status(200).send({message:"MDR Updated Succesfully"});
+
+  } catch (err) {
     res.status(500).send({ message: err.message });
   }
 };
@@ -1709,7 +1797,7 @@ if (document.assignedTo) {
 module.exports.listMDR = async (req, res) => {
   try {
     const mdr = await MDRModel.findAll({
-      where: { companyId: req?.query?.companyId, delete:false },
+      where: { companyId: req?.query?.companyId, removed:false },
     });
 
     console.log(mdr, "mdr");
@@ -1841,10 +1929,44 @@ module.exports.createMDR = async (req, res) => {
     req.body.departmentName = fetchProject.departmentTitle
     const mdr = await MDRModel.create(req?.body);
     console.log(mdr);
-    await SystemLogModel.create({
-      title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
-      companyId: req?.body?.companyId,
-    });
+
+    const departmentIds = req.body.departmentId.split(',');
+    
+    await Promise.all(
+      departmentIds.map(async (departmentId) => {
+        const user = await  UserModel.findOne({
+          where:{
+            roleId:2,
+            departmentId:departmentId
+          }
+        })
+        if(req?.body?.title==undefined){
+          const user = await  UserModel.findOne({
+            where:{
+              roleId:2,
+              departmentId:departmentId
+            }
+          })
+
+          await SystemLogModel.create({
+            companyId: req.body.companyId,
+            userId:user? user.id:"",
+            typeOfLog: 10,
+            departmentId: departmentId.trim(), // Trim to remove any leading/trailing whitespace
+            title: `MDR creation assigned to ${req?.body?.authorName}`,
+          });
+        }else{
+        await SystemLogModel.create({
+          companyId: req.body.companyId,
+          userId:user? user.id:"",
+          typeOfLog: 6,
+          departmentId: departmentId.trim(), // Trim to remove any leading/trailing whitespace
+          title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
+        });
+      }
+      })
+    );
+
     return res.status(200).send({ message: "Master Document Register Assigned" });
   } catch (err) {
     console.log(err.message);
@@ -1945,10 +2067,69 @@ module.exports.createDocument = async (req, res) => {
 // console.log(establishments);
 
     //  }
-    await SystemLogModel.create({
-      title: log,
-      companyId: req?.body?.companyId,
-    });
+
+    const approvers = req.body.approverId.split(",");
+
+    const departmentIds = req.body.docDepartmentId.split(',');
+    // await Promise.all(
+    //   departmentIds.map(async (departmentId) => {
+    //     await SystemLogModel.create({
+    //       companyId: req.body.companyId,
+    //       typeOfLog:"7a",
+    //       userId:user? user.id:"",
+    //       departmentId: departmentId.trim(), // Trim to remove any leading/trailing whitespace
+    //       title: log,
+    //     });
+    //   })
+    // );
+
+    await Promise.all(
+      departmentIds.map(async (departmentId) => {
+        await Promise.all(
+          approvers.map(async (approverId) => {
+            await SystemLogModel.create({
+              companyId: req.body.companyId,
+              typeOfLog: "7a",
+              userId: approverId.trim(), // Trim to remove any leading/trailing whitespace
+              departmentId: departmentId.trim(),
+              title: log,
+            });
+            await SystemLogModel.create({
+              companyId: req.body.companyId,
+              typeOfLog: "7a",
+              userId: approverId.trim(), // Trim to remove any leading/trailing whitespace
+              departmentId: departmentId.trim(),
+              title: `You are appointed as approver for Document ${req?.body?.title}`,
+            });
+          })
+        );
+      })
+    );
+
+    const reviewers = req.body.reviewerId.split(",");
+    await Promise.all(
+      departmentIds.map(async (departmentId) => {
+        await Promise.all(
+          reviewers.map(async (reviewerId) => {
+            await SystemLogModel.create({
+              companyId: req.body.companyId,
+              typeOfLog: "7b",
+              userId: reviewerId.trim(), // Trim to remove any leading/trailing whitespace
+              departmentId: departmentId.trim(),
+              title: log,
+            });
+            await SystemLogModel.create({
+              companyId: req.body.companyId,
+              typeOfLog: "7b",
+              userId: approverId.trim(), // Trim to remove any leading/trailing whitespace
+              departmentId: departmentId.trim(),
+              title: `You are appointed as reviewer for Document ${req?.body?.title}`,
+            });
+          })
+        );
+      })
+    );
+
     // if(req.body.status==)
     // const filePath = path.join(
     //   __dirname,
@@ -1983,10 +2164,52 @@ module.exports.assignDoc = async (req, res) => {
       { assignedTo: assignedTo, assignedBy: assignedBy,assignedFrom: assignedFrom },
       { where: { title: title } }
     );
-    // await SystemLogModel.update({
-    //   title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
-    //   companyId: req?.body?.companyId,
+
+
+    // const user_1 = await UserModel.findOne({
+    //   where: {
+    //     id: assignedTo,
+    //   },
     // });
+    // const user_2 = await UserModel.findOne({
+    //   where: {
+    //     id: assignedFrom,
+    //   },
+    // });
+
+    // await SystemLogModel.create({
+    //   companyId: req.query.companyId,
+    //   typeOfLog:11,
+    //   userId:user_1.id,
+    //   departmentId:user_1.departmentId,
+    //   title:`${user_1.firstName} is assigned a document by ${user_2.firstName}`
+    // });
+
+    const assignedToIds = assignedTo.split(',');
+    console.log(assignedToIds,'assignedToIds');
+    
+for (let i = 0; i < assignedToIds.length; i++) {
+  const user_1 = await UserModel.findOne({
+    where: {
+      id: assignedToIds[i],
+    },
+  });
+
+  const user_2 = await UserModel.findOne({
+    where: {
+      id: assignedFrom,
+    },
+  });
+
+  await SystemLogModel.create({
+    companyId: req.query.companyId,
+    typeOfLog: 11,
+    userId: user_1.id,
+    departmentId: user_1.departmentId,
+    title: `${user_1.firstName} is assigned a document by ${user_2.firstName}`,
+  });
+}
+
     return res.status(200).send({ message: "Document Assigned" });
   } catch (err) {
     console.log(err.message);
@@ -2021,6 +2244,7 @@ module.exports.updateMDR = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
 module.exports.updateReview = async (req, res) => {
   try {
     const body = req.body
@@ -2031,9 +2255,12 @@ module.exports.updateReview = async (req, res) => {
     const app = req.body.app
     const rev = req.body.rev
     const myrecord = req.body.myrecord
+    const reviewerIds = myrecord.reviewerId.split(",")
+    const approverIds = myrecord.approverId.split(",")
+    const companyId = myrecord.companyId
+     console.log(myrecord,'myrecord ha ye');
+    
 
-    console.log(body,status,commnent,version,docName);
-    console.log(app,rev,"yreocr",myrecord)
     function incrementVersion(versionIn) {
       // Split the version string at the first period ('.')
       const parts = versionIn.split('.');
@@ -2050,8 +2277,13 @@ module.exports.updateReview = async (req, res) => {
         return versionIn;
       }
     }
+        console.log(rev,app,'revAPP hay ');
+        
+
     var incrementFunc;
     if(status=="Reject"){
+      console.log(approverIds,reviewerIds,'apprevIDS');
+      
       incrementFunc = incrementVersion(version)||version
       const document = await DocumentModel.findOne({where:{ title: docName, version }});
 
@@ -2061,10 +2293,69 @@ module.exports.updateReview = async (req, res) => {
       }}
     });
 
+
+
     await EstablishmentModel.update(
       { clientStatus:status, clientComment:commnent },
       { where: { docName: docName ,version:version } }
     );
+
+
+// Create logs for all reviewers
+await Promise.all(
+  reviewerIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 15,
+        userId: user.id,
+        departmentId: user.departmentId,
+        title: `Document ${docName} rejected by Client `,
+      });
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 16,
+        title: `Please upload new document ${version} for client!`,
+        userId: user.id,
+        departmentId: user.departmentId,
+      });
+    }
+  })
+);
+
+// Create logs for all approvers
+await Promise.all(
+  approverIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 15,
+        userId: user.id,
+        departmentId: user.departmentId,
+        title: `Document ${docName} rejected by Client `,
+      });
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 16,
+        title: `Please upload new document ${version} for client!`,
+        userId: user.id,
+        departmentId: user.departmentId,
+      });
+    }
+  })
+);
 
     const revsId = myrecord.reviewerId.split(",")
     const appsId = myrecord.approverId.split(",")
@@ -2094,19 +2385,59 @@ module.exports.updateReview = async (req, res) => {
     }
     );
     return res.status(200).send({ message: "Document Rejected" });
-
     }
     else{
+      console.log(approverIds,reviewerIds,'apprevIDS');
+
       await EstablishmentModel.update(
         { clientStatus:status},
         { where: { docName: docName,version:version } }
       );
+
+await Promise.all(
+  reviewerIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 17,
+        title: `Client approved document ${docName} version ${version}!`,
+        userId: user.id,
+        departmentId: user.departmentId,
+      });
+    }
+  })
+);
+
+// Create logs for all approvers
+await Promise.all(
+  approverIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 17,
+        title: `Client approved document ${docName} version ${version}!`,
+        userId: user.id,
+        departmentId: user.departmentId,
+      });
+    }
+  })
+);
+
       return res.status(200).send({ message: "Document Approved" });
 
     }
-
-    console.log(EstablishmentModel);
-
     } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
@@ -2143,6 +2474,7 @@ const status='Uploaded';
 console.log('helooo',updatedDocument);
     await SystemLogModel.create({
       title: log,
+      typeOfLog:8,
       companyId: req?.body?.companyId,
     });
 
@@ -2204,8 +2536,11 @@ module.exports.listEstablishment = async (req, res) => {
   }
 
   if(req.query.roleId == 6){
+    console.log("yaha ayega");
+    console.log(req.query.companyId,'companyID');
+    
     const establishment = await EstablishmentModel.findAll({
-      where: { companyId: req?.query?.companyId , sendToClient:true
+      where: { companyId:req.query.companyId , sendToClient:true
       },
      
     });
@@ -2284,9 +2619,13 @@ module.exports.Accept = async (req, res) => {
     const docName = req.body.docName;
     const approverStatus=req.body.appStatusArr;
     const reviewerStatus=req.body.revStatusArr;
+    const app=req.body.app;
+    const rev=req.body.rev;
+    const companyId = req.body.companyId
     console.log(reviewerStatus,approverStatus,'status');
     const versionIn= req.query.version;
-  
+    const appIds  = app.split(",")
+    const revIds = rev.split(",")
     appArray=approverStatus.split(',');
     revArray=reviewerStatus.split(',');
 
@@ -2320,18 +2659,54 @@ const updateDocStatus = await DocumentModel.update({status,version}, {
     if (!updateCheck) {
       return res.status(404).send({ message: "Document not found" });
     }
-    
-    // // Check reviewerStatus for any '0'
-    // if (updateCheck.reviewerStatus && updateCheck.reviewerStatus.includes('0') && role === "Approver") {
-    //   return res.status(200).send({ message: "Reviewer Status is not completed yet" });
-    // }
-    
-    // Update document with new status values
+
     await EstablishmentModel.update(
       { reviewerStatus,approverStatus },
       { where: { docName: docName , version:versionIn } }
     );
-        
+
+    // Create logs for all reviewers
+await Promise.all(
+  revIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 18,
+      title: `Document ${docName} Accepted!`,
+        userId: user.id,
+        departmentId: user.departmentId,
+      });
+    }
+  })
+);
+
+// Create logs for all approvers
+await Promise.all(
+  appIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 18,
+      title: `Document ${docName} Accepted!`,
+        userId: user.id,
+        departmentId: user.departmentId,
+      });
+    }
+  })
+);
+
     return res.status(200).send({ message: "Document Status updated" });
   } catch (err) {
     console.log(err.message);
@@ -2422,6 +2797,7 @@ status='Approved(in-house)';
 // version='000';
 
 }
+
 const updateDocStatus = await DocumentModel.update({status,version}, {
   where: { title:  {
     [Sequelize.Op.like]: `%${docName}%`
@@ -2435,6 +2811,8 @@ const updateDocStatus = await DocumentModel.update({status,version}, {
     const updateCheck = await EstablishmentModel.findOne({
       where: { docName: docName }
     });
+
+
     
     if (!updateCheck) {
       return res.status(404).send({ message: "Document not found" });
@@ -2450,6 +2828,79 @@ const updateDocStatus = await DocumentModel.update({status,version}, {
       { reviewerStatus,approverStatus, approverComment, reviewerComment },
       { where: { docName: docName,version:versionIn } }
     );
+
+    // const departmentIds = docDepartmentId.split(',');
+    // const reviewerIds = reviewerId.split(",")
+    // const approverIds = approverId.split(",")
+    // await Promise.all(
+    //   departmentIds.map(async (departmentId) => {
+    //     const user = await  UserModel.findOne({
+    //       where:{
+    //         roleId:2,
+    //         departmentId:departmentId
+    //       }
+    //     })
+    //     await SystemLogModel.create({
+    //       companyId: companyId,
+    //       typeOfLog: 14,
+    //       userId: 1,
+    //       departmentId:departmentId,
+    //       title: `Document ${docName} version & status updated!`,
+    //     });
+    //   })
+    // );
+
+const reviewerIds = reviewerId.split(",");
+const approverIds = approverId.split(",");
+
+// Create logs for all reviewers
+await Promise.all(
+  reviewerIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 14,
+        userId: user.id,
+        departmentId: user.departmentId,
+        title: `Document ${docName} version & status updated for reviewer!`,
+      });
+    }
+  })
+);
+
+// Create logs for all approvers
+await Promise.all(
+  approverIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 14,
+        userId: user.id,
+        departmentId: user.departmentId,
+        title: `Document ${docName} version & status updated for approver!`,
+      });
+    }
+  })
+);
+
+
+    
+
+
+
+    
     
     // Retrieve updated document
     const updatedDocument = await EstablishmentModel.findOne({
@@ -2498,6 +2949,59 @@ const updateDocStatus = await DocumentModel.update({status,version}, {
       
       const newRecord = await EstablishmentModel.create(recordData)
 
+      docDepartmentId,
+      reviewer,
+      approver,
+
+
+
+// Create logs for all reviewers
+await Promise.all(
+  reviewerIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 13,
+        userId: user.id,
+        departmentId: user.departmentId,
+        title: `Please upload new version for Document ${docName}`,
+      });
+    }
+  })
+);
+
+// Create logs for all approvers
+await Promise.all(
+  approverIds.map(async (id, index) => {
+    const user = await UserModel.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (user) {
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 13,
+        userId: user.id,
+        departmentId: user.departmentId,
+        title: `Please upload new version for Document ${docName}`,
+      });
+    }
+  })
+);
+      await SystemLogModel.create({
+        companyId: companyId,
+        typeOfLog: 13,
+        title: ``,
+      });
+
       return res.status(200).send({ message: "Please upload a new version now!" });
     }
     
@@ -2521,15 +3025,25 @@ module.exports.createPermission = async (req, res) => {
 };
 module.exports.createComment = async (req, res) => {
   try {
-    console.log(req.body,"before");
-    console.log(req.body,"after"); 
     req.body.Resolved = 0
+    const userId = req.body.userId
     const comments = await CommentsModel.create(req?.body);
     console.log('hi',comments);
-    // await SystemLogModel.create({
-    //   title: `${req?.body?.authorName} Created MDR ${req?.body?.title}`,
-    //   companyId: req?.body?.companyId,
-    // });
+    console.log('userId',userId);
+    
+    const user = await  UserModel.findOne({
+      where:{
+        id:userId[0],
+      }
+    })
+
+    await SystemLogModel.create({
+      departmentId:user.departmentId,
+      title:`${user.firstName} just commented on ${comments.dataValues.docName}`,
+      userId:user.id,
+      companyId: user.companyId,
+    });
+
     return res.status(200).send({ message: "Comment saved into DB" });
   } catch (err) {
     console.log(err.message);
@@ -2539,7 +3053,7 @@ module.exports.createComment = async (req, res) => {
 module.exports.uploadComment = async (req, res) => {
   try {
     console.log(req.body);
-    const { comments, docName,user } = req.body;
+    const { comments, docName,user ,userId} = req.body;
     const { id } = req.body.comments; // Extract the comment ID from req.body
 
     console.log("Comments:", comments);
@@ -2584,11 +3098,20 @@ module.exports.uploadComment = async (req, res) => {
     )
     }
 
+        
+    const userMe = await  UserModel.findOne({
+      where:{
+        id:user,
+      }
+    })
+
 // console.log('helooo',updatedDocument);
-//     await SystemLogModel.create({
-//       title: log,
-//       companyId: req?.body?.companyId,
-//     });
+    await SystemLogModel.create({
+      title: `${userMe.firstName} replied to a comment on ${docName}`,
+      companyId: userMe.companyId,
+      departmentId: userMe.departmentId,
+      userId:userMe.id
+    });
 
     return res.status(200).send({ message: "Comment reply sent" });
   } catch (err) {
@@ -2706,6 +3229,7 @@ module.exports.listPermission = async (req, res) => {
     const resData = [];
     for (const item of data) {
       resData.push({
+        project:item?.project,
         id: item?.id,
         userId: item?.userId,
         masterDocumentId: item?.masterDocumentId,

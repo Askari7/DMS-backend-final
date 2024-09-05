@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
       },
-      delete: {
+      removed: {
         type: DataTypes.BOOLEAN,
         defaultValue:false
       },

@@ -19,13 +19,23 @@ module.exports.createClient = async (req, res) => {
   try {
     const { body } = req;
     if(body.clientName){
+
+      const Client = await UserModel.findOne(
+        {
+          where: {
+            email:body.Email,companyId:body.userCompanyId
+          }
+        }
+      );
+      if(!Client){
       const clients = await ClientOfficialModel.create(body);
       const password = generateRandomPassword(10);
       body.password = password;
       body.roleId = 6
       body.firstName = body.clientName
-      body.lastName = body.clientName
+      body.lastName=''
       body.email=body.Email
+      body.companyId=body.userCompanyId
       body.password = bcrypt.hashSync(password, 8);
       const users = await UserModel.create(body);
       
@@ -33,6 +43,10 @@ module.exports.createClient = async (req, res) => {
       await sendEmail(body);
       return res.status(200).send({ message: "Client Official has been Added" });
     }
+    return res.status(200).send({ message: "This email already exist!" });
+
+  }
+
     else{
       const clients = await ClientModel.create(body);
       return res.status(200).send({ message: "Client Company has been Created" });

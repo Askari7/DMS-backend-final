@@ -22,7 +22,7 @@ module.exports.getStats = async (req, res) => {
         roleId: {
           [Op.in]: roleIds,
         },
-        delete:false
+        removed:false
       },
     });
     
@@ -33,7 +33,7 @@ module.exports.getStats = async (req, res) => {
         where: {
           companyId: req?.query?.companyId,
           roleId: roleId,
-          delete:false
+          removed:false
         },
       });
       roleCounts[roleId] = count;
@@ -47,7 +47,7 @@ module.exports.getStats = async (req, res) => {
     const projectCount = await ProjectModel.count({
       where: {
         companyId: req?.query?.companyId,
-        delete:false
+        removed:false
 
       },
     });
@@ -60,14 +60,14 @@ module.exports.getStats = async (req, res) => {
     const departmentCount = await DepartmentModel.count({
       where: {
         companyId: req?.query?.companyId,
-        delete:false
+        removed:false
       },
     });
 
     const mdrCount = await MDRModel.count({
       where: {
         companyId: req?.query?.companyId,
-        delete:false
+        removed:false
 
       },
     });
@@ -143,6 +143,8 @@ module.exports.getStats = async (req, res) => {
       limit: 10,
     });
 
+    console.log(logs,'logslogs');
+    
     const data = [];
     for (const log of logs) {
       data.push({

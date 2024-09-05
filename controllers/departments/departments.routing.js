@@ -1,4 +1,4 @@
-const { listDepartments, createDepartment,associateUserDepartment ,updateUser,listCounts} = require("./departments.action");
+const { notifications,listDepartments,departmentUpdate, createDepartment,associateUserDepartment ,updateUser,listCounts} = require("./departments.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 
 module.exports = {
@@ -27,6 +27,18 @@ module.exports = {
    
     post: {
       action: [validateToken, associateUserDepartment],
+      level: "public",
+    },
+  },
+  "/notifications": {
+    post: {
+      action: [validateToken, notifications],
+      level: "public",
+    },
+  },
+  "/department_update": {
+    put: {
+      action: [validateToken, departmentUpdate],
       level: "public",
     },
   },

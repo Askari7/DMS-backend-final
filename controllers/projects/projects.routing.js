@@ -1,4 +1,4 @@
-const { createProject, listProjects,listInformation ,list,progress} = require("./projects.action");
+const { createProject, listProjects,listInformation ,list,progress, projectUpdate} = require("./projects.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 module.exports = {
   "/": {
@@ -8,6 +8,10 @@ module.exports = {
     },
     post: {
       action: [validateToken, createProject],
+      level: "public",
+    },
+    put: {
+      action: [validateToken, projectUpdate],
       level: "public",
     },
   },

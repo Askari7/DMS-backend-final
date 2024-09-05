@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
+      project: {
+        type: DataTypes.STRING,
+      },
       masterDocumentId: {
         type: DataTypes.INTEGER,
       },

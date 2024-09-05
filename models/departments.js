@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       parentId: {
         type: DataTypes.INTEGER,
       },
-      delete: {
+      removed: {
         type: DataTypes.BOOLEAN,
         defaultValue:false
       },

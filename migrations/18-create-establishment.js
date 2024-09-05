@@ -12,16 +12,13 @@ module.exports = {
           docName: {
             type: Sequelize.STRING,
           },
-          version: {
-            type: Sequelize.STRING,
-          },
           userName: {
             type: Sequelize.STRING,
           },
-          approver: {
+          reviewer: {
             type: Sequelize.STRING,
           },
-          reviewer: {
+          approver: {
             type: Sequelize.STRING,
           },
           approverId: {
@@ -30,6 +27,7 @@ module.exports = {
           reviewerId: {
             type: Sequelize.STRING,
           },
+    
           approverStatus: {
             type: Sequelize.STRING,
           },
@@ -42,10 +40,29 @@ module.exports = {
           reviewerComment: {
             type: Sequelize.STRING,
           },
+          clientId: {
+            type: Sequelize.STRING,
+          },
+    
+          clientStatus: {
+            type: Sequelize.STRING,
+          },
+          clientComment: {
+            type: Sequelize.STRING,
+          },
+          version: {
+            type: Sequelize.STRING,
+          },
           status: {
             type: Sequelize.BOOLEAN,
           },
           designation: {
+            type: Sequelize.BOOLEAN,
+          },
+          sendToClient: {
+            type: Sequelize.BOOLEAN,
+          },
+          sendForApproval: {
             type: Sequelize.BOOLEAN,
           },
           companyId: {
@@ -62,6 +79,10 @@ module.exports = {
           },
           masterDocumentName: {
             type: Sequelize.STRING,
+          },
+          removed: {
+            type: Sequelize.BOOLEAN,
+            defaultValue:false
           },
       createdAt: {
         allowNull: false,

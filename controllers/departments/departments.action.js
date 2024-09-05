@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 
 const Sequelize = require('sequelize');
 const db = require("../../models/index");
+const departments = require('../../models/departments');
 const DepartmentModel = db.departments;
 const MDRModel = db.master_document_registers;
 
@@ -29,16 +30,21 @@ module.exports.createDepartment = async (req, res) => {
       console.log('check change',req.body);
       req.body.noOfUsers = 0;
       console.log(req.body);
-      await DepartmentModel.create(req?.body);
+      const department = await DepartmentModel.create(req?.body);
+      
       await SystemLogModel.create({
         companyId: req?.body?.companyId,
+        departmentId:department.id,
+        typeOfLog:3,
         title: `${req?.body?.authorName} Created Department ${req?.body?.title}`,
       });
     } }
     else{
-    await DepartmentModel.create(req?.body);
+    const department = await DepartmentModel.create(req?.body);
     await SystemLogModel.create({
       companyId: req?.body?.companyId,
+      typeOfLog:3,
+      departmentId:department.id,
       title: `${req?.body?.authorName} Created Department ${req?.body?.title}`,
     });
   }
@@ -53,16 +59,43 @@ module.exports.associateUserDepartment = async (req, res) => {
     await DepartmentUserAssociation.create(req?.body);
     console.log(req.body);
     const id = req?.body.departmentId;
+    const userId = req?.body.userId
+console.log(userId,'userId');
+
     const departmentUpdate = await DepartmentModel.findOne({
       where: { id },
     });
     const updatedDepartment = await departmentUpdate.update({
       noOfUsers: departmentUpdate.noOfUsers + 1,
     });
+
+    const user = await UserModel.findOne({
+      where:{id:  req?.body.userId},
+    });
+
+    const previousDepartmentUpdate = await DepartmentModel.findOne({
+      where: { title : user.department},
+    });
+
+    const updatedUser = await user.update({
+      department: updatedDepartment.title,
+      departmentId:updatedDepartment.id
+    });
+
+
+    const previousUpdatedDepartment = await previousDepartmentUpdate.update({
+    noOfUsers: previousDepartmentUpdate.noOfUsers -1
+    });
+
+
+
     console.log(updatedDepartment);
     await SystemLogModel.create({
       companyId: req?.body?.companyId,
-      title: `${req?.body?.authorName} associated with Department ${req?.body?.title}`,
+      typeOfLog:4,
+      userId:user?.id,
+      departmentId:updatedDepartment.id,
+      title: `${user?.firstName} ${user?.lastName} transferred to ${updatedDepartment.title} Department`,
     });
     return res.status(200).send({ message: "User associated with Department" });
   } catch (err) {
@@ -70,6 +103,7 @@ module.exports.associateUserDepartment = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
 
 module.exports.listDepartments = async (req, res) => {
   try {
@@ -88,6 +122,9 @@ module.exports.listDepartments = async (req, res) => {
       attributes: ['department', [Sequelize.fn('COUNT', Sequelize.literal('1')), 'count']],
       group: ['department'],
     });
+
+    console.log(departmentCounts,'departmentCounts');
+    
 
     const usersDepartmentCount = {};
     departmentCounts.forEach((department) => {
@@ -172,6 +209,39 @@ module.exports.updateUser = async (req, res) => {
     });
 
     return res.status(200).send(updatedDepartment);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
+module.exports.departmentUpdate = async (req, res) => {
+  try {
+    const body = req.body
+    const {companyId,departmentId} = req.query
+    const findDepartment = await DepartmentModel.findOne({where:{companyId,id:departmentId}})
+    const update = await findDepartment.update({
+      title:body.title,
+      suffix:body.suffix
+    }) 
+
+    return res.status(200).send({message:"Department Updated Succesfully"});
+
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+module.exports.notifications = async (req, res) => {
+  try {
+    const companyId = req?.query?.companyId;
+
+    // Fetch the department
+    const notifications = await SystemLogModel.find({
+      where: { companyId },
+    });
+
+    return res.status(200).send(notifications);
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

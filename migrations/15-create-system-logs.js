@@ -15,6 +15,15 @@ module.exports = {
       title: {
         type: Sequelize.STRING,
       },
+      typeOfLog: {
+        type: Sequelize.STRING,
+      },
+      departmentId: {
+        type: Sequelize.STRING,
+      },
+      userId: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

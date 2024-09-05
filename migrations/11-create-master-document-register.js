@@ -38,6 +38,10 @@ module.exports = {
       status: {
         type: Sequelize.STRING,
       },
+      removed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue:false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

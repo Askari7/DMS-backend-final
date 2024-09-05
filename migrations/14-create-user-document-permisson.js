@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      project: {
+        type: Sequelize.STRING,
+      },
       masterDocumentId: {
         type: Sequelize.INTEGER,
       },

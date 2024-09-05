@@ -54,6 +54,10 @@ module.exports = {
       assignedFrom: {
         type: Sequelize.STRING,
       },
+      removed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue:false
+      },
       startedDate: {
         allowNull: true,
         type: Sequelize.DATE,

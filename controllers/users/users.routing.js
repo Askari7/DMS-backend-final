@@ -4,10 +4,12 @@ const {
   checkDuplicateUsernameOrEmail,
   updateUser,
   company,
+  notifications,
   getUser,
   profile,
   deleting,
   uploadImage,
+  userToUpdate,
 } = require("./users.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 module.exports = {
@@ -43,6 +45,18 @@ module.exports = {
     },
     put: {
       action: [validateToken, updateUser],
+      level: "public",
+    },
+  },
+  "/notifications": {
+    post: {
+      action: [validateToken, notifications],
+      level: "public",
+    },
+  },
+  "/user_update": {
+    post: {
+      action: [validateToken, userToUpdate],
       level: "public",
     },
   },

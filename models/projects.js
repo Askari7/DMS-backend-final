@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.STRING,
       },
-      delete: {
+      removed: {
         type: DataTypes.BOOLEAN,
         defaultValue:false
       },

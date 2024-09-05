@@ -3,12 +3,35 @@ const UserModel = db.users;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const config = require("../../config/auth.config");
+const departments = require("../../models/departments");
+const { where } = require("sequelize");
 const SystemLogModel = db.system_logs;
 const CompanyModel = db.company;
 
 //middlewares
 
 module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
+  console.log("YAHA AYA");
+  console.log(req.body,'BODY');
+if(req.body.name){
+  CompanyModel.findOne({
+    where: {
+      name: req.body.name,
+      // companyId:req.body.companyId
+    },
+  }).then((company) => {
+    if (company) {
+      res.status(409).send({
+        message: "Failed! Company Already Exists!",
+      });
+      return;
+    }
+    next();
+  });
+}
+else{
+  console.log("come here");
+  
   UserModel.findOne({
     where: {
       email: req.body.email,
@@ -23,12 +46,18 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
     }
     next();
   });
+}
+
+ 
 };
 
 //Signup Login
 
 module.exports.signup = async (req, res) => {
-  try {
+
+  console.log("Phr yaha");
+  
+  try {    
     const { body } = req;
     body.owner = body.firstName
     const createdCompany = await CompanyModel.create(body);
@@ -44,11 +73,18 @@ module.exports.signup = async (req, res) => {
         email: req.body.email,
       },
     });
+    console.log("YAHA AYA ma");
+
     const token = jwt.sign({ id: user.id }, config.secret, {
       expiresIn: 1.577e8, // 24 hours
     });
+    console.log("YAHA AYA");
+    
     await SystemLogModel.create({
       companyId: body.companyId,
+      typeOfLog:1,
+      departmentId:user?.departmentId,
+      userId:user?.id,
       title: `${body?.firstName} ${body?.lastName} Signed Up`,
     });
     res.status(200).send({
@@ -90,6 +126,9 @@ module.exports.signin = async (req, res) => {
 
     await SystemLogModel.create({
       companyId: user?.companyId,
+      typeOfLog:2,
+      userId:user?.id,
+      departmentId:user?.departmentId,
       title: `${user?.firstName} ${user?.lastName} Signed In`,
     });
 

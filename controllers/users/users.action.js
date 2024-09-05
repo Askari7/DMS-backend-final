@@ -1,7 +1,7 @@
 const db = require("../../models/index");
 const UserModel = db.users;
 const DepartmentModel = db.departments;
-const SystemLogModel = db.systemLog;
+const SystemLogModel = db.system_logs;
 const CompanyModel = db.company
 const ProjectModel = db.projects
 const DocumentModel = db.documents
@@ -23,6 +23,7 @@ const {
 } = require("../../helpers/generate-user-password");
 const { sendEmail } = require("../../helpers/send-email");
 const { where } = require("sequelize");
+const dayjs = require("dayjs");
 
 // module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
 //   // Username
@@ -117,6 +118,35 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
   }
 };
 
+
+module.exports.notifications = async (req, res) => {
+  console.log('hii');
+  
+  // try {
+
+    console.log("YAHA AI HA request");
+    const id = String(req?.body?.companyId);
+    const userId = String(req?.body?.userId);
+
+    const logs = await SystemLogModel.findAll({
+      where: { companyId: id,userId:userId },
+      order: [["createdAt", "DESC"]],
+
+    });
+    console.log(logs,'logs hain y');
+    
+    logs.map(log=>
+      log.createdAt = dayjs(log?.createdAt).format("YYYY-MM-DD HH:mm:ss")
+    )
+    
+    console.log(logs,'logs');
+    
+    res.status(200).send(logs)
+  //   } catch (err) {
+  //   console.log(err.message);
+  //   res.status(500).send({ message: err.message });
+  // }
+};
 
 // module.exports.createUser = async (req, res) => {
 
@@ -226,6 +256,23 @@ module.exports.createUser = async (req, res) => {
     body.password = password;
     await sendEmail(body);
 
+    const user = await UserModel.findOne({
+      where: {
+        email: req.body.email,
+      },
+    });
+console.log('my user',user);
+
+    await SystemLogModel.create({
+      companyId: body.companyId,
+
+      typeOfLog:9,
+      userId:user?.id,
+      title: `${user.firstName} ${user.lastName} is added into company as employee`,
+    });
+
+
+
     return res.status(200).send({ message: "User has been Created" });
   } catch (err) {
     console.log(err.message);
@@ -235,12 +282,33 @@ module.exports.createUser = async (req, res) => {
 
 
 
+module.exports.userToUpdate = async (req, res) => {
+  try {
+    console.log("hello");
+    
+    const body = req.body
+    const {companyId,id} = req.query
+    console.log(body,companyId,id);
 
+    const findDepartment = await UserModel.findOne({where:{companyId,id}})
+    const update = await findDepartment.update({
+      firstName:body.firstName,
+      lastName:body.lastName,
+      email:body.email
+    }) 
+
+    return res.status(200).send({message:"User Updated Succesfully"});
+
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
 
 module.exports.updateUser = async (req, res) => {
   try {
+    console.log('howru');
+    
     const { body } = req;
-
     let updatedFields = {};
     if (body.newPassword) {
       body.newPassword = bcrypt.hashSync(body.newPassword, 8);
@@ -286,6 +354,8 @@ module.exports.updateUser = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+
 module.exports.getUser = async (req, res) => {
   try {
     const user = await UserModel.findOne({
@@ -455,7 +525,7 @@ console.log(deleting,recordId,'ids');
     // console.log(user_to_delete, 'user_delete');
   
     const user = await UserModel.update(
-       {delete: true},{where: { id: recordId }},
+       {removed: true},{where: { id: recordId }},
     );
     // console.log(user,'user');
   
@@ -523,7 +593,7 @@ console.log(deleting,recordId,'ids');
       );
       console.log(department_to_delete,'department_delete');
         const department = await DepartmentModel.update(
-          { delete: true },
+          { removed: true },
           { where: { id: recordId } }
         );
         return res.status(200).send({ message: "Department Deleted" });
@@ -535,7 +605,7 @@ console.log(deleting,recordId,'ids');
       );
       console.log(project_to_delete,'department_delete');
         const project = await ProjectModel.update(
-          { delete: true },
+          { removed: true },
           { where: { id: recordId } }
         );
         return res.status(200).send({ message: "Project Deleted" });
@@ -547,7 +617,7 @@ console.log(deleting,recordId,'ids');
       );
       // console.log(mdr_to_delete,'department_delete');
         const mdr = await MDRModel.update(
-          { delete: true },
+          { removed: true },
           { where: { id: recordId } }
         );
         return res.status(200).send({ message: "MDR Deleted" });
@@ -560,7 +630,7 @@ console.log(deleting,recordId,'ids');
       );
       console.log(document_to_delete,'department_delete');
         const document = await DocumentModel.update(
-          { delete: true },
+          { removed: true },
           { where: { id: recordId } }
         );
             return res.status(200).send({ message: "document Deleted" });
