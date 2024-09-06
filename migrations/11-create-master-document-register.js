@@ -46,6 +46,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      clientId: {
+        type: Sequelize.INTEGER,
+      },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,

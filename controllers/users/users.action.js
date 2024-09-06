@@ -213,8 +213,10 @@ module.exports.notifications = async (req, res) => {
 
 module.exports.createUser = async (req, res) => {
   try {
+    
     const { body } = req;
     const { roleId, department, companyId } = body;
+    console.log(body,roleId,department,companyId,'companyIdcompanyId');
 
     // Generate a random password
     const password = generateRandomPassword(10);
