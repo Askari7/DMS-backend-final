@@ -2393,6 +2393,34 @@ await Promise.all(
         { clientStatus:status},
         { where: { docName: docName,version:version } }
       );
+      const latestDocuments = await EstablishmentModel.findAll({
+        where: {
+          masterDocumentCode: myrecord.masterDocumentCode,companyId:myrecord.companyId
+        },
+        attributes: [
+          'docName',
+          [Sequelize.fn('MAX', Sequelize.col('clientStatus')), 'clientStatus'],  // Get the latest clientStatus
+          [Sequelize.fn('MAX', Sequelize.col('version')), 'version']  // Get the latest version
+        ],
+        group: ['docName'],
+        order: [[Sequelize.fn('MAX', Sequelize.col('version')), 'DESC']],
+        having: Sequelize.literal(`version = (SELECT MAX(version) FROM \`establishments\` WHERE \`masterDocumentCode\` = '${myrecord.masterDocumentCode}' AND \`docName\` = \`establishments\`.\`docName\`)`)
+      });
+      
+      // Check if all documents have clientStatus as "Accept"
+      const allAccepted = latestDocuments.every(doc => doc.clientStatus === 'Accept');
+        console.log('hi',allAccepted);
+         
+      if (allAccepted) {
+        await MDRModel.update(
+          { status:'Completed'},
+          { where: { mdrCode: myrecord.masterDocumentCode,companyId: myrecord.companyId } }
+        );
+       
+          // All latest documents have clientStatus as "Accept"
+      } else {
+        console.log('falseeeee');  // Not all documents have clientStatus as "Accept"
+      }
 
 await Promise.all(
   reviewerIds.map(async (id, index) => {
@@ -2634,7 +2662,7 @@ let version = document ? document.version : null;
 let status = 'Uploaded'
 if (revArray.every(num => num == 1) && appArray.every(num => num == 0)) {
     status = 'Reviewers Rejected';
-} else if (appArray.every(num => num == 1) && revArray.every(num => num == 2)) {
+} else if (appArray.every(num => num == 1)) {
     status = 'Approvers Rejected';
 }
 else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
@@ -2642,7 +2670,7 @@ else if(revArray.every(num => num == 2) &&appArray.every(num => num == 0))
 status='Pending for Approval';
 }
 
-else if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
+else if(appArray.every(num => num == 2))
 {
 status='Approved(in-house)';
 }
@@ -3016,6 +3044,7 @@ await Promise.all(
 module.exports.createPermission = async (req, res) => {
   try {
     if (req?.body?.createDocument) req.body.reviewDocument = 1;
+    
     await DocumentPermssionModel.create(req?.body);
     return res.status(200).send({ message: "Document Permission Created" });
   } catch (err) {

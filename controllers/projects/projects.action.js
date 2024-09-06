@@ -234,7 +234,7 @@ module.exports.listProjects = async (req, res) => {
           where: { projectId }
         });
         const completedDocuments = await DocumentModel.count({
-          where: { projectId, status: 'Completed' }
+          where: { projectId, status: 'Approved(in-house)' }
         });
         const percentage = (completedDocuments / totalDocuments) * 100;
         return { projectId, percentage };
