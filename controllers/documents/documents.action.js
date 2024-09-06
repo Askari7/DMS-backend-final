@@ -1795,6 +1795,7 @@ module.exports.MDRUpdate = async (req, res) => {
 
 
 module.exports.listMDR = async (req, res) => {
+  
   try {
     const mdr = await MDRModel.findAll({
       where: { companyId: req?.query?.companyId, removed:false },
@@ -2216,6 +2217,27 @@ for (let i = 0; i < assignedToIds.length; i++) {
     res.status(500).send({ message: err.message });
   }
 };
+
+
+module.exports.checkDoc = async (req, res) => {
+  try {
+    const title = req.query.docName
+    const version = req.query.version
+
+    const fetchProject = await DocumentModel.findOne({where:{title,version}})
+    console.log(fetchProject,'fetchProjectfetchProject');
+    
+    if (fetchProject.status == "Approved(in-house)") {
+      return res.status(200).send({status:true});
+
+    }
+    return res.status(200).send({ message: "MDR Updated" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
 
 module.exports.updateMDR = async (req, res) => {
   try {

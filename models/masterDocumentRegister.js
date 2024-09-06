@@ -52,6 +52,9 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.STRING,
       },
+      clientId: {
+        type: DataTypes.STRING,
+      },
       removed: {
         type: DataTypes.BOOLEAN,
         defaultValue:false

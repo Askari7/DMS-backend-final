@@ -14,7 +14,7 @@ module.exports = {
             suffix:'PM',
             createdAt: new Date(),
             updatedAt: new Date(),
-            noOfUsers:1
+            noOfUsers:0
         },
         {
             id:2, 

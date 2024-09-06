@@ -201,8 +201,9 @@ module.exports.listProjects = async (req, res) => {
     const projects = await ProjectModel.findAll({
       where: { companyId: req?.query?.companyId },
     });
-    const projectIds = projects.map(project => project.dataValues.id);
-    console.log(projectIds, 'projectIds');
+    console.log(projects,'projectsprojects');
+    
+    
 
     if (req.query.roleId == 1) {
       let departmentMap = {};
@@ -218,23 +219,35 @@ module.exports.listProjects = async (req, res) => {
         }
       }
 
-      const combinedData = projects.map(project => {
-        for (let index = 0; index < departmentIds.length; index++) {
-          const departmentId = departmentIds[index].split(",");
-          for (let i = 0; i < departmentId.length; i++) {
-            const departmentName = departmentMap[departmentId[i]];
-            const p = { ...project.dataValues, departmentName: departmentName || 'Unknown' };
-            return p;
+      const combinedData = await Promise.all(
+        projects.map(async (project) => {
+          const client = await ClientModel.findOne({ where: { id: project.clientId } });
+      
+          for (let index = 0; index < departmentIds.length; index++) {
+            const departmentId = departmentIds[index].split(",");
+      
+            for (let i = 0; i < departmentId.length; i++) {
+              const departmentName = departmentMap[departmentId[i]];
+              const p = {
+                ...project.dataValues,
+                departmentName: departmentName || 'Unknown',
+                clientName: client ? client.companyName : 'Unknown',
+              };
+              return p;
+            }
           }
-        }
-      });
+        })
+      );
+      
+      const projectIds = projects.map(project => project.dataValues.id);
+      console.log(projectIds, 'projectIds');
 
       const documentProgress = projectIds.map(async projectId => {
         const totalDocuments = await DocumentModel.count({
           where: { projectId }
         });
         const completedDocuments = await DocumentModel.count({
-          where: { projectId, status: 'Approved(in-house)' }
+          where: { projectId, status: 'Completed' }
         });
         const percentage = (completedDocuments / totalDocuments) * 100;
         return { projectId, percentage };
@@ -264,6 +277,17 @@ module.exports.listProjects = async (req, res) => {
           clientName: req.query.firstName
         }
       });
+      console.log(client,'clientclientclient');
+      
+      const clientCompany = await ClientModel.findOne({
+        where: {
+          id: client.companyId
+        }
+      });
+      console.log(clientCompany,'clientCompanyclientCompanyclientCompany');
+      
+
+
       console.log(client,'client');
 
       const user = await ClientModel.findOne({
@@ -293,16 +317,20 @@ module.exports.listProjects = async (req, res) => {
         }
       }
 
-      const combinedData = filteredProjects.map(project => {
-        for (let index = 0; index < departmentIds.length; index++) {
-          const departmentId = departmentIds[index].split(",");
-          for (let i = 0; i < departmentId.length; i++) {
-            const departmentName = departmentMap[departmentId[i]];
-            const p = { ...project.dataValues, departmentName: departmentName || 'Unknown' };
-            return p;
-          }
-        }
-      });
+      const combinedData = await Promise.all(
+        filteredProjects.map(async (project) => {
+          const client = await ClientModel.findOne({ where: { id: project.clientId } });
+          const departmentNames = departmentIds.flatMap(id => 
+            id.split(",").map(deptId => departmentMap[deptId] || 'Unknown')
+          );
+      
+          return {
+            ...project.dataValues,
+            departmentNames: departmentNames.join(", "),  // Or handle them as an array
+            clientName: client ? client.companyName : 'Unknown',
+          };
+        })
+      );
 
       const documentProgress = projectIds.map(async projectId => {
         const totalDocuments = await DocumentModel.count({
@@ -373,9 +401,23 @@ module.exports.listProjects = async (req, res) => {
           }
         }
       }
+      console.log(filteredProjects,'filteredProjectsfilteredProjects');
+      const combinedData = await Promise.all(
+        filteredProjects.map(async (project) => {
+          const client = await ClientModel.findOne({ where: { id: project.clientId } });
+          console.log(client,'clientclient');
+          
+          return {
+            ...project,
+            clientName: client ? client.companyName : 'Unknown',
+          };
+        })
+      );
+      
 
-      console.log(filteredProjects, 'filteredProjects');
-      return res.status(200).send(filteredProjects);
+
+      console.log(combinedData, 'filteredProjects');
+      return res.status(200).send(combinedData);
     }
   } catch (err) {
     console.log(err.message);

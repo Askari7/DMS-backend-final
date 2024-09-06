@@ -12,7 +12,8 @@ const {
   updateReview,
   Accept,
   exportComments,
-  MDRUpdate
+  MDRUpdate,
+  checkDoc
 } = require("./documents.action");
 const { validateToken, authorize } = require("../../helpers/authorize");
 
@@ -58,6 +59,12 @@ module.exports = {
     post: {
       middlewares: [uploadFile.single("file")],
       action: [validateToken, uploadDoc],
+      level: "public",
+    },
+  },
+  "/checkDocuments": {
+    get: {
+      action: [validateToken, checkDoc],
       level: "public",
     },
   },
