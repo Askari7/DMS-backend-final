@@ -3126,8 +3126,83 @@ await Promise.all(
 
 module.exports.createPermission = async (req, res) => {
   try {
-    if (req?.body?.createDocument) req.body.reviewDocument = 1;
+
+    console.log(req.body,'reqbody');
+    const mdr = await MDRModel.findOne({
+      where:{id:req.body.masterDocumentId,companyId:req.body.companyId}
+    })
+    const documents =await DocumentModel.findAll({
+      where:{
+        title:req.body.doc,
+        masterDocumentId:mdr.mdrCode,
+        companyId:req.body.companyId
+      }
+    })
+
+    const user = await UserModel.findOne({
+      where:{
+        companyId:req.body.companyId,
+        id:req.body.userId
+      }
+    })
     
+    const establishments = await EstablishmentModel.findAll({
+      where: {
+        docName: req.body.doc,
+        masterDocumentCode: mdr.mdrCode,
+        companyId: req.body.companyId,
+      },
+    });
+    
+    if (req.body.reviewDocument) {
+      for (let establishment of establishments) {
+        // Split existing values by comma
+        let reviewers = establishment.reviewer ? establishment.reviewer.split(',') : [];
+        let reviewerIds = establishment.reviewerId ? establishment.reviewerId.split(',') : [];
+        let reviewerStatuses = establishment.reviewerStatus ? establishment.reviewerStatus.split(',') : [];
+    
+        // Add new values
+        reviewers.push(user.firstName);
+        reviewerIds.push(user.id);
+        reviewerStatuses.push('0'); // Status is '0'
+    
+        // Join them back to comma-separated strings
+        establishment.reviewer = reviewers.join(',');
+        establishment.reviewerId = reviewerIds.join(',');
+        establishment.reviewerStatus = reviewerStatuses.join(',');
+    
+        // Save the updated establishment
+        await establishment.save();
+      }
+    } else if (req.body.approveDocument) {
+      for (let establishment of establishments) {
+        // Split existing values by comma
+        let reviewers = establishment.approver ? establishment.approver.split(',') : [];
+        let reviewerIds = establishment.approverId ? establishment.approverId.split(',') : [];
+        let reviewerStatuses = establishment.approverStatus ? establishment.approverStatus.split(',') : [];
+    
+        // Add new values
+        reviewers.push(user.firstName);
+        reviewerIds.push(user.id);
+        reviewerStatuses.push('0'); // Status is '0'
+    
+        // Join them back to comma-separated strings
+        establishment.approver = reviewers.join(',');
+        establishment.approverId = reviewerIds.join(',');
+        establishment.approverStatus = reviewerStatuses.join(',');
+    
+        await establishment.save();
+      }    } else {
+      
+    }
+    
+
+    
+    
+    console.log(documents,'documentsdocuments');
+    
+    if (req?.body?.createDocument) req.body.reviewDocument = 1;
+    req.body.project = mdr.projectId
     await DocumentPermssionModel.create(req?.body);
     return res.status(200).send({ message: "Document Permission Created" });
   } catch (err) {

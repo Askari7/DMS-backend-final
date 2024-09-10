@@ -505,16 +505,42 @@ module.exports.listInformation = async (req, res) => {
 
 
 
-// module.exports.listInformation = async (req, res) => {
-//   try {
-//     const Projects = ProjectModel.findAll(
-//       {where:companyId:req?.query?.companyId}
-//       )
-//   } catch (err) {
-//     console.log(err.message);
-//     res.status(500).send({ message: err.message });
-//   }
-// };
+module.exports.fetchDocs = async (req, res) => {
+  try {
+    
+    const mdr =await MDRModel.findOne({
+      where:{
+        companyId:req.query.companyId,
+        id:req.query.mdrId
+      }
+    })
+    console.log(mdr,'mdrmdr');
+    
+    if(req.query.roleId == 1){
+      const documents = await DocumentModel.findAll({
+        where:{
+          companyId:req.query.companyId,
+          masterDocumentId :mdr.dataValues.mdrCode
+        }
+      }) 
+      res.status(200).send(documents);
+    }
+    else{
+      documents = await DocumentModel.findAll({
+        where:{
+          companyId:req.query.companyId,
+          masterDocumentId :mdr.mdrCode,
+          departmentId:req.query.departmentId
+        }
+      }) 
+      res.status(200).send(documents);
+
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
 
 
 
