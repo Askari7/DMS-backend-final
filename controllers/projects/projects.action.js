@@ -441,58 +441,68 @@ module.exports.listProjects = async (req, res) => {
   
 module.exports.listInformation = async (req, res) => {
   try {
+    const companyId = req?.query?.companyId;
+
+    // Fetch all projects for the given company ID
     const projects = await ProjectModel.findAll({
-      where: { companyId: req?.query?.companyId },
+      where: { companyId },
     });
 
     console.log("projects", projects);
 
+    // Fetch all MDR records for the given company ID
     const mdr = await MDRModel.findAll({
-      where: { companyId: req?.query?.companyId },
+      where: { companyId },
     });
 
-    const mdr_projects = mdr.map(mdr => mdr.dataValues.projectId);
-    console.log("mdrProjects", mdr_projects);
+    console.log("mdr", mdr);
 
+    // Fetch all documents associated with the masterDocumentIds from MDR
     const documents = await DocumentModel.findAll({
       where: {
-        companyId: req?.query?.companyId,
-        masterDocumentId: mdr.map(m => m.dataValues.mdrCode), // Get masterDocumentIds from MDR
+        companyId,
+        masterDocumentId: mdr.map(m => m.dataValues.mdrCode), // Extracting masterDocumentIds
       },
     });
 
-    // Combine projects with mdr based on projectId
+    console.log("documents", documents);
+
+    // Combine projects with matching MDRs and their corresponding documents
     const combinedProjects = projects.map(project => {
-      const matchingMdr = mdr.find(mdrItem => mdrItem.dataValues.projectId === project.dataValues.id);
+      const matchingMdrs = mdr.filter(mdrItem => mdrItem.dataValues.projectId === project.dataValues.id);
+      console.log(matchingMdrs, 'matchingMdrs');
       
-      // Filter documents based on mdrCode and masterDocumentId
-      const matchingDocuments = documents.filter(doc =>
-        doc.masterDocumentId === (matchingMdr ? matchingMdr.dataValues.mdrCode : null)
-      );
+      // For each matching MDR, find the corresponding documents and include them in the MDR object
+      const mdrsWithDocuments = matchingMdrs.map(matchingMdr => {
+        const projectDocuments = documents.filter(doc => doc.masterDocumentId === matchingMdr.dataValues.mdrCode);
+        console.log(projectDocuments, 'projectDocuments');
+
+        return {
+          departmentId: matchingMdr.dataValues.departmentId,
+          departmentName: matchingMdr.dataValues.departmentName,
+          mdrCode: matchingMdr.dataValues.mdrCode,
+          noOfDocuments: matchingMdr.dataValues.noOfDocuments,
+          projectCode: matchingMdr.dataValues.projectCode,
+          title: matchingMdr.dataValues.title,
+          documents: projectDocuments, // Attach the documents to the MDR
+        };
+      });
 
       return {
         ...project.dataValues,
-        ...(matchingMdr
-          ? {
-              departmentId: matchingMdr.dataValues.departmentId,
-              departmentName: matchingMdr.dataValues.departmentName,
-              mdrCode: matchingMdr.dataValues.mdrCode,
-              noOfDocuments: matchingMdr.dataValues.noOfDocuments,
-              projectCode: matchingMdr.dataValues.projectCode,
-              title: matchingMdr.dataValues.title,
-            }
-          : null),
-        documents: matchingDocuments,
+        mdrs: mdrsWithDocuments, // Attach MDRs with documents to the project
       };
     });
 
-    // console.log("combinedProjects", combinedProjects);
+    // Send the combined project information as the response
     res.send(combinedProjects);
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
   }
 };
+
+
 
 
 // module.exports.listInformation = async (req, res) => {
