@@ -89,7 +89,7 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
     // Check if the roleId is 2 and update the existing user's role to 3
     if (roleId === "2") {
       const [updatedCount, updatedUser] = await UserModel.update(
-        { roleId: "3" }, 
+        { roleId: "3",reported_to:`${req.body.firstName} ${req.body.lastName}`}, 
         { 
           where: { roleId, department, companyId },
           returning: true 

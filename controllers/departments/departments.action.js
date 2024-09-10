@@ -56,47 +56,66 @@ module.exports.createDepartment = async (req, res) => {
 };
 module.exports.associateUserDepartment = async (req, res) => {
   try {
-    await DepartmentUserAssociation.create(req?.body);
-    console.log(req.body);
+
     const id = req?.body.departmentId;
     const userId = req?.body.userId
-console.log(userId,'userId');
+    const companyId = req?.body.companyId
 
-    const departmentUpdate = await DepartmentModel.findOne({
-      where: { id },
-    });
-    const updatedDepartment = await departmentUpdate.update({
-      noOfUsers: departmentUpdate.noOfUsers + 1,
-    });
+    console.log(id,userId,'userIduserId');
 
     const user = await UserModel.findOne({
-      where:{id:  req?.body.userId},
+      where:{id: userId,companyId},
     });
+
+    const departmentUpdate = await DepartmentModel.findOne({
+      where: { id ,companyId},
+    });
+
+    console.log(departmentUpdate,'departmentUpdate');
 
     const previousDepartmentUpdate = await DepartmentModel.findOne({
-      where: { title : user.department},
+      where: { title : user.department,companyId},
     });
+    console.log(previousDepartmentUpdate,'previousDepartmentUpdate');
 
-    const updatedUser = await user.update({
-      department: updatedDepartment.title,
-      departmentId:updatedDepartment.id
-    });
-
-
-    const previousUpdatedDepartment = await previousDepartmentUpdate.update({
-    noOfUsers: previousDepartmentUpdate.noOfUsers -1
-    });
-
-
-
-    console.log(updatedDepartment);
+    if(user.roleId==2 && previousDepartmentUpdate.noOfUsers<=1){
+      const updatedDepartment = await departmentUpdate.update({
+        noOfUsers: departmentUpdate.noOfUsers + 1,
+      });
+      const updatedUser = await user.update({
+        department: updatedDepartment.title,
+        departmentId:updatedDepartment.id,
+        roleId:3,
+      });
+      console.log(updatedUser,'updatedUser');
+      const previousUpdatedDepartment = await previousDepartmentUpdate.update({
+        noOfUsers: previousDepartmentUpdate.noOfUsers -1
+        });
+    }
+    else if(user.roleId==2 && previousDepartmentUpdate.noOfUsers>=1){  
+      return res.status(200).send({ message: "Transfer cannot proceed without appointing a new department head." });
+    }
+    else{
+      const updatedDepartment = await departmentUpdate.update({
+        noOfUsers: departmentUpdate.noOfUsers + 1,
+      });
+      const updatedUser = await user.update({
+        department: updatedDepartment.title,
+        departmentId:updatedDepartment.id,
+      });
+      const previousUpdatedDepartment = await previousDepartmentUpdate.update({
+        noOfUsers: previousDepartmentUpdate.noOfUsers -1
+        });
+    }
+    await DepartmentUserAssociation.create(req?.body);
     await SystemLogModel.create({
       companyId: req?.body?.companyId,
       typeOfLog:4,
       userId:user?.id,
-      departmentId:updatedDepartment.id,
-      title: `${user?.firstName} ${user?.lastName} transferred to ${updatedDepartment.title} Department`,
+      departmentId:departmentUpdate.id,
+      title: `${user?.firstName} ${user?.lastName} transferred to ${departmentUpdate.title} Department`,
     });
+
     return res.status(200).send({ message: "User associated with Department" });
   } catch (err) {
     console.log(err.message);
@@ -117,19 +136,19 @@ module.exports.listDepartments = async (req, res) => {
 
     const headLeads = leads.filter((lead) => lead.roleId === 2 && departments.some(dep => dep.title === lead.department));
 
-    const departmentCounts = await UserModel.findAll({
-      where: { companyId: req?.query?.companyId },
-      attributes: ['department', [Sequelize.fn('COUNT', Sequelize.literal('1')), 'count']],
-      group: ['department'],
-    });
+    // const departmentCounts = await UserModel.findAll({
+    //   where: { companyId: req?.query?.companyId },
+    //   attributes: ['department', [Sequelize.fn('COUNT', Sequelize.literal('1')), 'count']],
+    //   group: ['department'],
+    // });
 
-    console.log(departmentCounts,'departmentCounts');
+    // console.log(departmentCounts,'departmentCounts');
     
 
-    const usersDepartmentCount = {};
-    departmentCounts.forEach((department) => {
-      usersDepartmentCount[department.department] = department.get('count');
-    });
+    // const usersDepartmentCount = {};
+    // departmentCounts.forEach((department) => {
+    //   usersDepartmentCount[department.department] = department.get('count');
+    // });
 
     const updatedDepartments = departments.map((department) => {
       const departmentName = department.get('title');
@@ -142,7 +161,7 @@ module.exports.listDepartments = async (req, res) => {
 
       return {
         ...department.toJSON(),
-        noOfUsers: usersDepartmentCount[departmentName] || 0,
+        // noOfUsers: usersDepartmentCount[departmentName] || 0,
         headLeads: departmentHeadLeads,
       };
     });

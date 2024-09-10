@@ -1,4 +1,4 @@
-const { where } = require("sequelize");
+const { where, Op } = require("sequelize");
 const db = require("../../models/index");
 const ProjectModel = db.projects;
 const SystemLogModel = db.system_logs;
@@ -13,6 +13,20 @@ const UserModel = db.users;
 
 module.exports.createProject = async (req, res) => {
   try {
+    const findProject = await ProjectModel.findOne({
+      where: {
+        companyId: req.body.companyId,
+        clientId: req.body.clientId,
+        [Op.or]: [
+          { title: req.body.title },
+          { code: req.body.code }
+        ]
+      }
+    });
+    
+    if (findProject) {
+      return res.status(409).send({ message: "Project with same name or code already exist" });
+    }
 
 
     console.log(req.body);
@@ -46,7 +60,6 @@ module.exports.createProject = async (req, res) => {
           });
         })
       );
-
     return res.status(200).send({ message: "Project has been Created" });
   } catch (err) {
     console.log(err.message);

@@ -1921,8 +1921,37 @@ module.exports.listMDR = async (req, res) => {
 
 module.exports.createMDR = async (req, res) => {
   try {
-    console.log(req.body);
+    const whereCondition = {
+      companyId: req.body.companyId,
 
+    };
+    
+    if (req.body.title) {
+      console.log('loglogtitle');
+
+      whereCondition[Op.or] = [
+        { title: req.body.title },
+        { mdrCode: req.body.mdrCode }
+      ];
+    } else {
+      console.log('loglogtitleloglogtitle');
+
+      whereCondition.mdrCode = req.body.mdrCode;
+    }
+    console.log('loglogtitleloglogtitleloglogtitleloglogtitle');
+
+    const findProject = await MDRModel.findOne({
+      where: whereCondition
+    });
+    console.log('loglog',findProject);
+
+    if (findProject) {
+      console.log('yesyes');
+      
+      return res.status(409).send({ message: "MDR with same name or code already exist" });
+    }
+
+    console.log(req.body);
     const id = req.body.projectId
     const fetchProject = await ProjectModel.findOne({where:{id}})
     console.log(fetchProject,id,"hurrah");
@@ -2221,17 +2250,17 @@ for (let i = 0; i < assignedToIds.length; i++) {
 
 module.exports.checkDoc = async (req, res) => {
   try {
+    
     const title = req.query.docName
     const version = req.query.version
 
     const fetchProject = await DocumentModel.findOne({where:{title,version}})
     console.log(fetchProject,'fetchProjectfetchProject');
     
-    if (fetchProject.status == "Approved(in-house)") {
+    if (fetchProject.status == "Approved(in-house)"&&req.query.roleId==6) {
       return res.status(200).send({status:true});
-
     }
-    return res.status(200).send({ message: "MDR Updated" });
+    return res.status(200).send({ status: true });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });
@@ -2241,6 +2270,38 @@ module.exports.checkDoc = async (req, res) => {
 
 module.exports.updateMDR = async (req, res) => {
   try {
+
+    const whereCondition = {
+      companyId: req.body.companyId,
+
+    };
+    
+    if (req.body.title) {
+      console.log('loglogtitle');
+
+      whereCondition[Op.or] = [
+        { title: req.body.title },
+        { mdrCode: req.body.mdrCode }
+      ];
+    } else {
+      console.log('loglogtitleloglogtitle');
+
+      whereCondition.mdrCode = req.body.mdrCode;
+    }
+    console.log('loglogtitleloglogtitleloglogtitleloglogtitle');
+
+    const findProject = await MDRModel.findOne({
+      where: whereCondition
+    });
+    console.log('loglog',findProject);
+
+    if (findProject) {
+      console.log('yesyes');
+      
+      return res.status(409).send({ message: "MDR with same name or code already exist" });
+    }
+
+
     const id = req.body.projectId
    
     const recordData = JSON.parse(req.body.record);
@@ -3101,6 +3162,57 @@ module.exports.createComment = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+
+module.exports.resolved = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { comments, docName,user ,userId} = req.body;
+    const { id } = req.body.comments; // Extract the comment ID from req.body
+
+    console.log("Comments:", comments);
+    console.log("Document Name:", docName);
+    console.log("Comment ID:", id);
+    console.log(comments,docName,"information ai ha ",id);
+
+      const updatedDocument = await CommentsModel.update({Resolved:true}, {
+      
+        where: {
+          docName,
+          [Op.and]: [
+            sequelize.where(
+              sequelize.fn('JSON_UNQUOTE', sequelize.fn('JSON_EXTRACT', sequelize.col('comments'), '$.id')),
+              '=', 
+              id
+            )
+          ]        
+        }
+      }
+    )
+        
+    const userMe = await  UserModel.findOne({
+      where:{
+        id:user,
+      }
+    })
+
+// console.log('helooo',updatedDocument);
+    await SystemLogModel.create({
+      title: `${userMe.firstName} resolved  a comment on ${docName}`,
+      companyId: userMe.companyId,
+      departmentId: userMe.departmentId,
+      userId:userMe.id
+    });
+
+    console.log('SystemLogModelSystemLogModel');
+    
+    return res.status(200).send({ message: "Comment reply sent" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({ message: err.message });
+  }
+};
+
 module.exports.uploadComment = async (req, res) => {
   try {
     console.log(req.body);
@@ -3133,7 +3245,7 @@ module.exports.uploadComment = async (req, res) => {
     )
     }
     else{
-      const updatedDocument = await CommentsModel.update({comments,Resolved:true}, {
+      const updatedDocument = await CommentsModel.update({comments}, {
       
         where: {
           docName,
@@ -3170,6 +3282,7 @@ module.exports.uploadComment = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
 
 
 module.exports.exportComments = async (req, res) => {

@@ -48,6 +48,19 @@ module.exports.createClient = async (req, res) => {
   }
 
     else{
+      const Client = await ClientModel.findOne(
+        {
+          where: {
+            companyName:req.body.companyName,
+            companyId:req.body.companyId
+          }
+        }
+      );
+      console.log(Client,'ClientClientClient');
+      
+      if (Client) {
+        return res.status(409).send({ message: "Client with this name already exist" });
+      }
       const clients = await ClientModel.create(body);
       return res.status(200).send({ message: "Client Company has been Created" });
     }    
