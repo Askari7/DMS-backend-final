@@ -764,8 +764,9 @@ module.exports.checkDoc = async (req, res) => {
   try {
     
     const {docName,version,companyId,masterDocumentCode} = req.query
-
-    const fetchProject = await EstablishmentModel.findOne({where:{title:docName,version,companyId,masterDocumentCode}})
+    console.log(version,'version');
+    
+    const fetchProject = await EstablishmentModel.findOne({where:{docName,version,companyId,masterDocumentCode}})
     console.log(fetchProject,'fetchProjectfetchProject');
     
     if (fetchProject.status == "Approved(in-house)"&&req.query.roleId==6) {
@@ -1212,7 +1213,7 @@ module.exports.Accept = async (req, res) => {
 const document = await DocumentModel.findOne({where:{ title: docName }});
 let version = document ? document.version : null;
 let status = ''
-if(appArray.every(num => num == 2)||revArray.every(num => num == 2))
+if(appArray.every(num => num == 2)&&revArray.every(num => num == 2))
   {
   status='Approved(in-house)';
   }
@@ -1227,11 +1228,11 @@ else if (revArray.some(num => num == 0)&& appArray.some(num => num == 0)) {
     status = "Approver's status Pending";
 }
 else if (revArray.some(num => num == 0)) {
-  status = "Approver's status Pending";
+  status = "Reviewer's status Pending";
 }
 
 
-const updateDocStatus = await DocumentModel.update({status,version,status}, {
+const updateDocStatus = await DocumentModel.update({status,version}, {
   where: { title:  {
     [Sequelize.Op.like]: `%${docName}%`
   }}
