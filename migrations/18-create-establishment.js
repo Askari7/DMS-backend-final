@@ -54,7 +54,7 @@ module.exports = {
             type: Sequelize.STRING,
           },
           status: {
-            type: Sequelize.BOOLEAN,
+            type: Sequelize.STRING,
           },
           designation: {
             type: Sequelize.BOOLEAN,

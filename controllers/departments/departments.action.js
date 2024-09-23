@@ -236,16 +236,108 @@ module.exports.updateUser = async (req, res) => {
 
 module.exports.departmentUpdate = async (req, res) => {
   try {
-    const body = req.body
-    const {companyId,departmentId} = req.query
-    const findDepartment = await DepartmentModel.findOne({where:{companyId,id:departmentId}})
+
+    const body = req.body;
+    const { companyId, departmentId } = req.query;
+    
+    // Find the department that needs to be updated
+    const findDepartment = await DepartmentModel.findOne({ where: { companyId, id: departmentId } });
+    const previousTitle = findDepartment.dataValues.title
+    const previousSuffix = findDepartment.dataValues.suffix
+    console.log(previousSuffix,previousTitle,'Previous');
+        
+    // Update the department title and suffix
     const update = await findDepartment.update({
-      title:body.title,
-      suffix:body.suffix
-    }) 
+      title: body.title,
+      suffix: body.suffix
+    });
 
+    console.log(update.dataValues.title,update.dataValues.suffix,'Updated');
+    
+    const updateOne = await DepartmentModel.findOne({
+      title: body.title,
+      suffix: body.suffix
+    });
+
+    const newTitle  = updateOne.dataValues.title
+    const newSuffix  = updateOne.dataValues.suffix
+
+    console.log(newTitle,newSuffix,'new');    
+    
+    // Find all projects for the given companyId
+    const findProjects = await ProjectModel.findAll({ where: { companyId } });
+    const findMDRs = await MDRModel.findAll({ where: { companyId } });
+
+    for (let project of findProjects) {
+      // Split departmentTitle and departmentSuffix into arrays
+      let departmentTitles = project.departmentTitle ? project.departmentTitle.split(',').map(title => title.trim()) : [];
+      let departmentSuffixes = project.departmentSuffix ? project.departmentSuffix.split(',').map(suffix => suffix.trim())  : [];
+      
+      // Check if any title matches the old department title
+      let titleUpdated = false;
+      departmentTitles = departmentTitles.map(title => {        
+        if (title == previousTitle) {
+          
+          titleUpdated = true;
+
+          return newTitle; // Update with the new title
+        }
+        return title;
+      });
+    
+      // Check if any suffix matches the old department suffix
+      let suffixUpdated = false;
+      departmentSuffixes = departmentSuffixes.map(suffix => {
+console.log(suffix == previousSuffix,'suffix == previousSuffix');
+
+        if (suffix == previousSuffix) {
+
+          suffixUpdated = true;
+
+          return newSuffix; // Update with the new suffix
+        }
+        return suffix;
+      });
+    
+      // If either the title or suffix has been updated, save the changes to the project
+      if (titleUpdated || suffixUpdated) {
+        console.log("updated");
+        await project.update({
+          departmentTitle: departmentTitles.join(','), // Join updated titles into a comma-separated string
+          departmentSuffix: departmentSuffixes.join(',') // Join updated suffixes into a comma-separated string
+        });
+      }
+    }
+    
+
+    for (let mdr of findMDRs) {
+
+
+      // Split departmentTitle and departmentSuffix into arrays
+      let departmentTitles = mdr.departmentName ? mdr.departmentName.split(',').map(title => title.trim()) : [];
+      let titleUpdated = false;
+      departmentTitles = departmentTitles.map(title => {
+console.log(title ==previousTitle,'title ==previousSuffix');
+console.log(title,previousTitle);
+
+        if (title ==previousTitle) {
+          
+          titleUpdated = true;
+
+          return newTitle; // Update with the new title
+        }
+        return title;
+      });
+      // If either the title or suffix has been updated, save the changes to the project
+      if (titleUpdated) {
+        await mdr.update({
+          departmentName: departmentTitles.join(','), // Join updated titles into a comma-separated string
+        });
+      }
+    }
+    
+    
     return res.status(200).send({message:"Department Updated Succesfully"});
-
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -253,12 +345,20 @@ module.exports.departmentUpdate = async (req, res) => {
 
 module.exports.notifications = async (req, res) => {
   try {
-    const companyId = req?.query?.companyId;
-
+    const {companyId,userId,departmentId,roleId} = req?.query?.companyId;
     // Fetch the department
-    const notifications = await SystemLogModel.find({
-      where: { companyId },
-    });
+    let notifications = []
+    if(roleId==1||roleId==6){
+       notifications = await SystemLogModel.find({
+        where: { companyId,departmentId ,userId},
+      });
+    }
+    else{
+      notifications = await SystemLogModel.find({
+        where: { companyId,departmentId ,userId},
+      });
+    }
+    
 
     return res.status(200).send(notifications);
   } catch (err) {

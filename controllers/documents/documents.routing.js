@@ -6,6 +6,7 @@ const {
   createPermission,
   listPermission,
   resolved,  updateDocumentFormat,
+  addingDoc,
   exportMDRCsv,
   gettingEstablishment,
   getCodes,createComment, listComments, uploadDoc, uploadComment, getDocumentFormat,assignDoc,updateMDR, listEstablishment, updateDocStatus, exportDoc,
@@ -83,6 +84,12 @@ module.exports = {
       level: "public",
     },
     
+  },
+  "/addingDoc": {
+    post: {
+      action: [validateToken, addingDoc],
+      level: "public",
+    },
   },
   "/establishment": {
     get: {

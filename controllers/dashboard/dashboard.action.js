@@ -40,8 +40,7 @@ module.exports.getStats = async (req, res) => {
     }
     
     console.log("Total employee count:", employeeCount);
-    console.log("Employee counts for each role:", roleCounts);
-
+    console.log("Employee counts for each role:", roleCounts)
     
     
     const projectCount = await ProjectModel.count({
@@ -82,6 +81,7 @@ module.exports.getStats = async (req, res) => {
     const approvalCount = await EstablishmentModel.findAll({
       where: {
         companyId:req.query.companyId
+        
       }
     });
 

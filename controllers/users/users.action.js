@@ -292,13 +292,68 @@ module.exports.userToUpdate = async (req, res) => {
     const {companyId,id} = req.query
     console.log(body,companyId,id);
 
-    const findDepartment = await UserModel.findOne({where:{companyId,id}})
-    const update = await findDepartment.update({
+    const findUser = await UserModel.findOne({where:{companyId,id}})
+    console.log(findUser,'findUser');
+    
+    const previousfirstName = findUser.dataValues.firstName
+    console.log(previousfirstName,'previousfirstName');
+
+    const update = await findUser.update({
       firstName:body.firstName,
       lastName:body.lastName,
       email:body.email
     }) 
 
+    const newfirstName = update.dataValues.firstName
+    console.log(newfirstName,'newfirstName');
+
+    const establishment = await EstablishmentModel.findAll({
+      where: {
+        companyId
+      }
+    });
+    
+
+    for (let est of establishment) {
+      // Split departmentTitle and departmentSuffix into arrays
+      let estReviewers = est.reviewer ? est.reviewer.split(',').map(firstName => firstName.trim()) : [];
+      let estApprovers = est.approver ? est.approver.split(',').map(firstName => firstName.trim())  : [];
+      
+      // Check if any title matches the old department title
+      let reviewerUpdated = false;
+      estReviewers = estReviewers.map(firstName => {        
+        if (firstName == previousfirstName) {
+          
+          reviewerUpdated = true;
+
+          return newfirstName; // Update with the new title
+        }
+        return firstName;
+      });
+    
+      // Check if any suffix matches the old department suffix
+      let approverUpdated = false;
+      estApprovers = estApprovers.map(firstName => {
+
+        if (firstName == previousfirstName) {
+
+          approverUpdated = true;
+
+          return newfirstName; // Update with the new suffix
+        }
+        return firstName;
+      });
+    
+      // If either the title or suffix has been updated, save the changes to the project
+      if (approverUpdated || reviewerUpdated) {
+        console.log("updated");
+        await est.update({
+          reviewer: estReviewers.join(','), // Join updated titles into a comma-separated string
+          approver: estApprovers.join(',') // Join updated suffixes into a comma-separated string
+        });
+      }
+    }
+    
     return res.status(200).send({message:"User Updated Succesfully"});
 
   } catch (err) {
@@ -593,6 +648,18 @@ console.log(deleting,recordId,'ids');
       const department_to_delete = await DepartmentModel.findOne(
         { where: { id: recordId } }
       );
+      const users = await UserModel.findAll({
+        where: { departmentId: department_to_delete.id }
+      });
+      
+      for (let user of users) {
+        user.departmentId = null; // or "", depending on your preference
+        user.department = null; // or "", depending on your preference
+
+        await user.save();
+      }
+      
+
       console.log(department_to_delete,'department_delete');
         const department = await DepartmentModel.update(
           { removed: true },
