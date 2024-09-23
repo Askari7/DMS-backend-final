@@ -129,9 +129,9 @@ module.exports.listDocuments = async (req, res) => {
         let documents = await DocumentModel.findAll({
      where: {
             companyId: companyId,
-            departmentId: {
-              [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
-            },
+            // departmentId: {
+            //   [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
+            // },
             [Op.or]: [
                 
               {
@@ -228,6 +228,8 @@ if (document.assignedTo) {
     res.status(500).send({ message: err.message });
   }
 };
+
+
 
 
 
