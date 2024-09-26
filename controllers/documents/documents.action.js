@@ -246,7 +246,7 @@ module.exports.listDocuments = async (req, res) => {
     console.log(departmentId, assignedTo, assignedBy, 'Request Parameters');
 
     // Handle documents filtering when only companyId is provided
-    if (!departmentId && !assignedTo && !assignedBy) {
+    if (assignedBy == 1) {
       const documents = await DocumentModel.findAll({ where: { companyId } });
       console.log('1 - All documents:', documents);
       return res.status(200).send(documents);
