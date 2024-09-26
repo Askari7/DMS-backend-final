@@ -35,6 +35,8 @@ module.exports.createClient = async (req, res) => {
       body.firstName = body.clientName
       body.lastName=''
       body.email=body.Email
+      body.department = ""
+      body.departmentId = ""
       body.companyId=body.userCompanyId
       body.password = bcrypt.hashSync(password, 8);
       const users = await UserModel.create(body);

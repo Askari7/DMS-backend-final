@@ -256,10 +256,10 @@ module.exports.listProjects = async (req, res) => {
       console.log(projectIds, 'projectIds');
 
       const documentProgress = projectIds.map(async projectId => {
-        const totalDocuments = await DocumentModel.count({
+        const totalDocuments = await MDRModel.count({
           where: { projectId }
         });
-        const completedDocuments = await DocumentModel.count({
+        const completedDocuments = await MDRModel.count({
           where: { projectId, status: 'Completed' }
         });
         const percentage = (completedDocuments / totalDocuments) * 100;
@@ -350,7 +350,7 @@ module.exports.listProjects = async (req, res) => {
           where: { projectId }
         });
         const completedDocuments = await DocumentModel.count({
-          where: { projectId, status: 'Completed' }
+          where: { projectId, status: 'Approved(in-house)' }
         });
         const percentage = (completedDocuments / totalDocuments) * 100;
         return { projectId, percentage };
@@ -594,17 +594,17 @@ module.exports.list=async(req,res)=>{
   }
 }
 
-module.exports.progress = async (req, res) => {
-  try {
+// module.exports.progress = async (req, res) => {
+//   try {
     
 
 
 
-    res.status(200).json({
-      documentProgressResults
-    })
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send({ message: err.message });
-  }
-};
+//     res.status(200).json({
+//       documentProgressResults
+//     })
+//   } catch (err) {
+//     console.log(err.message);
+//     res.status(500).send({ message: err.message });
+//   }
+// };

@@ -18,216 +18,303 @@ const Papa = require("papaparse");
 const { Sequelize, where } = require('sequelize');
 const { Op } = require('sequelize');
 const departments = require("../../models/departments");
-const { version } = require("process");
+const { version, title } = require("process");
 const e = require("express");
+
+// module.exports.listDocuments = async (req, res) => {
+//   console.log("documents bhejoo");
+//   // console.log(req.query.assignedBy,req.query.userId,"assigned");
+//   try {
+//     const companyId = parseInt(req?.query?.companyId);
+//     const departmentId = req?.query?.department;
+//     const assignedTo = req?.query?.userId;
+//     const assignedBy = req?.query?.assignedBy;
+//     console.log(departmentId,assignedTo,assignedBy,'ye ha asal ');
+    
+
+//     if(departmentId==undefined && !assignedTo ==undefined&&!assignedBy==undefined){
+//       const documents = await DocumentModel.findAll({
+//         where: {
+//           companyId: companyId,
+//         }
+//       });
+//       console.log('1',documents);
+//       return res.status(200).send(documents);
+//     }
+//     console.log(companyId,departmentId,assignedBy,assignedTo,'information');
+
+//     if(req.query.masterDocumentId){
+//       console.log('2yaha aya');
+//       const documents = await DocumentModel.findAll({
+//         where: {
+//           companyId: companyId,masterDocumentId:req.query.masterDocumentId,projectId:req.query.projectId
+//         }
+//       });
+//       console.log('1',documents);
+//       return res.status(200).send(documents);
+//     }
+
+//     else{
+//       console.log('3yaha aya');
+//       if(assignedTo=='1' || assignedBy=='1'){
+//         let documents = await DocumentModel.findAll({
+//         where: {
+//           companyId: companyId,
+//         }
+//       });
+//       console.log('2',documents);
+//       const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
+//       const users = await UserModel.findAll({
+//         where: {
+//           id: myAssignedToUsers
+//         }
+//       });
+      
+//       // const myDocuments = await Promise.all(documents.map(async document => {
+//       //   const assignedToIds =document.assignedTo!= ''|| null && document.assignedTo.split(','); // Split the assignedTo field into an array of IDs
+//       //   console.log(assignedToIds,'assignedToIds');
+        
+//       //   const assignedToNames = assignedToIds.map(id => {
+//       //     console.log(id,'id');
+          
+//       //     const user = users.find(user => user.id == id); // Find the user by ID
+          
+//       //     return user ? `${user.dataValues.firstName} ${user.dataValues.lastName}` : null; // Get the full name
+//       //   }).filter(name => name !== null); // Remove any null values
+      
+//       //   document.dataValues["assignedToName"] = assignedToNames.join(', '); // Join the names into a comma-separated string
+      
+//       //   return document;
+//       // }));
+      
+      
+//       return res.status(200).send(documents);    
+//     }
+//     else{
+//       console.log("LOG YAHA AYA");
+      
+//         // let documents = await DocumentModel.findAll({
+//         //   where: {
+//         //     companyId: companyId,
+//         //     departmentId: {
+//         //       [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
+//         //     },
+//         //     [Op.or]: [
+                
+//         //       {
+//         //         assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+//         //       }
+//         //     ]
+//             // [Op.or]: [
+//             //   // {
+//             //   //   assignedBy: {
+//             //   //     [Op.gte]: assignedBy // Matches or greater than assignedBy from query param
+//             //   //   }
+//             //   // },
+//             //   // { 
+//             //   //   assignedFrom: assignedTo // Matches assignedTo from query param
+//             //   // },
+//             //   {
+//             //     assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+//             //   }
+//             // ]
+//         //   }
+          
+//         // });
+// // /////////////////////////KNOWLEDGE/////////////////////////////////////////////////////
+
+// // assigned to is the user id to which doc is assigned
+// // assignedBy is ROLEID who has assigned doc to user
+// // assigned from is the user ID who has assigned doc to user
+//         let documents = await DocumentModel.findAll({
+//      where: {
+//             companyId: companyId,
+            
+//             [Op.or]: [
+//               {
+//                 assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+//               }
+//             ],
+//             [Op.or]: [
+//               {
+//                 assignedBy: {
+//                   [Op.gte]: assignedBy // Matches or greater than assignedBy from query param
+//                 }
+//               },
+//               { 
+//                 assignedFrom: assignedTo // Matches assignedTo from query param
+//               },
+//               {
+//                 assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+//               }
+//             ]
+//           }
+//         });
+        
+//         console.log(documents,'documentsdocuments');
+        
+//         // if (documents.length==0) {
+//         //   console.log('documentsdocumentsdocumentsdocuments');
+          
+//         //   documents = await DocumentModel.findAll({
+//         //     where: {
+//         //       companyId: companyId,
+            
+              
+//         //       [Op.or]: [
+                
+//         //         {
+//         //           assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
+//         //         }
+//         //       ]
+//         //     }
+            
+//         //   });
+          
+//         // }
+//         console.log('3 data aya ha ',documents);
+//         const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
+  
+//         const users = await UserModel.findAll({
+//           where: {
+//             id: myAssignedToUsers
+//           }
+//         });
+//         // console.log('my users', users);
+        
+//         const myDocuments = await Promise.all(documents.map(async document => {
+//           users.forEach(user => {
+//             // Assuming document.assignedTo is a comma-separated string like "1,2,3"
+// // And user.dataValues contains id, firstName, and lastName
+
+// if (document.assignedTo) {
+//   // Split the assignedTo string into an array of IDs
+//   const assignedToIds = document.assignedTo.split(',');
+//   console.log(assignedToIds,'assignedToIds');
+  
+//   // Initialize an array to store matching names
+//   const assignedToNames = [];
+
+//   const assignedToNames = await Promise.all(assignedToIds.map(async (id) => {
+//     if (id) {
+//       const findedUser = await UserModel.findOne({
+//         where: {
+//           id: id
+//         }
+//       });
+  
+//       return findedUser ? findedUser.dataValues.firstName + ' ' + findedUser.dataValues.lastName : null;
+//     }
+//     return null;
+//   }));
+  
+//   console.log(assignedToIds,'assignedToIds');
+
+//   // If there are any matching names, join them and add to the document's dataValues
+//   if (assignedToNames.length > 0) {
+//     console.log(assignedToNames,'assignedToNames');
+
+//     document.dataValues["assignedToName"] = assignedToNames.join(', ');
+//     // console.log(document, 'doc');
+//   }
+// }
+
+//           });
+//           return document;
+//         }));
+        
+//         console.log(myDocuments, 'mydocs');
+//         return res.status(200).send(myDocuments);    }
+//   }
+//   } catch (err) {
+//     console.log('error',err.message);
+//     res.status(500).send({ message: err.message });
+//   }
+// };
+
 
 module.exports.listDocuments = async (req, res) => {
   console.log("documents bhejoo");
-  // console.log(req.query.assignedBy,req.query.userId,"assigned");
   try {
     const companyId = parseInt(req?.query?.companyId);
     const departmentId = req?.query?.department;
     const assignedTo = req?.query?.userId;
     const assignedBy = req?.query?.assignedBy;
-    console.log(departmentId,assignedTo,assignedBy,'ye ha asal ');
+    const masterDocumentId = req?.query?.masterDocumentId;
+    const projectId = req?.query?.projectId;
+
+    console.log(departmentId, assignedTo, assignedBy, 'Request Parameters');
+
+    // Handle documents filtering when only companyId is provided
+    if (!departmentId && !assignedTo && !assignedBy) {
+      const documents = await DocumentModel.findAll({ where: { companyId } });
+      console.log('1 - All documents:', documents);
+      return res.status(200).send(documents);
+    }
+
+    // Handle documents filtering by masterDocumentId and projectId
+    if (masterDocumentId) {
+      const documents = await DocumentModel.findAll({
+        where: { companyId, masterDocumentId, projectId }
+      });
+      console.log('2 - Documents with masterDocumentId:', documents);
+      return res.status(200).send(documents);
+    }
+
+    // Advanced filtering based on `assignedTo` and `assignedBy`
+    let documents = await DocumentModel.findAll({
+      where: {
+        companyId,
+        [Op.or]: [
+          { assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%` } },
+          { assignedBy: { [Op.gte]: assignedBy } },
+          { assignedFrom: assignedTo }
+        ]
+      }
+    });
+
+    console.log('3 - Filtered documents:', documents);
+
+    if (documents.length === 0) {
+      return res.status(404).send({ message: 'No documents found' });
+    }
+
+    // Fetch assigned users and map to documents
+    const assignedToIds = documents
+      .map(document => document.dataValues.assignedTo)
+      .filter(Boolean);
+
+    const users = await UserModel.findAll({
+      where: {
+        id: assignedToIds
+      }
+    });
+
+    const myDocuments = await Promise.all(
+      documents.map(async (document) => {
+        if (document.assignedTo) {
+          const assignedToIds = document.assignedTo.split(',');
+          const assignedToNames = await Promise.all(assignedToIds.map(async (id) => {
+            const user = await UserModel.findOne({ where: { id } });
+            return user ? `${user.dataValues.firstName} ${user.dataValues.lastName}` : null;
+          }));
+
+          // Filter out null values and join names
+          document.dataValues["assignedToName"] = assignedToNames.filter(Boolean).join(', ');
+        }
+        return document;
+      })
+    );
+
+    console.log('Processed documents with names:', myDocuments);
+    return res.status(200).send(myDocuments);
     
-
-    if(departmentId==undefined && !assignedTo ==undefined&&!assignedBy==undefined){
-      const documents = await DocumentModel.findAll({
-        where: {
-          companyId: companyId,
-        }
-      });
-      console.log('1',documents);
-      return res.status(200).send(documents);
-    }
-    console.log(companyId,departmentId,assignedBy,assignedTo,'information');
-
-    if(req.query.masterDocumentId){
-      console.log('2yaha aya');
-      const documents = await DocumentModel.findAll({
-        where: {
-          companyId: companyId,masterDocumentId:req.query.masterDocumentId,projectId:req.query.projectId
-        }
-      });
-      console.log('1',documents);
-      return res.status(200).send(documents);
-    }
-
-    else{
-      console.log('3yaha aya');
-      if(assignedTo=='1' || assignedBy=='1'){
-        let documents = await DocumentModel.findAll({
-        where: {
-          companyId: companyId,
-        }
-      });
-      console.log('2',documents);
-      const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
-      const users = await UserModel.findAll({
-        where: {
-          id: myAssignedToUsers
-        }
-      });
-      
-      // const myDocuments = await Promise.all(documents.map(async document => {
-      //   const assignedToIds =document.assignedTo!= ''|| null && document.assignedTo.split(','); // Split the assignedTo field into an array of IDs
-      //   console.log(assignedToIds,'assignedToIds');
-        
-      //   const assignedToNames = assignedToIds.map(id => {
-      //     console.log(id,'id');
-          
-      //     const user = users.find(user => user.id == id); // Find the user by ID
-          
-      //     return user ? `${user.dataValues.firstName} ${user.dataValues.lastName}` : null; // Get the full name
-      //   }).filter(name => name !== null); // Remove any null values
-      
-      //   document.dataValues["assignedToName"] = assignedToNames.join(', '); // Join the names into a comma-separated string
-      
-      //   return document;
-      // }));
-      
-      
-      return res.status(200).send(documents);    
-    }
-    else{
-      console.log("LOG YAHA AYA");
-      
-        // let documents = await DocumentModel.findAll({
-        //   where: {
-        //     companyId: companyId,
-        //     departmentId: {
-        //       [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
-        //     },
-        //     [Op.or]: [
-                
-        //       {
-        //         assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
-        //       }
-        //     ]
-            // [Op.or]: [
-            //   // {
-            //   //   assignedBy: {
-            //   //     [Op.gte]: assignedBy // Matches or greater than assignedBy from query param
-            //   //   }
-            //   // },
-            //   // { 
-            //   //   assignedFrom: assignedTo // Matches assignedTo from query param
-            //   // },
-            //   {
-            //     assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
-            //   }
-            // ]
-        //   }
-          
-        // });
-// /////////////////////////KNOWLEDGE/////////////////////////////////////////////////////
-
-// assigned to is the user id to which doc is assigned
-// assignedBy is ROLEID who has assigned doc to user
-// assigned from is the user ID who has assigned doc to user
-        let documents = await DocumentModel.findAll({
-     where: {
-            companyId: companyId,
-            // departmentId: {
-            //   [Sequelize.Op.like]: `%${departmentId}%` // Using Sequelize operator for LIKE clause
-            // },
-            [Op.or]: [
-                
-              {
-                assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
-              }
-            ],
-            [Op.or]: [
-              {
-                assignedBy: {
-                  [Op.gte]: assignedBy // Matches or greater than assignedBy from query param
-                }
-              },
-              { 
-                assignedFrom: assignedTo // Matches assignedTo from query param
-              },
-              {
-                assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
-              }
-            ]
-          }
-        });
-        
-        console.log(documents,'documentsdocuments');
-        
-        // if (documents.length==0) {
-        //   console.log('documentsdocumentsdocumentsdocuments');
-          
-        //   documents = await DocumentModel.findAll({
-        //     where: {
-        //       companyId: companyId,
-            
-              
-        //       [Op.or]: [
-                
-        //         {
-        //           assignedTo: { [Sequelize.Op.like]: `%${assignedTo}%`} // Matches assignedTo from query param
-        //         }
-        //       ]
-        //     }
-            
-        //   });
-          
-        // }
-        console.log('3 data aya ha ',documents);
-        const myAssignedToUsers = documents.map(document => document.dataValues.assignedTo);
-  
-        const users = await UserModel.findAll({
-          where: {
-            id: myAssignedToUsers
-          }
-        });
-        // console.log('my users', users);
-        
-        const myDocuments = await Promise.all(documents.map(async document => {
-          users.forEach(user => {
-            // Assuming document.assignedTo is a comma-separated string like "1,2,3"
-// And user.dataValues contains id, firstName, and lastName
-
-if (document.assignedTo) {
-  // Split the assignedTo string into an array of IDs
-  const assignedToIds = document.assignedTo.split(',');
-  console.log(assignedToIds,'assignedToIds');
-  
-  // Initialize an array to store matching names
-  const assignedToNames = [];
-
-  // Iterate over the IDs and check for a match with the current user's ID
-  assignedToIds.forEach(id => {
-    if (id == user.dataValues.id) {
-      // If a match is found, add the corresponding name to the array
-      assignedToNames.push(user.dataValues.firstName + ' ' + user.dataValues.lastName);
-    }
-  });
-  console.log(assignedToIds,'assignedToIds');
-
-  // If there are any matching names, join them and add to the document's dataValues
-  if (assignedToNames.length > 0) {
-    console.log(assignedToNames,'assignedToNames');
-
-    document.dataValues["assignedToName"] = assignedToNames.join(', ');
-    // console.log(document, 'doc');
-  }
-}
-
-          });
-          return document;
-        }));
-        
-        console.log(myDocuments, 'mydocs');
-        return res.status(200).send(myDocuments);    }
-  }
   } catch (err) {
-    console.log('error',err.message);
-    res.status(500).send({ message: err.message });
+    console.error('Error:', err.message);
+    return res.status(500).send({ message: err.message });
   }
 };
+
 
 
 
@@ -985,36 +1072,105 @@ await Promise.all(
       console.log(approverIds,reviewerIds,'apprevIDS');
 
       await EstablishmentModel.update(
-        { clientStatus:status},
+        { clientStatus:status,clientComment:commnent,status:"Completed"},
         { where: { docName: docName,version:version } }
       );
-      const latestDocuments = await EstablishmentModel.findAll({
-        where: {
-          masterDocumentCode: myrecord.masterDocumentCode,companyId:myrecord.companyId
-        },
-        attributes: [
-          'docName',
-          [Sequelize.fn('MAX', Sequelize.col('clientStatus')), 'clientStatus'],  // Get the latest clientStatus
-          [Sequelize.fn('MAX', Sequelize.col('version')), 'version']  // Get the latest version
-        ],
-        group: ['docName'],
-        order: [[Sequelize.fn('MAX', Sequelize.col('version')), 'DESC']],
-        having: Sequelize.literal(`version = (SELECT MAX(version) FROM \`establishments\` WHERE \`masterDocumentCode\` = '${myrecord.masterDocumentCode}' AND \`docName\` = \`establishments\`.\`docName\`)`)
-      });
+
+      
+      const docs = await DocumentModel.update(
+        { status:"Completed"},
+        { where: { title: docName,version:version } }
+      );
+
+      const latestDocumentOfDB = await DocumentModel.sequelize.query(
+        `SELECT e.*
+         FROM Documents e
+         INNER JOIN (
+           SELECT title, MAX(CAST(version AS DECIMAL)) AS maxVersion 
+           FROM Documents
+           WHERE companyId = :companyId AND masterDocumentId = :masterDocumentId
+           GROUP BY title
+         ) groupedDocs
+         ON e.title = groupedDocs.title AND CAST(e.version AS DECIMAL) = groupedDocs.maxVersion
+         WHERE e.companyId = :companyId AND e.masterDocumentId =:masterDocumentId`,
+        {
+          replacements: { 
+            masterDocumentId:myrecord.masterDocumentCode,
+            companyId: myrecord.companyId 
+          },
+          model: DocumentModel,
+          mapToModel: true
+        }
+      );
+      
+      console.log(latestDocumentOfDB,"latestDocumentOfDB");
       
       // Check if all documents have clientStatus as "Accept"
-      const allAccepted = latestDocuments.every(doc => doc.clientStatus === 'Accept');
+      const allAccepted = latestDocumentOfDB.every(doc => doc.dataValues.status=="Completed");
         console.log('hi',allAccepted);
          
       if (allAccepted) {
-        await MDRModel.update(
-          { status:'Completed'},
-          { where: { mdrCode: myrecord.masterDocumentCode,companyId: myrecord.companyId } }
+        const mdrsUpdate = await MDRModel.update(
+          { status: 'Completed' },
+          { where: { mdrCode: myrecord.masterDocumentCode, companyId: myrecord.companyId } }
         );
+        
+        // Step 2: Fetch all MDRs for the given companyId and mdrCode
+        const allMdrs = await MDRModel.findAll({
+          where: {
+            companyId: myrecord.companyId,
+            mdrCode: myrecord.masterDocumentCode
+          }
+        });
+        console.log(allMdrs,'allMdrs');
+        
+        // Step 3: Check if all MDR statuses are 'Completed'
+        const allCompleted = allMdrs.every(mdr => mdr.status === 'Completed');
+        console.log(allAccepted,'allCompleted');
+        
+        if (allCompleted) {
+          // Step 4: If all are completed, update the ProjectModel to 'Ongoing'
+          await Promise.all(
+            allMdrs.map(async (mdr) => {
+              await ProjectModel.update(
+                { status: 'Completed' },
+                { where: { companyId: myrecord.companyId, id: mdr.projectId } }
+              );
+            })
+          );
+        }
        
           // All latest documents have clientStatus as "Accept"
       } else {
-        console.log('falseeeee');  // Not all documents have clientStatus as "Accept"
+       // Step 1: Update the MDRModel where mdrCode and companyId match
+      const mdrsUpdate = await MDRModel.update(
+        { status: 'Ongoing' },
+        { where: { mdrCode: myrecord.masterDocumentCode, companyId: myrecord.companyId } }
+      );
+
+      // Step 2: Fetch all MDRs for the given companyId and mdrCode
+      const allMdrs = await MDRModel.findAll({
+        where: {
+          companyId: myrecord.companyId,
+          mdrCode: myrecord.masterDocumentCode
+        }
+      });
+
+      // Step 3: Check if all MDR statuses are 'Completed'
+      const allCompleted = allMdrs.every(mdr => mdr.status === 'Completed');
+
+      if (allCompleted) {
+        // Step 4: If all are completed, update the ProjectModel to 'Ongoing'
+        await Promise.all(
+          allMdrs.map(async (mdr) => {
+            await ProjectModel.update(
+              { status: 'Ongoing' },
+              { where: { companyId: myrecord.companyId, id: mdr.projectId } }
+            );
+          })
+        );
+      }
+
       }
 
 await Promise.all(
@@ -1202,13 +1358,15 @@ module.exports.listEstablishment = async (req, res) => {
 
 module.exports.Accept = async (req, res) => {
   try {
-    const {docName,appStatusArr,revStatusArr,app,rev,companyId} = req.body
+    const {docName,appStatusArr,revStatusArr,app,rev,companyId,reviewerComment,approverComment} = req.body
     console.log(appStatusArr,revStatusArr,'status');
     const versionIn= req.query.version;
     const appIds  = app.split(",")
     const revIds = rev.split(",")
     const appArray=appStatusArr.split(',');
     const revArray=revStatusArr.split(',');
+    const revComment = reviewerComment.split(",")
+    const appComment = approverComment.split(",")
 
 const document = await DocumentModel.findOne({where:{ title: docName }});
 let version = document ? document.version : null;
@@ -1247,7 +1405,7 @@ const updateDocStatus = await DocumentModel.update({status,version}, {
     }
 
     await EstablishmentModel.update(
-      { approverStatus:appStatusArr,reviewerStatus:revStatusArr,status},
+      { approverStatus:appStatusArr,reviewerStatus:revStatusArr,status,reviewerComment,approverComment},
       { where: { docName , version:versionIn } }
     );
 
@@ -1394,7 +1552,7 @@ const updateDocStatus = await DocumentModel.update({status,version:updatedVersio
     
     // Update document with new status values
     await EstablishmentModel.update(
-      { reviewerStatus:revStatusArr,approverStatus:appStatusArr, approverComment, reviewerComment ,status},
+      { reviewerStatus:revStatusArr,approverStatus:appStatusArr, approverComment, reviewerComment ,status,},
       { where: { docName,version} }
     );
 const reviewerIds = reviewerId.split(",");

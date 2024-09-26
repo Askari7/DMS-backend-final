@@ -33,10 +33,10 @@ module.exports = {
       level: "public",
     },
   },
-  "progress": {
-    get: {
-      action: [validateToken, progress],
-      level: "public",
-    },
-  },
+  // "progress": {
+  //   get: {
+  //     action: [validateToken, progress],
+  //     level: "public",
+  //   },
+  // },
 };
