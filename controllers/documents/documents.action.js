@@ -855,11 +855,15 @@ module.exports.checkDoc = async (req, res) => {
     
     const fetchProject = await EstablishmentModel.findOne({where:{docName,version,companyId,masterDocumentCode}})
     console.log(fetchProject,'fetchProjectfetchProject');
-    
+    const fetchDocument = await DocumentModel.findOne({where:{title:docName,companyId,masterDocumentId:masterDocumentCode,status:"Uploaded",version}})
+
     if (fetchProject.status == "Approved(in-house)"&&req.query.roleId==6) {
       return res.status(200).send({status:true});
     }
-    return res.status(200).send({ status: true });
+    if (fetchDocument) {
+      return res.status(200).send({status:true});
+    }
+    return res.status(200).send({ status: false });
   } catch (err) {
     console.log(err.message);
     res.status(500).send({ message: err.message });

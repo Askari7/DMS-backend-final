@@ -8,6 +8,7 @@ const ProjectModel = db.projects;
 const CompanyModal = db.company;
 const UserModel = db.users;
 const EstablishmentModel = db.establishments;
+const SystemLogModel = db.system_logs;
 
 const bcrypt = require("bcryptjs")
 const config = require("../../config/auth.config");
@@ -87,20 +88,43 @@ module.exports.sendEmailClient = async (req, res) => {
       }
     );
     body.password = Client.password
-console.log(record,'record aya ');    
-    const change = await EstablishmentModel.update(
-      { sendToClient: true },
-      {
-        where: {
-          docName: docName,
-          version: version
-        }
-      }
-    );
 
-    console.log('api hit bodu',body);
-    await sendClientEmail(body);
-      return res.status(200).send({ message: "Email sent to client" });
+    const check = await EstablishmentModel.findOne({
+      where: {
+        docName: docName,
+        version: version
+      }
+    })
+
+    console.log(check.status,'statuss');
+    
+
+    if (check.status == "Approved(in-house)") {
+      const change = await EstablishmentModel.update(
+        { sendToClient: true },
+        {
+          where: {
+            docName: docName,
+            version: version
+          }
+        }
+      );
+  
+  
+      await sendClientEmail(body);
+      await SystemLogModel.create({
+        companyId: change.companyId,
+        typeOfLog: 25,
+        title: `Document ${docName} version ${version} is available to view`,
+        userId: Client.id,
+      });
+        return res.status(200).send({ message: "Email sent to client" });
+    }
+    else{
+      console.log("Complete All Review and Approve procedure for Inhouse Assessment");
+      
+      return res.status(200).send({ message: "Complete All Review and Approve procedure for Inhouse Assessment" });
+    }
       
   } catch (err) {
     console.log(err.message);

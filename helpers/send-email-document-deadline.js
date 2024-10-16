@@ -107,7 +107,7 @@ const { documentDeadline } = require("../lang/document-deadline");
 const { clientDeadline } = require('../lang/client-deadline');
 
 
-cron.schedule('* * * * *', async () => { // Runs every day at 23:59
+cron.schedule('* * 13 * *', async () => { // Runs every day at 23:59
   console.log('Checking deadlines...');
 
   try {
