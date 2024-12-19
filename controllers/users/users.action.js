@@ -87,20 +87,20 @@ module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
     const { roleId, department, companyId, email } = req.body;
     
     // Check if the roleId is 2 and update the existing user's role to 3
-    if (roleId === "2") {
-      const [updatedCount, updatedUser] = await UserModel.update(
-        { roleId: "3",reported_to:`${req.body.firstName} ${req.body.lastName}`}, 
-        { 
-          where: { roleId, department, companyId },
-          returning: true 
-        }
-      );
+    // if (roleId === "2") {
+    //   const [updatedCount, updatedUser] = await UserModel.update(
+    //     { roleId: "3",reported_to:`${req.body.firstName} ${req.body.lastName}`}, 
+    //     { 
+    //       where: { roleId, department, companyId },
+    //       returning: true 
+    //     }
+    //   );
 
-      if (updatedCount > 0) {
-        res.send({ message: "Lead has been changed!" });
-        return;
-      }
-    }
+    //   if (updatedCount > 0) {
+    //     res.send({ message: "Lead has been changed!" });
+    //     return;
+    //   }
+    // }
 
     // Check for duplicate email
     const existingUser = await UserModel.findOne({

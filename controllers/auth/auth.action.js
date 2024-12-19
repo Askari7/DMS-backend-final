@@ -10,45 +10,37 @@ const CompanyModel = db.company;
 
 //middlewares
 
-module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
-  console.log("YAHA AYA");
-  console.log(req.body,'BODY');
-if(req.body.name){
-  CompanyModel.findOne({
-    where: {
-      name: req.body.name,
-      // companyId:req.body.companyId
-    },
-  }).then((company) => {
-    if (company) {
-      res.status(409).send({
-        message: "Failed! Company Already Exists!",
-      });
-      return;
-    }
-    next();
 
-  });
-  UserModel.findOne({
-    where: {
-      email: req.body.email,
-      // companyId:req.body.companyId
-    },
-  }).then((user) => {
-    if (user) {
-      res.status(409).send({
-        message: "Failed! Email Already Exists!",
-      });
-      return;
-    }
-    next();
-  });
-}
 
 
   
  
+module.exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
+  try {
+  
+      const companyExists = await CompanyModel.findOne({
+        where: { name: req.body.name },
+      });
+      if (companyExists) {
+        return res.status(409).send({ message: "Failed! Company Already Exists!" });
+      }
+  
+
+    
+      const emailExists = await UserModel.findOne({
+        where: { email: req.body.email },
+      });
+      if (emailExists) {
+        return res.status(409).send({ message: "Failed! Email Already Exists!" });
+      
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
 };
+
 
 //Signup Login
 
