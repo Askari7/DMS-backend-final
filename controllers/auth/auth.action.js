@@ -27,11 +27,8 @@ if(req.body.name){
       return;
     }
     next();
+
   });
-}
-else{
-  console.log("come here");
-  
   UserModel.findOne({
     where: {
       email: req.body.email,
@@ -48,6 +45,8 @@ else{
   });
 }
 
+
+  
  
 };
 
